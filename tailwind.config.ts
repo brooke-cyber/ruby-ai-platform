@@ -5,6 +5,10 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        navy: "#0f172a",
+        "navy-light": "#1e293b",
+        accent: "#2563eb",
+        "accent-light": "#3b82f6",
         ruby: {
           50: "#fdf2f2",
           100: "#fce4e4",

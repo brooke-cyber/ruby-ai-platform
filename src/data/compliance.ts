@@ -44,6 +44,19 @@ export const MODULES: ComplianceModule[] = [
   { id: "data-residency", name: "Data Residency Requirements", shortName: "Residency", category: "commercial", description: "Cross-border data transfer and storage requirements", alwaysOn: false },
   { id: "casl", name: "CASL Anti-Spam Compliance", shortName: "CASL", category: "commercial", description: "Canada Anti-Spam Legislation electronic messaging", alwaysOn: false },
   { id: "sla-liability", name: "SLA Liability Framework", shortName: "SLA Liab", category: "commercial", description: "Service credit, liability cap, and force majeure framework", alwaysOn: false },
+  // ── PLATFORM (3) ──
+  { id: "quebec-law25", name: "Quebec Law 25 (Privacy)", shortName: "Law 25", category: "platform", description: "Quebec Act respecting the protection of personal information in the private sector — consent, transparency, and privacy officer requirements", alwaysOn: false },
+  { id: "platform-pipeda", name: "PIPEDA Platform Compliance", shortName: "PIPEDA Plat", category: "platform", description: "Federal privacy legislation applied to platform data collection and user accounts", alwaysOn: false },
+  { id: "platform-casl", name: "CASL Platform Messaging", shortName: "CASL Plat", category: "platform", description: "Canada Anti-Spam Legislation for platform-originated electronic messages", alwaysOn: false },
+  { id: "platform-data-residency", name: "Platform Data Residency", shortName: "Plat Resid", category: "platform", description: "Cross-border data transfer and storage requirements for platform user data", alwaysOn: false },
+
+  // ── CREATOR (6) ──
+  { id: "competition-act-s52", name: "Competition Act s.52 — Misleading Advertising", shortName: "Competition Act", category: "creator", description: "Mandatory influencer disclosure and material connection requirements", alwaysOn: true },
+  { id: "asc-disclosure", name: "Ad Standards Canada — Testimonials", shortName: "ASC", category: "creator", description: "Ad Standards Canada disclosure standards for testimonials and endorsements", alwaysOn: true },
+  { id: "copyright-moral-rights", name: "Copyright Act s.14.1 — Moral Rights", shortName: "Moral Rights", category: "creator", description: "Content creator moral rights waiver requirements", alwaysOn: true },
+  { id: "ftc-cross-border", name: "FTC Endorsement Guides (Cross-Border)", shortName: "FTC", category: "creator", description: "US audience triggers FTC 16 CFR 255 compliance", alwaysOn: false },
+  { id: "agco-igaming", name: "AGCO iGaming Standards", shortName: "AGCO", category: "creator", description: "Ontario alcohol and gaming advertising restrictions for influencer content", alwaysOn: false },
+  { id: "pipeda-casl-creator", name: "PIPEDA & CASL — Creator Data Collection", shortName: "PIPEDA/CASL", category: "creator", description: "Privacy and anti-spam compliance for data collection via influencer campaigns", alwaysOn: false },
 ];
 
 export interface Jurisdiction {
@@ -92,6 +105,16 @@ export const TRIGGER_QUESTIONS: TriggerQuestion[] = [
   { id: "tq-personal-info", question: "Will personal information be collected or processed?", description: "PIPEDA commercial compliance and data residency", categories: ["commercial"], activatesModules: ["pipeda-commercial", "data-residency"] },
   { id: "tq-electronic-messaging", question: "Will the service involve electronic messaging to users?", description: "CASL anti-spam legislation compliance", categories: ["commercial"], activatesModules: ["casl"] },
   { id: "tq-cloud-saas", question: "Is this a cloud/SaaS service?", description: "SLA liability framework and data residency requirements", categories: ["commercial"], activatesModules: ["sla-liability", "data-residency"] },
+  // ── PLATFORM ──
+  { id: "tq-platform-personal-info", question: "Does the platform collect personal information?", description: "Triggers PIPEDA and data residency compliance for platform user data", categories: ["platform"], activatesModules: ["platform-pipeda", "platform-data-residency"] },
+  { id: "tq-platform-quebec", question: "Does the platform operate in Quebec?", description: "Triggers Quebec Law 25 privacy requirements including consent and privacy officer obligations", categories: ["platform"], activatesModules: ["quebec-law25"] },
+  { id: "tq-platform-accounts", question: "Will users create accounts with stored credentials?", description: "User account data collection triggers PIPEDA compliance", categories: ["platform"], activatesModules: ["platform-pipeda"] },
+  { id: "tq-platform-payments", question: "Does the platform accept payments or handle financial data?", description: "Financial data handling triggers PIPEDA commercial compliance", categories: ["platform"], activatesModules: ["platform-pipeda"] },
+  { id: "tq-platform-cem", question: "Does the platform send commercial electronic messages (emails, push notifications)?", description: "Commercial electronic messages trigger CASL compliance", categories: ["platform"], activatesModules: ["platform-casl"] },
+  // ── CREATOR ──
+  { id: "tq-us-audience", question: "Does the influencer have a US audience (>5%)?", description: "Triggers FTC Endorsement Guide compliance on top of Canadian law", categories: ["creator"], activatesModules: ["ftc-cross-border"] },
+  { id: "tq-regulated-industry", question: "Is this a regulated industry (alcohol, iGaming, cannabis, health)?", description: "Triggers AGCO or industry-specific advertising restrictions", categories: ["creator"], activatesModules: ["agco-igaming"] },
+  { id: "tq-creator-data", question: "Will the campaign collect personal data (contests, email lists)?", description: "Triggers PIPEDA/CASL compliance for influencer campaigns", categories: ["creator"], activatesModules: ["pipeda-casl-creator"] },
 ];
 
 export function getModulesForCategories(categories: Category[]): ComplianceModule[] {

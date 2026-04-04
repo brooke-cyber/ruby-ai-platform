@@ -43,7 +43,7 @@ export default function FAQPage() {
         {
           question: 'How long does it take to get my document?',
           answer:
-            'Self-serve documents are generated in under 60 seconds. Counsel-tier documents — which include a plain-language memo, redline markup, specific legal advice, and a formal sign-off from a licensed Canadian lawyer — are typically delivered within 1-4 hours depending on complexity.',
+            'Self-serve documents are generated in minutes. Counsel-tier documents — which include a plain-language memo, redline markup, specific legal advice, and a formal sign-off from a licensed Canadian lawyer — are typically delivered within 1-4 hours depending on complexity.',
         },
         {
           question: 'What documents can you generate?',
@@ -51,9 +51,9 @@ export default function FAQPage() {
             'We cover six categories: Hiring & Team (7 types — standard, executive, fixed-term, contractor, non-compete, IP assignment, offer letters), Equity & Governance (8 types — five shareholder agreement structures, articles of incorporation and amendment, partnership), Raising Capital (5 types — SAFE, convertible note, bilateral loan, demand note, revolving credit), Software & Services (3 types — SaaS, managed services, and enterprise SLAs), Platform & Business (3 types — terms & conditions, privacy policy, MSA), and Creator & Influencer (1 type — influencer/brand partnership). 27 agreement types in total.',
         },
         {
-          question: 'What if I need revisions?',
+          question: 'What if I need changes after delivery?',
           answer:
-            'One round of revisions is included in every counsel-tier document. For $100 per agreement, you can add unlimited revisions for 30 days — your lawyer revises until you\u2019re satisfied. Self-serve documents can be re-generated with updated parameters at no additional cost.',
+            'Expert Draft documents can be re-generated with updated parameters at no additional cost. For counsel-tier documents, your lawyer provides specific guidance on any changes needed. You can also use our Customization Wizard to make modifications at any time.',
         },
         {
           question: 'What is the Customization Wizard?',
@@ -63,7 +63,7 @@ export default function FAQPage() {
         {
           question: 'Can I customize my contract after purchase?',
           answer:
-            'Yes. Every base contract includes a \u2018Customize This Contract\u2019 option. You can modify, add, or remove clauses through an AI conversation. All revisions happen before payment — you shape the modification interactively, then pay to unlock the final text.',
+            'Yes. Every base contract includes a \u2018Customize This Contract\u2019 option. You can modify, add, or remove clauses through an AI conversation. You shape the modification interactively, then pay to unlock the final text.',
         },
       ],
     },

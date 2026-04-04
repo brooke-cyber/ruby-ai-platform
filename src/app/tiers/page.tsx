@@ -59,8 +59,7 @@ export default function TiersPage() {
     "Redline markup flagging anything that needs attention",
     "Specific legal advice on enforceability and risk",
     "Formal sign-off to use — or clear guidance on what to change",
-    "One round of revisions included",
-    "Add unlimited revisions for 30 days ($100/agreement)",
+    "Formal approval or clear guidance on what to change",
   ];
 
   return (
@@ -169,25 +168,6 @@ export default function TiersPage() {
           </div>
         </div>
 
-        {/* Unlimited Revisions Add-on */}
-        <div className="mt-12 border border-neutral-200 p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <span className="inline-block bg-[#be123c]/10 text-[#be123c] text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1">
-                Add-on
-              </span>
-              <h3 className="text-lg font-semibold text-neutral-900">Unlimited Revisions</h3>
-            </div>
-            <p className="text-[14px] text-neutral-500 leading-relaxed max-w-lg">
-              Add unlimited revision rounds for 30 days after delivery. Your lawyer will revise until you&apos;re satisfied — no cap on rounds.
-            </p>
-          </div>
-          <div className="text-right shrink-0">
-            <span className="font-serif text-3xl text-neutral-900">$100</span>
-            <span className="text-[13px] text-neutral-400 ml-1">CAD</span>
-            <p className="text-[12px] text-neutral-400 mt-1">per agreement</p>
-          </div>
-        </div>
 
         {/* Customization note */}
         <div className="mt-16 max-w-lg mx-auto text-center">

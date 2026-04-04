@@ -63,7 +63,7 @@ export default function PricingPage() {
     },
     {
       question: 'What does Lawyer Review add?',
-      answer: 'A licensed Canadian lawyer personally reviews your agreement. You get a plain-language memo, redline markup, enforceability advice, and a formal sign-off. One round of revisions is included.',
+      answer: 'A licensed Canadian lawyer personally reviews your agreement. You get a plain-language memo, redline markup, enforceability advice, and a formal sign-off.',
     },
     {
       question: 'Can I customize my contract after purchase?',
@@ -71,11 +71,11 @@ export default function PricingPage() {
     },
     {
       question: 'Do bundles include lawyer review?',
-      answer: 'Yes. Every bundle includes counsel-level review with a formal approval for every document, plus one round of revisions per agreement.',
+      answer: 'Yes. Every bundle includes counsel-level review with a formal approval for every document.',
     },
     {
       question: 'How long does delivery take?',
-      answer: 'Expert Draft documents are generated in under 60 seconds. Lawyer Review is delivered within 3-5 business days, or 24 hours with Priority Review.',
+      answer: 'Expert Draft documents are generated in minutes. Lawyer Review is delivered within 3-5 business days, or 24 hours with Priority Review.',
     },
   ];
 
@@ -155,7 +155,7 @@ export default function PricingPage() {
                   'Lawyer-engineered clause library',
                   'Canadian compliance built in',
                   'Three-position risk allocation',
-                  'Downloadable in under 60 seconds',
+                  'Downloadable in minutes',
                   'Customization engine available',
                 ].map((item) => (
                   <div key={item} className="flex items-start gap-2.5">
@@ -188,7 +188,7 @@ export default function PricingPage() {
                   'Redline markup & annotations',
                   'Plain-language legal memo',
                   'Formal sign-off or advice to change',
-                  'One round of revisions included',
+                  'Formal approval or advice on what to change',
                 ].map((item) => (
                   <div key={item} className="flex items-start gap-2.5">
                     <svg className="h-4 w-4 text-[#be123c] mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -457,7 +457,7 @@ export default function PricingPage() {
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-gray-900 mb-3">Ready to start?</h2>
           <p className="text-lg text-gray-500 mb-8 leading-relaxed">
-            Pick your agreement, answer a few questions, and get a production-ready document in under 60 seconds.
+            Pick your agreement, answer a few questions, and get a production-ready document in minutes.
           </p>
           <Link href="/documents" className="btn-primary !px-8 !py-4 !text-base inline-flex items-center gap-2">
             Browse Agreements

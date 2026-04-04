@@ -43,9 +43,9 @@ const config: Config = {
         },
       },
       fontFamily: {
-        display: ['"Cormorant Garamond"', "Georgia", "serif"],
+        display: ["var(--font-heading)", '"DM Sans"', "Inter", "system-ui", "sans-serif"],
         sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
-        serif: ["Georgia", "Cambria", "serif"],
+        serif: ["var(--font-heading)", '"DM Sans"', "Inter", "system-ui", "sans-serif"],
       },
       fontSize: {
         "display-xl": ["4.5rem", { lineHeight: "1.05", letterSpacing: "-0.03em" }],

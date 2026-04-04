@@ -169,7 +169,7 @@ export default function AboutPage() {
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-gray-900 mb-4">Your legal shouldn&apos;t hold you back.</h2>
           <p className="text-lg text-gray-500 mb-8 leading-relaxed">
-            Generate your first agreement in under 60 seconds. See why founders are switching from traditional firms.
+            Generate your first agreement in minutes. See why founders are switching from traditional firms.
           </p>
           <Link href="/documents" className="btn-primary !px-8 !py-4 !text-base inline-flex items-center gap-2">
             Start Building

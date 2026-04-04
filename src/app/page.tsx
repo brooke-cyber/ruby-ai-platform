@@ -349,18 +349,23 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
             {/* Left — Copy */}
             <div>
+              <div className="inline-flex items-center gap-2 bg-[#be123c]/[0.06] border border-[#be123c]/10 rounded-full px-3.5 py-1.5 mb-7">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#be123c] animate-pulse shrink-0" />
+                <span className="text-[11px] sm:text-[12px] font-semibold uppercase tracking-[0.12em] sm:tracking-[0.15em] text-[#be123c] whitespace-nowrap">Canada&rsquo;s First AI-Native Law Firm</span>
+              </div>
+
               <h1 className="font-serif text-[2.75rem] md:text-[3.5rem] lg:text-[4rem] leading-[1.06] tracking-tight text-neutral-900">
-                Legal agreements,{' '}
-                <span className="text-[#be123c]">engineered.</span>
+                Your lawyer is{' '}
+                <span className="text-[#be123c]">already here.</span>
               </h1>
 
               <p className="text-[17px] text-neutral-500 leading-[1.7] mt-7 max-w-md">
-                Employment contracts, shareholder agreements, service agreements, influencer deals, and more — drafted in under 60 seconds, reviewed by a licensed Canadian lawyer. The same quality as a top firm. A fraction of the cost.
+                Ruby Law is a licensed Canadian law firm that drafts production-ready legal agreements in minutes, not weeks. Choose your agreement, answer guided questions, and download a contract built to the same standard as Canada&rsquo;s top firms &mdash; at a fraction of the cost.
               </p>
 
               <div className="flex flex-wrap gap-4 mt-10">
                 <Link href="/documents" className="inline-flex items-center gap-2.5 bg-[#be123c] hover:bg-[#9f1239] text-white text-[15px] font-medium tracking-wide px-8 py-3.5 transition-colors">
-                  Start Drafting
+                  Draft Your Agreement
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </Link>
                 <Link href="/pricing" className="inline-flex items-center gap-2 border border-neutral-200 hover:border-neutral-300 text-neutral-600 text-[15px] font-medium tracking-wide px-8 py-3.5 transition-colors">
@@ -368,10 +373,19 @@ export default function Home() {
                 </Link>
               </div>
 
-              <div className="flex items-center gap-6 mt-10 text-[13px] text-neutral-400 uppercase tracking-wide">
-                <span>Canada&rsquo;s first AI-native law firm</span>
-                <span className="text-neutral-200">|</span>
-                <span>Licensed Canadian Practice</span>
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-10">
+                <div className="flex items-center gap-2 text-[13px] text-neutral-500">
+                  <svg className="h-3.5 w-3.5 text-[#be123c]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  Licensed &amp; regulated
+                </div>
+                <div className="flex items-center gap-2 text-[13px] text-neutral-500">
+                  <svg className="h-3.5 w-3.5 text-[#be123c]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  27 agreement types
+                </div>
+                <div className="flex items-center gap-2 text-[13px] text-neutral-500">
+                  <svg className="h-3.5 w-3.5 text-[#be123c]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  Optional lawyer review
+                </div>
               </div>
             </div>
 
@@ -393,14 +407,14 @@ export default function Home() {
               You&rsquo;re paying $850/hr for a<br className="hidden md:block" /> copy-paste job.
             </h2>
             <p className="text-[16px] text-neutral-500 leading-[1.7] max-w-xl mx-auto mb-20">
-              Top firms bill 8–15 hours for a first draft — $6,800–$12,750 for a shareholder agreement built from the same precedent they used last time. You&rsquo;re not paying for their expertise. You&rsquo;re paying for their inefficiency.
+              Top firms bill 8&ndash;15 hours for a first draft &mdash; $6,800&ndash;$12,750 for a shareholder agreement built from the same precedent they used last time. We built the system that does it in under a minute, with the same legal rigor, for a fixed price you know before you start.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 max-w-2xl mx-auto">
               {[
                 { value: '$850', sub: 'Average hourly rate', sub2: 'Top tier law firm' },
                 { value: '8–15 hrs', sub: 'Typical drafting time', sub2: 'for a single agreement' },
-                { value: '< 60s', sub: 'Our drafting time', sub2: 'same compliance standard', accent: true },
+                { value: 'Minutes', sub: 'Not weeks', sub2: 'same compliance standard', accent: true },
               ].map((s) => (
                 <div key={s.value} className="text-center">
                   <div className={`font-serif text-3xl md:text-4xl mb-2 ${s.accent ? 'text-[#be123c]' : 'text-neutral-900'}`}>{s.value}</div>
@@ -417,9 +431,12 @@ export default function Home() {
         <div className="max-w-5xl mx-auto">
           <FadeIn>
             <p className="text-[13px] font-medium uppercase tracking-[0.25em] text-[#be123c] mb-5">How It Works</p>
-            <h2 className="font-serif text-3xl md:text-[2.75rem] leading-[1.12] tracking-tight text-neutral-900 mb-20">
-              Four steps to a production-ready agreement.
+            <h2 className="font-serif text-3xl md:text-[2.75rem] leading-[1.12] tracking-tight text-neutral-900 mb-6">
+              Four steps. Minutes, not weeks.
             </h2>
+            <p className="text-[16px] text-neutral-500 leading-[1.7] max-w-xl mb-20">
+              No intake calls. No retainers. No waiting weeks. Pick your agreement, answer the questions, and download a production-ready contract.
+            </p>
           </FadeIn>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
@@ -437,7 +454,7 @@ export default function Home() {
               {
                 num: '03',
                 title: 'Get your base contract',
-                desc: 'AI generates your agreement in under 60 seconds. Download it immediately or add counsel review. Every permutation is pre-certified by a lawyer.',
+                desc: 'AI generates your agreement in minutes. Download it immediately or add counsel review. Every permutation is pre-certified by a lawyer.',
               },
               {
                 num: '04',
@@ -478,7 +495,7 @@ export default function Home() {
                     'Deterministic wizard — same inputs, same output, every time',
                     'Every permutation pre-certified by a licensed lawyer',
                     'Zero ongoing lawyer cost for base agreements',
-                    'Instant delivery in under 60 seconds',
+                    'Instant delivery in minutes, not weeks',
                   ].map((item) => (
                     <li key={item} className="text-[14px] text-neutral-500 leading-[1.75] flex items-start gap-3">
                       <svg className="h-4 w-4 text-[#be123c] shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
@@ -518,10 +535,10 @@ export default function Home() {
             <FadeIn>
               <p className="text-[13px] font-medium uppercase tracking-[0.25em] text-[#be123c] mb-5">Why Founders Trust Us</p>
               <h2 className="font-serif text-3xl md:text-[2.75rem] leading-[1.12] tracking-tight text-neutral-900 mb-6">
-                This isn&rsquo;t a template.<br className="hidden md:block" /> It&rsquo;s a real law firm.
+                Not a template generator.<br className="hidden md:block" /> A real law firm.
               </h2>
               <p className="text-[16px] text-neutral-500 leading-[1.75]">
-                We&rsquo;re Canada&rsquo;s first AI-native law firm — licensed, regulated, and built for founders. Every agreement is drafted using the same legal methodology as top-tier Canadian firms. The difference is we do it in minutes, not weeks.
+                Ruby Law is licensed and regulated in Canada. Every agreement is drafted from our proprietary clause library &mdash; the same legal methodology as top-tier firms, with AI that enforces compliance automatically. You get the quality of a $50,000 retainer without the retainer.
               </p>
             </FadeIn>
 
@@ -533,7 +550,7 @@ export default function Home() {
                   { title: 'Canadian compliance, handled automatically', desc: 'Securities exemptions, employment standards, corporate governance, privacy law — our system detects which rules apply to your deal and builds them in. You don\u2019t have to ask.' },
                 ].map((item) => (
                   <div key={item.title} className="border-l-2 border-neutral-100 pl-6 hover:border-[#be123c]/40 transition-colors duration-300">
-                    <h3 style={{ fontFamily: 'Inter, system-ui, sans-serif' }} className="text-[14px] font-semibold text-neutral-900 mb-1.5">{item.title}</h3>
+                    <h3 className="text-[14px] font-semibold text-neutral-900 mb-1.5">{item.title}</h3>
                     <p className="text-[15px] text-neutral-500 leading-[1.75]">{item.desc}</p>
                   </div>
                 ))}
@@ -569,7 +586,7 @@ export default function Home() {
                   <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-neutral-50 mb-4">
                     {item.icon}
                   </div>
-                  <h3 style={{ fontFamily: 'Inter, system-ui, sans-serif' }} className="text-[14px] font-semibold text-neutral-900 mb-2">{item.title}</h3>
+                  <h3 className="text-[14px] font-semibold text-neutral-900 mb-2">{item.title}</h3>
                   <p className="text-[15px] text-neutral-500 leading-[1.7]">{item.desc}</p>
                 </div>
               ))}
@@ -628,7 +645,7 @@ export default function Home() {
           <div className="max-w-3xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
               {[
-                { stat: '< 60s', label: 'Draft generation', href: '/documents' },
+                { stat: 'Minutes', label: 'Not weeks', href: '/documents' },
                 { stat: '27', label: 'Agreement types', href: '/documents' },
                 { stat: '100%', label: 'Canadian compliant', href: '/about' },
                 { stat: 'From $49', label: 'Per customization', href: '/pricing' },
@@ -648,16 +665,16 @@ export default function Home() {
         <FadeIn>
           <div className="max-w-xl mx-auto text-center">
             <h2 className="font-serif text-3xl md:text-[2.75rem] text-neutral-900 tracking-tight leading-[1.1] mb-6">
-              Every week you wait costs you<br />more than this entire platform.
+              Stop waiting weeks.<br />Start drafting now.
             </h2>
             <p className="text-[16px] text-neutral-500 mb-10 leading-[1.7]">
-              Same legal rigor. Same enforceability.<br className="hidden md:block" /> A fraction of the cost and time.
+              27 agreement types. Six practice areas. Instant delivery.<br className="hidden md:block" /> Add a licensed Canadian lawyer review for any agreement.
             </p>
-            <Link href="/documents" className="inline-flex items-center gap-2.5 bg-[#be123c] hover:bg-[#9f1239] text-white text-[14px] font-medium tracking-wide px-10 py-4 transition-colors">
+            <Link href="/documents" className="inline-flex items-center gap-2.5 bg-[#be123c] hover:bg-[#9f1239] text-white text-[15px] font-medium tracking-wide px-10 py-4 transition-colors">
               Draft Your First Agreement
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </Link>
-            <p className="text-[13px] text-neutral-400 mt-6 tracking-wide uppercase">Canada&rsquo;s first AI-native law firm · Licensed Canadian practice · No retainer</p>
+            <p className="text-[13px] text-neutral-400 mt-6 tracking-wide uppercase">Canada&rsquo;s first AI-native law firm · Licensed &amp; regulated · No retainer required</p>
           </div>
         </FadeIn>
       </section>

@@ -5,8 +5,9 @@ import Link from 'next/link'
 const navLinks = [
   { href: '/documents', label: 'Agreements' },
   { href: '/pricing', label: 'Pricing' },
-  { href: '/portal', label: 'Client Portal' },
+  { href: '/about', label: 'About' },
   { href: '/faq', label: 'FAQ' },
+  { href: '/portal', label: 'Client Portal' },
 ]
 
 export default function Nav() {
@@ -38,12 +39,12 @@ export default function Nav() {
           </Link>
 
           {/* Desktop Links */}
-          <div className="hidden md:flex items-center gap-9">
+          <div className="hidden md:flex items-center gap-6 lg:gap-7">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-[15px] uppercase tracking-[0.08em] text-neutral-500 hover:text-[#be123c] transition-colors duration-200 font-medium"
+                className="text-[13px] lg:text-[14px] uppercase tracking-[0.08em] text-neutral-500 hover:text-[#be123c] transition-colors duration-200 font-medium"
               >
                 {link.label}
               </Link>

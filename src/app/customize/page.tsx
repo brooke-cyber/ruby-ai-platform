@@ -251,17 +251,11 @@ export default function CustomizePage() {
 
   // ─── Handlers ───
   function handleCategorySelect(cat: ModificationCategory) {
-    setSelectedCategory(cat);
-    // Wizard redirect check (per spec §4.4)
-    if (cat.id !== "custom-schedule" && cat.id !== "something-else") {
-      // Check if this might be a standard wizard option
-      const hasClauseIds = cat.clauseIds && cat.clauseIds.length > 0;
-      if (hasClauseIds) {
-        setShowRedirect(true);
-        setCurrentStep(2);
-        return;
-      }
-    }
+    setSelectedCategory(selectedCategory?.id === cat.id ? null : cat);
+  }
+
+  function handleCategoryNext() {
+    if (!selectedCategory) return;
     setShowRedirect(false);
     setCurrentStep(2);
   }
@@ -592,21 +586,38 @@ export default function CustomizePage() {
 
             {/* Category grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {categories.map((cat) => (
-                <button key={cat.id} type="button" onClick={() => handleCategorySelect(cat)} className="text-left bg-white border border-neutral-200 rounded-xl p-5 sm:p-6 hover:border-[#be123c]/30 hover:shadow-sm transition-all duration-200 group">
-                  <h3 className="text-sm font-semibold text-neutral-900 group-hover:text-[#be123c] transition-colors mb-1.5">{cat.name}</h3>
-                  <p className="text-[14px] text-neutral-500 leading-relaxed mb-3">{cat.description}</p>
-                  <p className="text-[13px] text-neutral-400 leading-relaxed border-t border-neutral-100 pt-3">
-                    <span className="font-medium text-neutral-500">e.g.</span> {cat.example}
-                  </p>
-                </button>
-              ))}
+              {categories.map((cat) => {
+                const isSelected = selectedCategory?.id === cat.id;
+                return (
+                  <button key={cat.id} type="button" onClick={() => handleCategorySelect(cat)} className={`text-left bg-white rounded-xl p-5 sm:p-6 transition-all duration-200 group ${isSelected ? "border-2 border-[#be123c] shadow-sm bg-[rgba(190,18,60,0.02)]" : "border border-neutral-200 hover:border-[#be123c]/30 hover:shadow-sm"}`}>
+                    <div className="flex items-start justify-between">
+                      <h3 className={`text-sm font-semibold transition-colors mb-1.5 ${isSelected ? "text-[#be123c]" : "text-neutral-900 group-hover:text-[#be123c]"}`}>{cat.name}</h3>
+                      {isSelected && (
+                        <div className="flex items-center justify-center w-5 h-5 rounded-full bg-[#be123c] shrink-0 mt-0.5">
+                          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-[14px] text-neutral-500 leading-relaxed mb-3">{cat.description}</p>
+                    <p className="text-[13px] text-neutral-400 leading-relaxed border-t border-neutral-100 pt-3">
+                      <span className="font-medium text-neutral-500">e.g.</span> {cat.example}
+                    </p>
+                  </button>
+                );
+              })}
             </div>
 
-            <button onClick={() => setCurrentStep(0)} className="text-[15px] text-neutral-500 hover:text-neutral-700 transition-colors flex items-center gap-1">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-              Back to contract
-            </button>
+            {/* Navigation */}
+            <div className="flex flex-col-reverse sm:flex-row justify-between gap-3">
+              <button onClick={() => setCurrentStep(0)} className="inline-flex items-center justify-center gap-2 border border-neutral-200 rounded-xl px-5 py-3 text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                Back to contract
+              </button>
+              <button onClick={handleCategoryNext} disabled={!selectedCategory} className="inline-flex items-center justify-center gap-2 bg-[#be123c] text-white rounded-xl px-6 py-3 text-sm font-semibold hover:bg-[#9f1239] transition-colors disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]">
+                Continue
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              </button>
+            </div>
           </div>
         )}
 
@@ -618,17 +629,7 @@ export default function CustomizePage() {
               <p className="text-[15px] sm:text-[14px] text-neutral-500 leading-relaxed">Tell us what you&apos;d like to change. The more specific you are, the better our legal drafting engine can tailor your modification.</p>
             </div>
 
-            {/* Wizard Redirect (per spec §4.4) */}
-            {showRedirect && (
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                <p className="text-[15px] text-blue-800 font-medium mb-1">This might already be available</p>
-                <p className="text-[14px] text-blue-700 leading-relaxed mb-3">It looks like the standard wizard may cover this type of change. Would you like to go back and check, or continue with a custom modification?</p>
-                <div className="flex gap-3">
-                  <Link href="/wizard" className="text-[14px] text-blue-700 font-medium underline underline-offset-2">Go back to wizard</Link>
-                  <button onClick={handleDismissRedirect} className="text-[14px] text-blue-600 font-medium">Continue with custom</button>
-                </div>
-              </div>
-            )}
+            {/* Customization upsell context */}
 
             <div className="bg-white border border-neutral-200 rounded-xl p-4 sm:p-6 lg:p-8 space-y-6">
               {/* Modification type selector (spec §5.1) */}
@@ -782,7 +783,7 @@ export default function CustomizePage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2">
               <div>
                 <h2 className="text-lg sm:text-xl font-semibold text-neutral-900">Legal Drafting Engine</h2>
-                <p className="text-[13px] sm:text-[14px] text-neutral-400 mt-1">Shape your modification through conversation. All revisions happen here — before payment.</p>
+                <p className="text-[13px] sm:text-[14px] text-neutral-400 mt-1">Shape your modification through conversation.</p>
               </div>
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2 text-[13px] text-neutral-400">
@@ -1153,11 +1154,11 @@ export default function CustomizePage() {
               </Link>
             </div>
 
-            {/* Upgrade path (spec §8.2 — 30-day upgrade) */}
+            {/* Upgrade path */}
             {deliveryTier === "ai-only" && (
               <div className="max-w-md mx-auto bg-neutral-50 border border-neutral-200 rounded-xl p-5">
                 <p className="text-sm font-medium text-neutral-900 mb-1">Want a lawyer to review your customizations?</p>
-                <p className="text-[14px] text-neutral-500 leading-relaxed mb-3">You can upgrade to lawyer review within 30 days. You&apos;ll only pay the review add-on — your base modification fee was already covered.</p>
+                <p className="text-[14px] text-neutral-500 leading-relaxed mb-3">Upgrade to lawyer review at any time. You&apos;ll only pay the review add-on — your base modification fee was already covered.</p>
                 <div className="flex flex-col sm:flex-row gap-2">
                   <button className="text-[15px] text-[#be123c] font-medium hover:underline">Standard Review (+${LAWYER_ADDON.standard})</button>
                   <span className="text-neutral-300 hidden sm:inline">|</span>

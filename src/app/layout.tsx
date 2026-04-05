@@ -12,11 +12,11 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Ruby Law | AI-Powered Legal Documents for Canadian Startups",
-  description: "Generate startup legal documents in minutes. Convertible notes, SAFEs, shareholder agreements, and more. AI-generated, lawyer-reviewed. Outcome based pricing.",
+  title: "Ruby Law | AI-Powered Legal Documents for Canadian Companies",
+  description: "Generate production-ready legal documents in minutes. Convertible notes, SAFEs, shareholder agreements, and more. Lawyer-engineered, AI-drafted. Fixed pricing.",
   openGraph: {
-    title: "Ruby Law | AI-Powered Legal Documents for Canadian Startups",
-    description: "Generate startup legal documents in minutes. Convertible notes, SAFEs, shareholder agreements, and more. AI-generated, lawyer-reviewed. Outcome based pricing.",
+    title: "Ruby Law | AI-Powered Legal Documents for Canadian Companies",
+    description: "Generate production-ready legal documents in minutes. Convertible notes, SAFEs, shareholder agreements, and more. Lawyer-engineered, AI-drafted. Fixed pricing.",
     url: "https://rubylegal.ai",
     type: "website",
   },
@@ -28,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`min-h-screen antialiased ${dmSans.variable}`}>
         <ScrollToTop />
         <Nav />
-        <main className="pt-16">{children}</main>
+        <main className="pt-[68px]">{children}</main>
         <Footer />
       </body>
     </html>

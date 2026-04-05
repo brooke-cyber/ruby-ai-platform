@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Logo from './Logo'
 
 const footerColumns = [
   {
@@ -6,7 +7,7 @@ const footerColumns = [
     links: [
       { href: '/documents', label: 'Agreements' },
       { href: '/pricing', label: 'Pricing' },
-      { href: '/documents', label: 'Get Started' },
+      { href: '/documents', label: 'Get Started', key: 'get-started' },
     ],
   },
   {
@@ -29,36 +30,34 @@ export default function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="bg-[#F9F8F6] border-t border-[#e5e5e5]">
+    <footer className="bg-[#FAFAF8] border-t border-neutral-200">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10">
 
         {/* Main Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 pt-16 pb-14">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-12 gap-x-6 gap-y-10 md:gap-8 pt-14 pb-12 md:pt-16 md:pb-14">
 
-          {/* Brand Column */}
-          <div className="md:col-span-4 lg:col-span-5">
+          {/* Brand Column — full width on mobile, sits above link columns */}
+          <div className="col-span-2 sm:col-span-2 md:col-span-4 lg:col-span-5">
             <Link href="/" className="inline-block">
-              <span className="font-serif text-[19px] font-semibold text-[#1A1A1A] tracking-[-0.01em]">
-                Ruby Law
-              </span>
+              <Logo size="default" />
             </Link>
-            <p className="mt-4 text-[14px] leading-relaxed text-[#8A847D] max-w-xs">
-              AI-powered legal documents for Canadian startups and founders. Professional-grade agreements, delivered in minutes.
+            <p className="mt-4 text-[14px] leading-[1.65] text-neutral-500 max-w-xs">
+              AI-powered legal documents for Canadian companies. Lawyer-engineered agreements, delivered in minutes.
             </p>
           </div>
 
-          {/* Link Columns */}
+          {/* Link Columns — 2-column grid on small mobile, then 3 across on md+ */}
           {footerColumns.map((col) => (
-            <div key={col.heading} className="md:col-span-2 lg:col-span-2">
-              <h3 className="text-[13px] font-semibold uppercase tracking-[0.14em] text-[#A09A93] mb-5">
+            <div key={col.heading} className="col-span-1 md:col-span-2 lg:col-span-2">
+              <h3 className="text-[12px] font-semibold uppercase tracking-[0.14em] text-neutral-400 mb-4 md:mb-5">
                 {col.heading}
               </h3>
-              <ul className="space-y-3">
+              <ul className="space-y-2.5 md:space-y-3">
                 {col.links.map((link) => (
-                  <li key={link.href}>
+                  <li key={'key' in link ? (link as { key: string }).key : link.href}>
                     <Link
                       href={link.href}
-                      className="text-[13.5px] text-[#6B6560] hover:text-[#be123c] transition-colors duration-200"
+                      className="text-[14px] text-neutral-600 hover:text-[#be123c] transition-colors duration-200"
                     >
                       {link.label}
                     </Link>
@@ -70,33 +69,31 @@ export default function Footer() {
         </div>
 
         {/* Contact Row */}
-        <div className="border-t border-[#e5e5e5] py-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="border-t border-neutral-200 py-8 md:py-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
             <div>
-              <h3 className="text-[13px] font-semibold uppercase tracking-[0.14em] text-[#A09A93] mb-2.5">
+              <h3 className="text-[12px] font-semibold uppercase tracking-[0.14em] text-neutral-400 mb-2">
                 Contact
               </h3>
-              <p className="text-[13.5px] text-[#6B6560]">
-                <a
-                  href="mailto:hello@rubylegal.ai"
-                  className="hover:text-[#be123c] transition-colors duration-200"
-                >
-                  hello@rubylegal.ai
-                </a>
-              </p>
+              <a
+                href="mailto:hello@rubylegal.ai"
+                className="text-[14px] text-neutral-600 hover:text-[#be123c] transition-colors duration-200"
+              >
+                hello@rubylegal.ai
+              </a>
             </div>
             <div>
-              <h3 className="text-[13px] font-semibold uppercase tracking-[0.14em] text-[#A09A93] mb-2.5">
+              <h3 className="text-[12px] font-semibold uppercase tracking-[0.14em] text-neutral-400 mb-2">
                 Location
               </h3>
-              <p className="text-[13.5px] text-[#6B6560]">Serving founders across Canada</p>
+              <p className="text-[14px] text-neutral-600">Serving companies across Canada</p>
             </div>
           </div>
         </div>
 
         {/* Copyright */}
-        <div className="border-t border-[#e5e5e5] py-8">
-          <p className="text-[14px] text-[#A09A93] text-center">
+        <div className="border-t border-neutral-200 py-6 md:py-8">
+          <p className="text-[13px] text-neutral-400 text-center">
             &copy; {currentYear} Ruby Law Inc. All rights reserved.
           </p>
         </div>

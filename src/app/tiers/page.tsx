@@ -45,20 +45,19 @@ export default function TiersPage() {
   }
 
   const selfServeFeatures = [
-    "AI-generated draft agreement",
-    "Full compliance analysis",
-    "Clause position selection",
-    "Instant delivery",
-    "Unlimited regeneration",
+    "Lawyer-engineered, AI-drafted agreement",
+    "Built from the same clause library used by top Canadian firms",
+    "Full provincial compliance analysis",
+    "Clause position selection (client-favorable, balanced, or counter-party)",
+    "Instant delivery — download in minutes",
   ];
 
   const counselFeatures = [
-    "Everything in AI-Generated",
+    "Everything in Expert Draft",
     "Licensed Canadian lawyer in your province reviews your agreement",
     "Plain-language memo: what's in it and what it means for you",
     "Redline markup flagging anything that needs attention",
     "Specific legal advice on enforceability and risk",
-    "Formal sign-off to use — or clear guidance on what to change",
     "Formal approval or clear guidance on what to change",
   ];
 
@@ -86,10 +85,10 @@ export default function TiersPage() {
 
         {/* Tier Cards */}
         <div className="grid md:grid-cols-2 gap-8">
-          {/* AI-Generated */}
+          {/* Expert Draft */}
           <div className="border border-neutral-200 p-10 md:p-12">
             <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-400">
-              AI-Generated
+              Expert Draft
             </p>
 
             <div className="mt-8 pb-8 border-b border-neutral-100">
@@ -125,13 +124,13 @@ export default function TiersPage() {
             </button>
           </div>
 
-          {/* AI + Lawyer Review */}
+          {/* Expert Draft + Lawyer Review */}
           <div className="border border-[#be123c] p-10 md:p-12 relative">
             <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-[#be123c] mb-1">
               Recommended
             </p>
             <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-400">
-              AI + Lawyer Review
+              Expert Draft + Lawyer Review
             </p>
 
             <div className="mt-8 pb-8 border-b border-neutral-100">
@@ -172,7 +171,7 @@ export default function TiersPage() {
         {/* Customization note */}
         <div className="mt-16 max-w-lg mx-auto text-center">
           <p className="text-[13px] text-neutral-500 leading-relaxed">
-            After receiving your base contract, you can optionally customize it further through our AI-powered Customization Wizard. Customization pricing starts at $49 per modification.
+            After receiving your base contract, you can optionally customize it further through the Ruby Customization Wizard. Customization pricing starts at $49 per modification.
           </p>
           <Link href="/pricing" className="inline-block mt-3 text-[13px] text-[#be123c] font-medium hover:underline">
             Learn about customization &rarr;

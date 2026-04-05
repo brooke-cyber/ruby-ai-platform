@@ -35,49 +35,60 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-6 bg-[#0a0a0a]">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-10">
-          <div className="mx-auto h-12 w-12 rounded-xl bg-blue-600 flex items-center justify-center mb-5">
-            <span className="text-sm font-bold text-white tracking-tight">FF</span>
+    <div className="min-h-[80vh] flex items-center justify-center px-6 bg-[#faf9f7]">
+      <div className="w-full max-w-md">
+        {/* Logo area */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center h-12 w-12 rounded-xl bg-[#be123c]/10 mb-4">
+            <svg className="h-6 w-6 text-[#be123c]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+            </svg>
           </div>
-          <h1 className="text-3xl font-bold text-white">Counsel Portal</h1>
-          <p className="text-sm text-gray-400 mt-2">Sign in to access the review dashboard</p>
+          <h1 className="font-serif text-3xl font-bold text-neutral-900">Ruby Dashboard</h1>
+          <p className="text-neutral-500 mt-1 text-sm">Sign in to access the admin dashboard</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label htmlFor="password" className="block text-[13px] font-medium text-gray-300 mb-1.5">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter dashboard password"
-              required
-              className="w-full rounded-lg border border-gray-700 bg-zinc-800 px-4 py-3.5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200"
-            />
-          </div>
-
-          {error && (
-            <div className="rounded-lg bg-red-950/30 border border-red-500/30 px-4 py-3.5">
-              <p className="text-sm text-red-400">{error}</p>
+        <div className="bg-white border border-neutral-200 rounded-xl p-8 shadow-sm">
+          <h2 className="font-serif text-xl font-semibold text-neutral-900 mb-6">Sign In</h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-neutral-700 mb-1.5">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter dashboard password"
+                required
+                className="w-full rounded-lg border border-neutral-200 px-4 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#be123c]/20 focus:border-[#be123c] transition-all"
+              />
             </div>
-          )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? "Signing in..." : "Sign In"}
-          </button>
-        </form>
+            {error && (
+              <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3">
+                <p className="text-sm text-red-600">{error}</p>
+              </div>
+            )}
 
-        <p className="text-[12px] text-gray-600 text-center mt-8">
-          Access restricted to Ruby Law counsel
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-[#be123c] text-white rounded-lg py-2.5 text-sm font-semibold hover:bg-[#9f1239] disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+            >
+              {loading ? (
+                <span className="inline-flex items-center gap-2">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                  Signing in...
+                </span>
+              ) : 'Sign In'}
+            </button>
+          </form>
+        </div>
+
+        <p className="text-center text-xs text-neutral-400 mt-6">
+          Access restricted to Ruby Law team
         </p>
       </div>
     </div>

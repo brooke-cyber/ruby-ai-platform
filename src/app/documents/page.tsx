@@ -38,15 +38,20 @@ function AgreementCard({ doc, isSelected, onToggle }: { doc: Agreement; isSelect
     <button
       type="button"
       onClick={() => onToggle(doc.id)}
-      className={`group flex flex-col text-left bg-white border rounded-xl overflow-hidden transition-all duration-300 ${
+      aria-pressed={isSelected}
+      aria-label={`${isSelected ? 'Deselect' : 'Select'} ${doc.title}`}
+      className={`group relative flex flex-col text-left bg-white border rounded-xl overflow-hidden transition-all duration-200 ease-smooth will-change-transform ${
         isSelected
-          ? 'border-[#be123c] border-2 shadow-lg shadow-rose-50 ring-1 ring-rose-100'
-          : 'border-neutral-200 hover:border-rose-300 hover:shadow-lg hover:shadow-rose-50'
+          ? 'border-[#be123c] border-2 shadow-lg shadow-rose-100/60 ring-1 ring-rose-100 -translate-y-0.5'
+          : 'border-neutral-200 hover:border-neutral-300 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm'
       }`}
     >
-      <div className="px-6 pt-6 pb-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className={`inline-block px-3 py-1 text-[13px] font-semibold rounded-full ${CATEGORY_STYLES[doc.category]}`}>
+      {/* Selected indicator bar */}
+      <div className={`absolute top-0 left-0 right-0 h-[3px] bg-[#be123c] transition-opacity duration-200 ${isSelected ? 'opacity-100' : 'opacity-0'}`} />
+
+      <div className="px-5 pt-5 pb-2.5 sm:px-6 sm:pt-6 sm:pb-3 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className={`inline-block px-2.5 py-0.5 text-[12px] font-semibold rounded-full tracking-wide ${CATEGORY_STYLES[doc.category]}`}>
             {meta?.label || doc.category}
           </span>
           {(doc.complexity === 'high' || doc.complexity === 'very-high') && (
@@ -54,40 +59,51 @@ function AgreementCard({ doc, isSelected, onToggle }: { doc: Agreement; isSelect
           )}
         </div>
         {/* Checkbox */}
-        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${
-          isSelected ? 'bg-[#be123c] border-[#be123c]' : 'border-neutral-300 bg-white group-hover:border-rose-300'
-        }`}>
-          {isSelected && (
-            <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-          )}
+        <div
+          role="checkbox"
+          aria-checked={isSelected}
+          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 flex-shrink-0 ${
+            isSelected
+              ? 'bg-[#be123c] border-[#be123c] scale-110'
+              : 'border-neutral-300 bg-white group-hover:border-[#be123c]/40 group-hover:bg-rose-50/50'
+          }`}
+        >
+          <svg
+            className={`w-3.5 h-3.5 text-white transition-all duration-200 ${isSelected ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+          </svg>
         </div>
       </div>
-      <div className="px-6 pb-6 flex-1 flex flex-col">
-        <h3 className={`font-serif text-lg font-semibold mb-2 leading-snug transition-colors ${isSelected ? 'text-rose-700' : 'text-neutral-900 group-hover:text-rose-700'}`}>
+      <div className="px-5 pb-5 sm:px-6 sm:pb-6 flex-1 flex flex-col">
+        <h3 className={`font-serif text-[17px] sm:text-lg font-semibold mb-2 leading-snug transition-colors duration-200 ${isSelected ? 'text-[#be123c]' : 'text-neutral-900 group-hover:text-[#be123c]'}`}>
           {doc.title}
         </h3>
-        <p className="text-neutral-500 text-sm mb-3 flex-1 leading-relaxed">
+        <p className="text-neutral-500 text-[13px] sm:text-sm mb-2.5 flex-1 leading-relaxed line-clamp-3">
           {doc.description}
         </p>
-        <p className="text-[13px] text-neutral-400 mb-4 leading-relaxed">
+        <p className="text-[12px] sm:text-[13px] text-neutral-400 mb-4 leading-relaxed line-clamp-2">
           {doc.typicalUseCase}
         </p>
-        <div className="flex items-center gap-4 py-3 border-t border-neutral-100">
-          <div>
+        <div className="flex items-center gap-3 sm:gap-4 py-3 border-t border-neutral-100 mt-auto">
+          <div className="min-w-0">
             <div className="text-[10px] text-neutral-400 uppercase tracking-wider mb-0.5">Expert Draft</div>
-            <div className="text-base font-bold text-neutral-900">
-              ${doc.price} <span className="text-xs font-normal text-neutral-400">CAD</span>
+            <div className="text-[15px] sm:text-base font-bold text-neutral-900">
+              ${doc.price} <span className="text-[11px] font-normal text-neutral-400">CAD</span>
             </div>
           </div>
-          <div>
+          <div className="min-w-0">
             <div className="text-[10px] text-neutral-400 uppercase tracking-wider mb-0.5">+ Lawyer Review</div>
-            <div className="text-sm font-semibold text-neutral-600">
+            <div className="text-[13px] sm:text-sm font-semibold text-neutral-600">
               ${doc.counselPrice}
             </div>
           </div>
-          <div className="flex-1 text-right">
+          <div className="flex-1 text-right min-w-0">
             <div className="text-[10px] text-neutral-400 uppercase tracking-wider mb-0.5">Est. Time</div>
-            <div className={`text-sm font-medium ${time.color}`}>{time.label}</div>
+            <div className={`text-[13px] sm:text-sm font-medium ${time.color}`}>{time.label}</div>
           </div>
         </div>
       </div>
@@ -147,24 +163,35 @@ export default function DocumentsPage() {
           Agreement Library
         </p>
         <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-normal text-neutral-900 mb-6 leading-tight">
-          Every agreement your startup needs.
+          Every agreement your company needs.
         </h1>
         <p className="text-lg text-neutral-500 max-w-2xl mx-auto mb-2">
-          Select one or multiple — bundle pricing kicks in automatically. Customize any agreement after purchase with our legal modification engine.
+          Select one or multiple — bundle pricing kicks in automatically. Customize any agreement after purchase with the Ruby modification engine.
         </p>
         <p className="text-sm text-neutral-400 max-w-xl mx-auto mb-8">
           Expert-drafted. Reviewed by licensed Canadian lawyers in your province. Ready to sign in minutes.
         </p>
         {/* Search */}
-        <div className="max-w-md mx-auto relative">
-          <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+        <div className="max-w-md mx-auto relative group/search">
+          <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 transition-colors group-focus-within/search:text-[#be123c]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search — e.g. 'shareholder', 'SaaS', 'contractor'"
-            className="w-full pl-11 pr-4 py-3 border border-neutral-200 rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 focus:ring-2 focus:ring-[rgba(190,18,60,0.1)] focus:border-[#be123c] outline-none transition-all"
+            aria-label="Search agreements"
+            className="w-full pl-11 pr-10 py-3.5 border border-neutral-200 rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 focus:ring-2 focus:ring-[#be123c]/10 focus:border-[#be123c] outline-none transition-all duration-200 shadow-sm hover:border-neutral-300"
           />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              aria-label="Clear search"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full bg-neutral-200 hover:bg-neutral-300 text-neutral-500 transition-colors"
+            >
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          )}
         </div>
       </section>
 
@@ -200,20 +227,22 @@ export default function DocumentsPage() {
       {/* Filter Tabs */}
       <section className="px-4 pt-10 pb-2">
         <div className="max-w-5xl mx-auto">
-          <div className="flex flex-wrap gap-2 justify-center">
+          <div className="flex flex-wrap gap-2 justify-center" role="tablist" aria-label="Filter by category">
             {FILTER_TABS.map((tab) => (
               <button
                 key={tab.id}
+                role="tab"
+                aria-selected={activeFilter === tab.id}
                 onClick={() => setActiveFilter(tab.id)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ease-smooth border ${
                   activeFilter === tab.id
-                    ? 'bg-rose-700 text-white'
-                    : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200 hover:text-neutral-900'
+                    ? 'bg-[#be123c] text-white border-[#be123c] shadow-sm shadow-rose-200/50'
+                    : 'bg-white text-neutral-600 border-neutral-200 hover:border-neutral-300 hover:text-neutral-900 hover:shadow-sm active:bg-neutral-50'
                 }`}
               >
                 {tab.label}
                 {tab.id !== 'all' && (
-                  <span className="ml-1.5 text-[13px] opacity-70">
+                  <span className={`ml-1.5 text-[13px] ${activeFilter === tab.id ? 'opacity-80' : 'opacity-50'}`}>
                     ({AGREEMENTS.filter((a) => matchesCategory(a, tab.id as Category)).length})
                   </span>
                 )}
@@ -224,17 +253,17 @@ export default function DocumentsPage() {
       </section>
 
       {/* Agreements — grouped by category */}
-      <section className={`px-4 py-8 sm:py-12 ${selected.length > 0 ? 'pb-32' : ''}`}>
-        <div className="max-w-5xl mx-auto space-y-12">
+      <section className={`px-4 py-8 sm:py-12 transition-[padding] duration-300 ${selected.length > 0 ? 'pb-36 sm:pb-32' : ''}`}>
+        <div className="max-w-5xl mx-auto space-y-14">
           {grouped.map((group) => (
             <div key={group.category}>
               {activeFilter === 'all' && (
-                <div className="mb-6">
-                  <h2 className="font-serif text-2xl font-normal text-neutral-900">{group.meta.label}</h2>
-                  <p className="text-sm text-neutral-500 mt-1">{group.meta.description}</p>
+                <div className="mb-6 sm:mb-8">
+                  <h2 className="font-serif text-2xl sm:text-[1.65rem] font-normal text-neutral-900">{group.meta.label}</h2>
+                  <p className="text-sm text-neutral-500 mt-1.5">{group.meta.description}</p>
                 </div>
               )}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                 {group.docs.map((doc) => (
                   <AgreementCard key={doc.id} doc={doc} isSelected={selected.includes(doc.id)} onToggle={toggleAgreement} />
                 ))}
@@ -242,9 +271,19 @@ export default function DocumentsPage() {
             </div>
           ))}
           {filtered.length === 0 && (
-            <div className="text-center py-16">
-              <p className="text-neutral-400 text-lg">No agreements match your search.</p>
-              <button onClick={() => { setSearchQuery(''); setActiveFilter('all'); }} className="mt-3 text-rose-700 hover:text-rose-800 text-sm font-medium">Clear filters</button>
+            <div className="text-center py-20">
+              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-neutral-100 flex items-center justify-center">
+                <svg className="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              </div>
+              <p className="text-neutral-500 text-lg font-serif">No agreements match your search.</p>
+              <p className="text-neutral-400 text-sm mt-1 mb-4">Try adjusting your search terms or filters.</p>
+              <button
+                onClick={() => { setSearchQuery(''); setActiveFilter('all'); }}
+                className="inline-flex items-center gap-1.5 text-[#be123c] hover:text-[#9f1239] text-sm font-medium transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                Clear all filters
+              </button>
             </div>
           )}
         </div>
@@ -326,7 +365,7 @@ export default function DocumentsPage() {
               Don&apos;t see what you need?
             </h2>
             <p className="text-neutral-500 text-lg mb-8">
-              We build custom agreements for founders with unique needs. Tell us what you&apos;re working on.
+              We build custom agreements for companies with unique needs. Tell us what you&apos;re working on.
             </p>
             <a
               href="mailto:hello@rubylegal.ai"
@@ -340,24 +379,29 @@ export default function DocumentsPage() {
 
       {/* ─── Floating Action Bar ─── */}
       {selected.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-neutral-200 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-neutral-200 shadow-[0_-4px_24px_rgba(0,0,0,0.1)] animate-[slideUp_0.25s_ease-out]">
           {/* Expandable selected items panel */}
           {showSelectedPanel && (
             <div className="max-w-5xl mx-auto px-4 pt-4 pb-2 border-b border-neutral-100">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-[14px] font-semibold text-neutral-500 uppercase tracking-wide">Selected Agreements</p>
-                <button type="button" onClick={() => setShowSelectedPanel(false)} className="text-neutral-400 hover:text-neutral-600 transition-colors p-1">
+                <p className="text-[13px] font-semibold text-neutral-500 uppercase tracking-wide">Selected Agreements</p>
+                <button type="button" onClick={() => setShowSelectedPanel(false)} aria-label="Close panel" className="text-neutral-400 hover:text-neutral-600 transition-colors p-1.5 rounded-md hover:bg-neutral-100">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
               </div>
-              <div className="space-y-1.5 max-h-48 overflow-y-auto">
+              <div className="space-y-1.5 max-h-48 overflow-y-auto overscroll-contain">
                 {selectedItems.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between gap-3 rounded-lg bg-neutral-50 px-3 py-2.5">
+                  <div key={item.id} className="flex items-center justify-between gap-3 rounded-lg bg-neutral-50 px-3 py-2.5 group/item hover:bg-neutral-100 transition-colors">
                     <div className="min-w-0">
                       <p className="text-[14px] font-medium text-neutral-900 truncate">{item.title}</p>
                       <p className="text-[10px] text-neutral-400">${item.price} CAD</p>
                     </div>
-                    <button type="button" onClick={() => setSelected(selected.filter(id => id !== item.id))} className="shrink-0 text-neutral-400 hover:text-red-500 active:text-red-600 transition-colors p-1.5 -mr-1">
+                    <button
+                      type="button"
+                      onClick={() => setSelected(selected.filter(id => id !== item.id))}
+                      aria-label={`Remove ${item.title}`}
+                      className="shrink-0 text-neutral-300 group-hover/item:text-neutral-400 hover:!text-[#be123c] active:!text-[#9f1239] transition-colors p-1.5 -mr-1 rounded-md hover:bg-white"
+                    >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                   </div>
@@ -365,21 +409,26 @@ export default function DocumentsPage() {
               </div>
             </div>
           )}
-          <div className="max-w-5xl mx-auto px-4 py-3 sm:py-4 flex flex-col gap-3">
+          <div className="max-w-5xl mx-auto px-4 py-3 sm:py-4 flex flex-col gap-2 sm:gap-3">
             {/* Top row: selected items, tier toggle, pricing, actions */}
             <div className="flex items-center justify-between gap-3 sm:gap-4">
               {/* Selected items — tap to expand */}
               <div className="flex-1 min-w-0">
-                <button type="button" onClick={() => setShowSelectedPanel(!showSelectedPanel)} className="flex items-center gap-2 text-left w-full">
+                <button type="button" onClick={() => setShowSelectedPanel(!showSelectedPanel)} className="flex items-center gap-2 text-left w-full group/expand">
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-neutral-900">
                       {selected.length} agreement{selected.length !== 1 ? 's' : ''}
+                      {pricing.discount > 0 && (
+                        <span className="ml-2 inline-flex items-center px-1.5 py-0.5 text-[10px] font-semibold rounded bg-emerald-50 text-emerald-700">
+                          {Math.round(pricing.discount * 100)}% off
+                        </span>
+                      )}
                     </p>
-                    <p className="text-[13px] text-neutral-400 truncate">
+                    <p className="text-[12px] sm:text-[13px] text-neutral-400 truncate">
                       {selectedItems.map((i) => i.title.split(' ').slice(0, 2).join(' ')).join(', ')}
                     </p>
                   </div>
-                  <svg className={`w-4 h-4 text-neutral-400 shrink-0 transition-transform ${showSelectedPanel ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                  <svg className={`w-4 h-4 text-neutral-400 shrink-0 transition-transform duration-200 group-hover/expand:text-neutral-600 ${showSelectedPanel ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                 </button>
               </div>
 
@@ -388,7 +437,7 @@ export default function DocumentsPage() {
                 <button
                   type="button"
                   onClick={() => setTier('self-serve')}
-                  className={`px-3 py-1.5 text-[13px] font-medium rounded-md transition-all ${
+                  className={`px-3 py-1.5 text-[13px] font-medium rounded-md transition-all duration-200 ${
                     tier === 'self-serve'
                       ? 'bg-white text-neutral-900 shadow-sm'
                       : 'text-neutral-500 hover:text-neutral-700'
@@ -399,7 +448,7 @@ export default function DocumentsPage() {
                 <button
                   type="button"
                   onClick={() => setTier('counsel')}
-                  className={`px-3 py-1.5 text-[13px] font-medium rounded-md transition-all ${
+                  className={`px-3 py-1.5 text-[13px] font-medium rounded-md transition-all duration-200 ${
                     tier === 'counsel'
                       ? 'bg-white text-neutral-900 shadow-sm'
                       : 'text-neutral-500 hover:text-neutral-700'
@@ -420,22 +469,20 @@ export default function DocumentsPage() {
                     ${basePricing.total} base + ${lawyerReviewCost} review
                   </p>
                 )}
-                {pricing.discount > 0 && (
-                  <p className="text-[10px] text-emerald-600 font-medium">{Math.round(pricing.discount * 100)}% bundle savings</p>
-                )}
               </div>
 
               {/* Actions */}
               <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                 <button
                   onClick={() => setSelected([])}
-                  className="hidden sm:block px-4 py-2.5 text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors"
+                  aria-label="Clear all selections"
+                  className="hidden sm:block px-4 py-2.5 text-sm font-medium text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 rounded-lg transition-all duration-200"
                 >
                   Clear
                 </button>
                 <button
                   onClick={handleContinue}
-                  className="px-4 sm:px-6 py-2.5 bg-[#be123c] hover:bg-[#9f1239] text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2"
+                  className="px-4 sm:px-6 py-2.5 bg-[#be123c] hover:bg-[#9f1239] active:bg-[#881337] text-white text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-2 shadow-sm hover:shadow-md shadow-rose-200/50"
                 >
                   Continue
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
@@ -444,7 +491,7 @@ export default function DocumentsPage() {
             </div>
 
             {/* Customizations note */}
-            <div className="text-center sm:text-left">
+            <div className="hidden sm:block text-left">
               <p className="text-[10px] text-neutral-400">Customizations available after purchase — from $49/modification</p>
             </div>
           </div>

@@ -52,7 +52,7 @@ interface SessionData {
 // ─── Dynamic Categories (mapped from clause library per spec §4.1) ───
 const UNIVERSAL_CATEGORIES: ModificationCategory[] = [
   { id: "custom-schedule", name: "Custom Schedule or Exhibit", description: "Create a non-standard payment schedule, milestone table, deliverables schedule, or exhibit.", example: "Add a milestone-based payment schedule tied to project deliverables.", icon: "CS" },
-  { id: "something-else", name: "Something Else", description: "Describe what you need in your own words. Our counsel engine will help structure your request.", example: "I need a revenue-sharing earn-out tied to Q3 and Q4 performance metrics.", icon: "SE" },
+  { id: "something-else", name: "Something Else", description: "Describe what you need in your own words. Ruby will help structure your request.", example: "I need a revenue-sharing earn-out tied to Q3 and Q4 performance metrics.", icon: "SE" },
 ];
 
 const CONTRACT_CATEGORIES: Record<string, ModificationCategory[]> = {
@@ -123,6 +123,189 @@ function volumeDiscount(index: number): number {
   if (index === 1) return 0.2;
   return 0.4;
 }
+
+// ─── Suggestion Chips per Category ───
+const SUGGESTION_CHIPS: Record<string, string[]> = {
+  'emp-termination': [
+    'Increase severance to 2 weeks per year of service',
+    'Add change-of-control termination trigger',
+    'Extend notice period to 6 months',
+    'Add garden leave provision',
+    'Remove termination without cause clause',
+  ],
+  'emp-covenants': [
+    'Narrow non-solicit to direct clients only',
+    'Reduce non-compete from 24 to 12 months',
+    'Add carve-out for personal projects',
+    'Remove non-compete entirely (non-C-suite)',
+    'Limit geographic scope to GTA only',
+  ],
+  'emp-compensation': [
+    'Add signing bonus with 12-month clawback',
+    'Add equity vesting with 1-year cliff',
+    'Include performance bonus structure',
+    'Add car allowance or expense provisions',
+    'Change salary review frequency to annual',
+  ],
+  'emp-ip': [
+    'Carve out personal projects from IP assignment',
+    'Add pre-existing IP schedule',
+    'Modify moral rights waiver scope',
+    'Add open-source contribution policy',
+  ],
+  'corp-transfer': [
+    'Extend ROFR period to 90 days',
+    'Lower drag-along threshold to 66.7%',
+    'Add tag-along rights for minority holders',
+    'Add shotgun buy-sell mechanism',
+    'Include put/call option on death or disability',
+  ],
+  'corp-governance': [
+    'Add board observer rights for 10%+ shareholders',
+    'Expand reserved matters list',
+    'Change voting threshold to supermajority',
+    'Add casting vote for board chair',
+  ],
+  'corp-deadlock': [
+    'Replace shotgun with mediation then arbitration',
+    'Add mandatory cooling-off period',
+    'Add expert determination for valuation disputes',
+  ],
+  'corp-dividends': [
+    'Add minimum annual distribution of 30% net profits',
+    'Create preferred distribution waterfall',
+    'Add reinvestment threshold before distributions',
+  ],
+  'inv-interest': [
+    'Lower interest rate to 6%',
+    'Switch from bullet to amortizing repayment',
+    'Add PIK (payment-in-kind) interest option',
+    'Change day-count to actual/365',
+  ],
+  'inv-conversion': [
+    'Lower valuation cap',
+    'Increase discount rate to 25%',
+    'Add most-favoured-nation clause',
+    'Add automatic conversion at maturity',
+  ],
+  'inv-rights': [
+    'Add board observer rights for investors above $500K',
+    'Add pro-rata participation rights',
+    'Require monthly financial reporting',
+    'Add information rights for all investors',
+  ],
+  'com-sla': [
+    'Increase uptime to 99.95%',
+    'Add enhanced service credits schedule',
+    'Tighten P1 response time to 15 minutes',
+    'Add disaster recovery RPO/RTO commitments',
+  ],
+  'com-liability': [
+    'Increase liability cap to 24 months of fees',
+    'Add IP indemnification carve-out',
+    'Remove consequential damages exclusion for data breach',
+  ],
+  'com-data': [
+    'Add Canada-only data residency requirement',
+    'Tighten breach notification to 48 hours',
+    'Add data deletion on termination clause',
+    'Require SOC 2 Type II certification',
+  ],
+  'inf-exclusivity': [
+    'Limit exclusivity to direct competitors only',
+    'Add geographic carve-out for European brands',
+    'Reduce exclusivity period to campaign duration only',
+  ],
+  'inf-compensation': [
+    'Add 5% affiliate commission on sales',
+    'Add performance bonus at 100K views',
+    'Switch to hybrid flat fee plus commission',
+  ],
+  'custom-schedule': [
+    'Milestone-based payment schedule',
+    'Vesting schedule with acceleration triggers',
+    'Service credit calculation table',
+    'Deliverables and acceptance criteria schedule',
+  ],
+  'something-else': [
+    'Add a revenue-sharing earn-out provision',
+    'Include an arbitration clause with specific rules',
+    'Add a most-favoured-customer pricing provision',
+    'Include a force majeure clause with pandemic carve-out',
+  ],
+  'plat-terms': [
+    'Switch from browsewrap to clickwrap acceptance',
+    'Add version tracking for terms changes',
+    'Modify auto-renewal disclosure per Ontario CPA',
+    'Add specific prohibited conduct list',
+  ],
+  'plat-disputes': [
+    'Add 30-day informal resolution period',
+    'Switch to arbitration under ADR Institute rules',
+    'Remove class action waiver (post Uber v. Heller)',
+    'Add mediation step before litigation',
+  ],
+  'plat-content': [
+    'Add DMCA/Copyright Act takedown procedure',
+    'Modify UGC license scope and duration',
+    'Add content moderation appeal process',
+  ],
+  'plat-privacy': [
+    'Add biometric data collection disclosure',
+    'Expand cookie categories and consent options',
+    'Add Quebec Law 25 privacy impact provisions',
+    'Specify PIPEDA-compliant retention schedule',
+  ],
+  'plat-sharing': [
+    'Add named third-party processor list',
+    'Restrict cross-border data transfers',
+    'Add data processing agreement requirements',
+  ],
+  'plat-retention': [
+    'Shorten retention to 18 months',
+    'Add automatic deletion on account closure',
+    'Create tiered retention by data category',
+  ],
+  'plat-userrights': [
+    'Add GDPR-style data portability right',
+    'Add right to explanation for automated decisions',
+    'Add Quebec Law 25 access request process',
+  ],
+  'inf-content': [
+    'Limit brand usage to social media only',
+    'Require creator approval for paid advertising use',
+    'Add content revision caps (max 2 rounds)',
+    'Specify content ownership after campaign',
+  ],
+  'inf-compliance': [
+    'Add AGCO-compliant messaging for iGaming',
+    'Add French-language disclosure for Quebec audience',
+    'Update FTC disclosure requirements',
+  ],
+  'inv-default': [
+    'Extend cure period to 15 days',
+    'Add MAC exclusion for pandemic events',
+    'Remove cross-default provision',
+    'Add grace period for payment defaults',
+  ],
+  'inv-security': [
+    'Switch from all-assets GSA to specific pledge',
+    'Add PPSA registration requirements',
+    'Add permitted encumbrances schedule',
+  ],
+  'inv-parties': [
+    'Add co-founder as personal guarantor',
+    'Add co-borrower with joint liability',
+    'Add corporate guarantor subsidiary',
+  ],
+  'default': [
+    'Modify a specific clause or threshold',
+    'Add a new provision or schedule',
+    'Adjust payment or compensation terms',
+    'Change dispute resolution mechanism',
+    'Modify termination or exit provisions',
+  ],
+};
 
 // ─── Shared UI ───
 const inputClass = "mt-1.5 block w-full border border-neutral-200 bg-white rounded-lg px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 focus:ring-2 focus:ring-[rgba(190,18,60,0.1)] focus:border-[#be123c] outline-none transition-all duration-200";
@@ -483,7 +666,7 @@ export default function CustomizePage() {
   const lawyerAddon = deliveryTier === "lawyer-standard" ? LAWYER_ADDON.standard : deliveryTier === "lawyer-priority" ? LAWYER_ADDON.priority : 0;
   const total = subtotal + (lawyerAddon * modifications.length);
 
-  const STEPS = ["Contract Delivered", "Select Category", "Describe Change", "Counsel Engine", "Review & Pay", "Confirmed"];
+  const STEPS = ["Contract Delivered", "Select Category", "Describe Change", "Ruby Drafting", "Review & Pay", "Confirmed"];
 
   // Mobile step indicator
   const stepName = STEPS[currentStep] || "";
@@ -564,7 +747,7 @@ export default function CustomizePage() {
               </button>
             </div>
             {/* Spec §3.2 — supporting copy */}
-            <p className="text-center text-[14px] text-neutral-400 max-w-md mx-auto leading-relaxed">Need something the standard options don&apos;t cover? Our legal drafting engine will craft custom provisions for you, with optional lawyer review.</p>
+            <p className="text-center text-[14px] text-neutral-400 max-w-md mx-auto leading-relaxed">Need something the standard options don&apos;t cover? Ruby will craft custom provisions for you, with optional lawyer review.</p>
           </div>
         )}
 
@@ -626,7 +809,7 @@ export default function CustomizePage() {
           <div className="space-y-6">
             <div>
               <h2 className="text-xl sm:text-2xl font-semibold text-neutral-900 mb-2">{selectedCategory?.name}</h2>
-              <p className="text-[15px] sm:text-[14px] text-neutral-500 leading-relaxed">Tell us what you&apos;d like to change. The more specific you are, the better our legal drafting engine can tailor your modification.</p>
+              <p className="text-[15px] sm:text-[14px] text-neutral-500 leading-relaxed">Tell us what you&apos;d like to change. The more specific you are, the better Ruby can tailor your modification.</p>
             </div>
 
             {/* Customization upsell context */}
@@ -651,6 +834,25 @@ export default function CustomizePage() {
                 <textarea value={intakeData.description || ""} onChange={(e) => setIntakeData({ ...intakeData, description: e.target.value })} placeholder={`e.g. "${selectedCategory?.example || "Describe your modification..."}"` } rows={3} className={inputClass} />
                 <p className="text-[10px] text-neutral-400 mt-1.5">{intakeType === "freeform" ? "Max 1,000 characters" : "Max 500 characters"}</p>
               </label>
+
+              {/* Quick suggestion chips — help clients know what's possible */}
+              {selectedCategory && (
+                <div>
+                  <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-400 mb-2">Common customizations for this section</p>
+                  <div className="flex flex-wrap gap-2">
+                    {(SUGGESTION_CHIPS[selectedCategory.id] || SUGGESTION_CHIPS['default']).map((chip) => (
+                      <button
+                        key={chip}
+                        type="button"
+                        onClick={() => setIntakeData({ ...intakeData, description: chip })}
+                        className="text-[12px] px-3 py-1.5 rounded-full border border-neutral-200 text-neutral-600 hover:border-[#be123c] hover:text-[#be123c] hover:bg-[rgba(190,18,60,0.03)] transition-all"
+                      >
+                        {chip}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* ─── Conditional fields per intake type (spec §5.1.1–5.1.6) ─── */}
 
@@ -695,7 +897,7 @@ export default function CustomizePage() {
               {intakeType === "remove" && (
                 <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-4">
                   <p className="text-[14px] text-amber-800 font-medium mb-1">Important</p>
-                  <p className="text-[14px] text-amber-700 leading-relaxed">Removing clauses may affect the enforceability of your agreement. Our counsel engine will flag any risks, and you&apos;ll have the option to add lawyer review.</p>
+                  <p className="text-[14px] text-amber-700 leading-relaxed">Removing clauses may affect the enforceability of your agreement. Ruby will flag any risks, and you&apos;ll have the option to add lawyer review.</p>
                 </div>
               )}
 
@@ -782,8 +984,8 @@ export default function CustomizePage() {
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2">
               <div>
-                <h2 className="text-lg sm:text-xl font-semibold text-neutral-900">Legal Drafting Engine</h2>
-                <p className="text-[13px] sm:text-[14px] text-neutral-400 mt-1">Shape your modification through conversation.</p>
+                <h2 className="text-lg sm:text-xl font-semibold text-neutral-900">Ruby Drafting Engine</h2>
+                <p className="text-[13px] sm:text-[14px] text-neutral-400 mt-1">Shape your modification through conversation with Ruby.</p>
               </div>
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2 text-[13px] text-neutral-400">
@@ -981,7 +1183,7 @@ export default function CustomizePage() {
                       className={`text-left border rounded-xl p-4 sm:p-6 transition-all ${anyRequiresLawyer ? "opacity-50 cursor-not-allowed border-neutral-200 bg-neutral-50" : deliveryTier === "ai-only" ? "border-[#be123c] border-2 bg-[rgba(190,18,60,0.02)]" : "border-neutral-200 hover:border-neutral-300"}`}
                     >
                       <p className="text-sm font-semibold text-neutral-900 mb-1">Engine-Drafted Contract</p>
-                      <p className="text-[14px] text-neutral-500 leading-relaxed mb-3">Delivered immediately upon payment. Drafted by our legal drafting engine based on your instructions.</p>
+                      <p className="text-[14px] text-neutral-500 leading-relaxed mb-3">Delivered immediately upon payment. Drafted by Ruby based on your instructions.</p>
                       <p className="text-[13px] text-neutral-400">Instant delivery</p>
                       <p className="text-[13px] text-neutral-400 mt-1">Not reviewed by a licensed lawyer</p>
                       {/* Regulatory override warning (per spec §12.6) */}
@@ -1005,7 +1207,7 @@ export default function CustomizePage() {
                       className={`text-left border rounded-xl p-4 sm:p-6 transition-all ${deliveryTier.startsWith("lawyer") ? "border-[#be123c] border-2 bg-[rgba(190,18,60,0.02)]" : "border-neutral-200 hover:border-neutral-300"}`}
                     >
                       <div className="flex items-center gap-2 mb-1">
-                        <p className="text-sm font-semibold text-neutral-900">Engine Draft + Lawyer Review</p>
+                        <p className="text-sm font-semibold text-neutral-900">Expert Draft + Lawyer Review</p>
                         <span className="text-[10px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">Recommended</span>
                       </div>
                       <p className="text-[14px] text-neutral-500 leading-relaxed mb-3">Reviewed and approved by a licensed Canadian lawyer.</p>
@@ -1139,7 +1341,7 @@ export default function CustomizePage() {
 
             {/* AI-Only footer note (per spec §8.2) */}
             {deliveryTier === "ai-only" && (
-              <p className="text-[13px] text-neutral-400 max-w-md mx-auto">This contract was drafted by our legal drafting engine and has not been reviewed by a lawyer.</p>
+              <p className="text-[13px] text-neutral-400 max-w-md mx-auto">This contract was drafted by Ruby and has not been reviewed by a lawyer.</p>
             )}
 
             <div className="flex flex-col sm:flex-row justify-center gap-3 pt-4">

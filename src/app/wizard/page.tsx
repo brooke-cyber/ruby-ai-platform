@@ -10,11 +10,12 @@ import { getTermsForStep, type LegalTerm } from "@/data/legal-terms";
 
 // ─── Types ───
 interface PartyInfo { partyA: string; partyB: string; jurisdiction: string; }
-interface EmploymentData { salary: string; startDate: string; vacationDays: string; benefitsPlan: string; terminationPosition: string; probationPosition: string; confidentiality: boolean; nonSolicitClient: boolean; nonSolicitClientDuration: string; nonSolicitEmployee: boolean; nonSolicitEmployeeDuration: string; nonCompete: boolean; nonCompeteDuration: string; nonCompeteScope: string; gardenLeave: boolean; ipPosition: string; ipAssignmentScope: string; overtimeEligibility: string; bonusStructure: string; bonusClawback: boolean; workArrangement: string; expTechStipend: boolean; expTravel: boolean; expProfDev: boolean; relocationAssistance: boolean; relocationAmount: string; signingBonus: string; signingBonusRepayMonths: string; }
-interface CorporateData { shareholders: { name: string; equity: string; role: string }[]; boardSize: string; appointmentRights: string; reservedMatters: string[]; votingThreshold: string; rofr: boolean; rofrDays: string; tagAlong: boolean; tagAlongThreshold: string; dragAlong: boolean; dragAlongThreshold: string; preEmptive: boolean; deadlockMethod: string; exitMechanism: string; directorAppointmentMethod: string; infoRightsFrequency: string; spendingLimitBeforeBoard: string; expenseApprovalThreshold: string; relatedPartyDisclosure: boolean; }
-interface InvestmentData { investmentAmount: string; valuationCap: string; discountRate: number; conversionTriggers: string[]; mfnClause: string; proRataThreshold: string; infoFrequency: string; infoScope: string[]; boardObserver: boolean; proRataRights: boolean; }
-interface CommercialData { serviceDescription: string; deploymentModel: string; uptimeCommitment: number; responseCritical: string; responseHigh: string; responseMedium: string; responseLow: string; serviceCreditSchedule: string; pipeda: boolean; dataResidency: string; breachNotification: string; casl: boolean; liabilityCap: string; forceMajeure: boolean; consequentialDamages: boolean; dataBackupDR: boolean; serviceAvailability: string; maintenanceWindow: string; changeManagement: boolean; escalationMatrix: boolean; customerAuditRights: boolean; dataEncryption: string; subProcessorNotification: boolean; breachNotificationTimeline: string; dataPortability: boolean; dataDeletionTimeline: string; crossBorderRestrictions: boolean; }
-interface PlatformData { businessType: string; platformUrl: string; hasUserAccounts: boolean; collectsPersonalInfo: boolean; hasEcommerce: boolean; hasUGC: boolean; operatesInQuebec: boolean; hasInternationalUsers: boolean; acceptanceMechanism: string; disputeResolution: string; dataStorage: string; partnershipType: string; profitSplit: string; managementStructure: string; msaPaymentTerms: string; msaIpOwnership: string; ageRestriction: boolean; cookieConsent: string; contentModeration: string; apiAccess: boolean; rateLimiting: boolean; accountSuspensionRights: boolean; classActionWaiver: boolean; }
+interface EmploymentData { salary: string; startDate: string; vacationDays: string; benefitsPlan: string; terminationPosition: string; probationPosition: string; confidentiality: boolean; nonSolicitClient: boolean; nonSolicitClientDuration: string; nonSolicitEmployee: boolean; nonSolicitEmployeeDuration: string; nonCompete: boolean; nonCompeteDuration: string; nonCompeteScope: string; gardenLeave: boolean; ipPosition: string; ipAssignmentScope: string; overtimeEligibility: string; bonusStructure: string; bonusClawback: boolean; workArrangement: string; expTechStipend: boolean; expTravel: boolean; expProfDev: boolean; relocationAssistance: boolean; relocationAmount: string; signingBonus: string; signingBonusRepayMonths: string; positionTitle: string; department: string; reportingTo: string; employmentType: string; hoursPerWeek: string; probationMonths: string; equityGrant: boolean; equityType: string; equityVestingSchedule: string; equityAmount: string; pensionPlan: boolean; pensionMatchPercent: string; disabilityInsurance: boolean; lifeInsurance: boolean; dentalVision: boolean; eapAccess: boolean; noticeFromEmployer: string; noticeFromEmployee: string; inventionDisclosurePeriod: string; priorInventionsExclusion: boolean; priorInventionsDescription: string; }
+interface CorporateData { shareholders: { name: string; equity: string; role: string }[]; boardSize: string; appointmentRights: string; reservedMatters: string[]; votingThreshold: string; rofr: boolean; rofrDays: string; tagAlong: boolean; tagAlongThreshold: string; dragAlong: boolean; dragAlongThreshold: string; preEmptive: boolean; deadlockMethod: string; exitMechanism: string; directorAppointmentMethod: string; infoRightsFrequency: string; spendingLimitBeforeBoard: string; expenseApprovalThreshold: string; relatedPartyDisclosure: boolean; companyName: string; incorporationJurisdiction: string; authorizedShares: string; shareClasses: string[]; vestingSchedule: string; vestingAccelerationTrigger: string; nonCompeteDuration: string; nonCompeteScope: string; valuationMethod: string; valuationAppraiser: string; dividendPolicy: string; dividendFrequency: string; shotgunNoticeMinDays: string; shotgunFinancingDays: string; keyManInsurance: boolean; keyManInsuranceAmount: string; ipAssignment: boolean; nonSolicitAfterExit: boolean; nonSolicitDuration: string; foundingDocDate: string; companyFiscalYearEnd: string; bankingResolution: string; signingAuthority: string; }
+interface InvestmentData { investmentAmount: string; valuationCap: string; discountRate: number; conversionTriggers: string[]; mfnClause: string; proRataThreshold: string; infoFrequency: string; infoScope: string[]; boardObserver: boolean; proRataRights: boolean; investorType: string; exemptionBasis: string; qualifiedFinancingThreshold: string; maturityDate: string; interestRate: string; interestCalculation: string; securityType: string; mostFavoredNation: boolean; antiDilution: string; liquidationPreference: string; dragAlongThreshold: string; founderLockup: boolean; founderLockupMonths: string; keyPersonProvision: boolean; keyPersonNames: string; closingConditions: string[]; }
+interface CommercialData { serviceDescription: string; deploymentModel: string; uptimeCommitment: number; responseCritical: string; responseHigh: string; responseMedium: string; responseLow: string; serviceCreditSchedule: string; pipeda: boolean; dataResidency: string; breachNotification: string; casl: boolean; liabilityCap: string; forceMajeure: boolean; consequentialDamages: boolean; dataBackupDR: boolean; serviceAvailability: string; maintenanceWindow: string; changeManagement: boolean; escalationMatrix: boolean; customerAuditRights: boolean; dataEncryption: string; subProcessorNotification: boolean; breachNotificationTimeline: string; dataPortability: boolean; dataDeletionTimeline: string; crossBorderRestrictions: boolean; incidentSeverityLevels: boolean; disasterRecoveryRpo: string; disasterRecoveryRto: string; supportHours: string; supportChannels: string[]; uptimeMeasurement: string; plannedMaintenanceNotice: string; serviceCreditCap: string; terminationAssistance: boolean; terminationAssistancePeriod: string; dataClassification: string; penetrationTesting: boolean; complianceCertifications: string[]; dataProcessingAgreement: boolean; acceptanceTesting: boolean; acceptanceTestingDays: string; }
+interface PlatformData { businessType: string; platformUrl: string; hasUserAccounts: boolean; collectsPersonalInfo: boolean; hasEcommerce: boolean; hasUGC: boolean; operatesInQuebec: boolean; hasInternationalUsers: boolean; acceptanceMechanism: string; disputeResolution: string; dataStorage: string; partnershipType: string; profitSplit: string; managementStructure: string; msaPaymentTerms: string; msaIpOwnership: string; ageRestriction: boolean; cookieConsent: string; contentModeration: string; apiAccess: boolean; rateLimiting: boolean; accountSuspensionRights: boolean; classActionWaiver: boolean; dataCategories: string[]; dataRetentionPeriod: string; thirdPartyProcessors: boolean; crossBorderTransfers: boolean; crossBorderCountries: string; breachNotificationHours: string; cookieCategories: string[]; privacyOfficerDesignated: boolean; dataSubjectRights: string[]; automatedDecisionMaking: boolean; childrenDataCollection: boolean; biometricData: boolean; consentMechanism: string; dataMinimization: boolean; pipedaCompliant: boolean; quebecLaw25Compliant: boolean; userRegistrationRequired: boolean; paymentProcessing: string; refundPolicy: string; autoRenewalDisclosure: boolean; autoRenewalPeriod: string; governingLaw: string; liabilityCapType: string; liabilityCapAmount: string; indemnificationScope: string; dmcaTakedown: boolean; accessibilityCompliance: boolean; sowTemplate: boolean; changeOrderProcess: string; acceptanceCriteria: string; warrantyPeriod: string; insuranceRequirements: string[]; backgroundChecks: boolean; subcontractingAllowed: boolean; exitTransitionPeriod: string; dataReturnOnTermination: boolean; performanceMetrics: boolean; escalationProcess: string; }
+interface LendingData { loanAmount: string; interestRateType: string; interestRate: string; loanTerm: string; repaymentSchedule: string; secured: boolean; collateralDescription: string; prepaymentPenalty: boolean; financialCovenants: string[]; reportingRequirements: string; eventsOfDefault: string[]; curePeriod: string; defaultInterestPremium: string; }
 interface RiskProfile { tolerance: string; priorities: string[]; context: string; experience: string; }
 interface InfluencerData { platforms: string[]; contentTypes: string[]; campaignDuration: string; postFrequency: string; hasUsAudience: boolean; usAudiencePercent: string; isRegulatedIndustry: boolean; regulatedCategory: string; collectsPersonalData: boolean; usesAiContent: boolean; hasQuebecAudience: boolean; compensationModel: string; compensationAmount: string; paymentSchedule: string; performanceMetrics: boolean; metricType: string; metricTarget: string; contentApproval: string; approvalDays: string; revisionRounds: string; ipOwnership: string; usageRightsScope: string; usageRightsDuration: string; exclusivity: boolean; exclusivityScope: string; exclusivityDuration: string; moralsClauseScope: string; terminationNotice: string; terminationForCause: string[]; whitelisting: boolean; whitelistingScope: string; boostingRights: boolean; }
 
@@ -108,23 +109,24 @@ function LegalTermsBar({ stepId }: { stepId: string }) {
 }
 
 const GENERATION_STAGES = [
-  { label: "Analyzing your inputs", duration: 3000 },
-  { label: "Mapping regulatory frameworks", duration: 4000 },
-  { label: "Assembling clause positions", duration: 5000 },
-  { label: "Drafting agreement sections", duration: 8000 },
-  { label: "Running compliance verification", duration: 4000 },
-  { label: "Finalizing document", duration: 3000 },
+  { label: "Ruby is analyzing deal parameters", duration: 2000 },
+  { label: "Ruby is mapping regulatory frameworks", duration: 2500 },
+  { label: "Ruby is assembling clause positions", duration: 3000 },
+  { label: "Ruby is drafting agreement sections", duration: 6000 },
+  { label: "Ruby is running compliance verification", duration: 2500 },
+  { label: "Ruby is finalizing your document", duration: 2000 },
 ];
 
 function GenerationProgress({ isActive }: { isActive: boolean }) {
   const [stageIndex, setStageIndex] = useState(0);
   const [stageProgress, setStageProgress] = useState(0);
+  const [dots, setDots] = useState("");
 
   useEffect(() => {
     if (!isActive) { setStageIndex(0); setStageProgress(0); return; }
     let elapsed = 0;
     const interval = setInterval(() => {
-      elapsed += 100;
+      elapsed += 80;
       let cumulative = 0;
       for (let i = 0; i < GENERATION_STAGES.length; i++) {
         cumulative += GENERATION_STAGES[i].duration;
@@ -137,7 +139,14 @@ function GenerationProgress({ isActive }: { isActive: boolean }) {
       }
       setStageIndex(GENERATION_STAGES.length - 1);
       setStageProgress(95);
-    }, 100);
+    }, 80);
+    return () => clearInterval(interval);
+  }, [isActive]);
+
+  // Animated dots
+  useEffect(() => {
+    if (!isActive) return;
+    const interval = setInterval(() => setDots(d => d.length >= 3 ? "" : d + "."), 400);
     return () => clearInterval(interval);
   }, [isActive]);
 
@@ -151,28 +160,51 @@ function GenerationProgress({ isActive }: { isActive: boolean }) {
   );
 
   return (
-    <div className="space-y-6 py-4">
-      {/* Overall progress bar */}
-      <div>
-        <div className="h-2 w-full bg-neutral-100 rounded-full overflow-hidden">
-          <div className="h-full bg-gradient-to-r from-[#be123c] to-rose-400 rounded-full transition-all duration-300 ease-out" style={{ width: `${overallProgress}%` }} />
+    <div className="py-6">
+      {/* Header */}
+      <div className="text-center mb-6">
+        <div className="inline-flex items-center gap-2 mb-3">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute h-full w-full rounded-full bg-[#be123c] opacity-40" />
+            <span className="inline-flex h-2.5 w-2.5 rounded-full bg-[#be123c]" />
+          </span>
+          <span className="text-[13px] font-semibold text-[#be123c] uppercase tracking-[0.1em]">Ruby Engine Active</span>
         </div>
-        <p className="text-[14px] text-neutral-400 mt-2 tabular-nums">{Math.round(overallProgress)}% complete</p>
+        <p className="text-[15px] text-neutral-500">
+          {GENERATION_STAGES[stageIndex]?.label}{dots}
+        </p>
       </div>
-      {/* Stage list */}
-      <div className="space-y-3">
+
+      {/* Progress bar */}
+      <div className="mb-6">
+        <div className="h-1.5 w-full bg-neutral-100 rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-[#be123c] to-rose-400 rounded-full transition-all duration-200 ease-out" style={{ width: `${overallProgress}%` }} />
+        </div>
+        <div className="flex justify-between mt-2">
+          <p className="text-[12px] text-neutral-400 tabular-nums">{Math.round(overallProgress)}%</p>
+          <p className="text-[12px] text-neutral-400">Step {stageIndex + 1} of {GENERATION_STAGES.length}</p>
+        </div>
+      </div>
+
+      {/* Stage list — compact */}
+      <div className="space-y-2">
         {GENERATION_STAGES.map((stage, i) => (
-          <div key={stage.label} className={`flex items-center gap-3 transition-all duration-300 ${i < stageIndex ? "opacity-50" : i === stageIndex ? "opacity-100" : "opacity-30"}`}>
-            <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${i < stageIndex ? "bg-emerald-100" : i === stageIndex ? "bg-[rgba(190,18,60,0.1)]" : "bg-neutral-100"}`}>
+          <div key={stage.label} className={`flex items-center gap-2.5 py-1.5 transition-all duration-300 ${i < stageIndex ? "opacity-60" : i === stageIndex ? "opacity-100" : "opacity-25"}`}>
+            <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
+              i < stageIndex ? "bg-emerald-50 border border-emerald-200" :
+              i === stageIndex ? "bg-[#be123c]/10 border border-[#be123c]/30" :
+              "bg-neutral-50 border border-neutral-200"
+            }`}>
               {i < stageIndex ? (
-                <svg className="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                <svg className="w-2.5 h-2.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
               ) : i === stageIndex ? (
-                <div className="w-2 h-2 rounded-full bg-[#be123c] animate-pulse" />
+                <div className="w-1.5 h-1.5 rounded-full bg-[#be123c] animate-pulse" />
               ) : (
-                <div className="w-2 h-2 rounded-full bg-neutral-300" />
+                <div className="w-1.5 h-1.5 rounded-full bg-neutral-300" />
               )}
             </div>
-            <span className={`text-[15px] ${i === stageIndex ? "text-neutral-900 font-medium" : i < stageIndex ? "text-neutral-500" : "text-neutral-400"}`}>{stage.label}</span>
+            <span className={`text-[14px] ${i === stageIndex ? "text-neutral-900 font-medium" : i < stageIndex ? "text-neutral-500" : "text-neutral-400"}`}>{stage.label}</span>
+            {i < stageIndex && <span className="text-[11px] text-emerald-500 font-medium ml-auto">Done</span>}
           </div>
         ))}
       </div>
@@ -204,11 +236,12 @@ export default function WizardPage() {
 
   const [party, setParty] = useState<PartyInfo>({ partyA: "", partyB: "", jurisdiction: "ontario" });
   const [triggerAnswers, setTriggerAnswers] = useState<Record<string, boolean>>({});
-  const [employment, setEmployment] = useState<EmploymentData>({ salary: "", startDate: "", vacationDays: "15", benefitsPlan: "standard", terminationPosition: "balanced", probationPosition: "balanced", confidentiality: true, nonSolicitClient: true, nonSolicitClientDuration: "12", nonSolicitEmployee: true, nonSolicitEmployeeDuration: "12", nonCompete: false, nonCompeteDuration: "12", nonCompeteScope: "city", gardenLeave: false, ipPosition: "full-assignment", ipAssignmentScope: "all-work-product", overtimeEligibility: "exempt", bonusStructure: "none", bonusClawback: false, workArrangement: "in-office", expTechStipend: false, expTravel: false, expProfDev: false, relocationAssistance: false, relocationAmount: "", signingBonus: "", signingBonusRepayMonths: "" });
-  const [corporate, setCorporate] = useState<CorporateData>({ shareholders: [{ name: "", equity: "", role: "" }], boardSize: "3", appointmentRights: "pro-rata", reservedMatters: ["Dividend policy", "Share issuance or dilution"], votingThreshold: "66.67", rofr: true, rofrDays: "30", tagAlong: true, tagAlongThreshold: "50", dragAlong: true, dragAlongThreshold: "75", preEmptive: true, deadlockMethod: "mediation-arbitration", exitMechanism: "shotgun", directorAppointmentMethod: "pro-rata", infoRightsFrequency: "quarterly", spendingLimitBeforeBoard: "", expenseApprovalThreshold: "", relatedPartyDisclosure: true });
-  const [investment, setInvestment] = useState<InvestmentData>({ investmentAmount: "", valuationCap: "", discountRate: 20, conversionTriggers: ["equity-financing"], mfnClause: "both", proRataThreshold: "5", infoFrequency: "quarterly", infoScope: ["P&L", "Balance sheet"], boardObserver: false, proRataRights: true });
-  const [commercial, setCommercial] = useState<CommercialData>({ serviceDescription: "", deploymentModel: "cloud", uptimeCommitment: 99.9, responseCritical: "1", responseHigh: "4", responseMedium: "8", responseLow: "24", serviceCreditSchedule: "tiered", pipeda: true, dataResidency: "canada", breachNotification: "72", casl: true, liabilityCap: "12mo", forceMajeure: true, consequentialDamages: true, dataBackupDR: true, serviceAvailability: "24-7", maintenanceWindow: "sunday-2am", changeManagement: true, escalationMatrix: false, customerAuditRights: false, dataEncryption: "both", subProcessorNotification: true, breachNotificationTimeline: "72h", dataPortability: true, dataDeletionTimeline: "30", crossBorderRestrictions: false });
-  const [platform, setPlatform] = useState<PlatformData>({ businessType: "saas", platformUrl: "", hasUserAccounts: true, collectsPersonalInfo: true, hasEcommerce: false, hasUGC: false, operatesInQuebec: false, hasInternationalUsers: false, acceptanceMechanism: "clickwrap", disputeResolution: "arbitration", dataStorage: "canada", partnershipType: "general", profitSplit: "equal", managementStructure: "all-partners", msaPaymentTerms: "net-30", msaIpOwnership: "client-owns", ageRestriction: false, cookieConsent: "banner", contentModeration: "post-moderation", apiAccess: false, rateLimiting: true, accountSuspensionRights: true, classActionWaiver: false });
+  const [employment, setEmployment] = useState<EmploymentData>({ salary: "", startDate: "", vacationDays: "15", benefitsPlan: "standard", terminationPosition: "balanced", probationPosition: "balanced", confidentiality: true, nonSolicitClient: true, nonSolicitClientDuration: "12", nonSolicitEmployee: true, nonSolicitEmployeeDuration: "12", nonCompete: false, nonCompeteDuration: "12", nonCompeteScope: "city", gardenLeave: false, ipPosition: "full-assignment", ipAssignmentScope: "all-work-product", overtimeEligibility: "exempt", bonusStructure: "none", bonusClawback: false, workArrangement: "in-office", expTechStipend: false, expTravel: false, expProfDev: false, relocationAssistance: false, relocationAmount: "", signingBonus: "", signingBonusRepayMonths: "", positionTitle: "", department: "", reportingTo: "", employmentType: "full-time", hoursPerWeek: "40", probationMonths: "3", equityGrant: false, equityType: "stock-options", equityVestingSchedule: "4yr-1yr-cliff", equityAmount: "", pensionPlan: false, pensionMatchPercent: "", disabilityInsurance: false, lifeInsurance: false, dentalVision: false, eapAccess: false, noticeFromEmployer: "esa-minimum", noticeFromEmployee: "2-weeks", inventionDisclosurePeriod: "30", priorInventionsExclusion: false, priorInventionsDescription: "" });
+  const [corporate, setCorporate] = useState<CorporateData>({ shareholders: [{ name: "", equity: "", role: "" }], boardSize: "3", appointmentRights: "pro-rata", reservedMatters: ["Dividend policy", "Share issuance or dilution"], votingThreshold: "66.67", rofr: true, rofrDays: "30", tagAlong: true, tagAlongThreshold: "50", dragAlong: true, dragAlongThreshold: "75", preEmptive: true, deadlockMethod: "mediation-arbitration", exitMechanism: "shotgun", directorAppointmentMethod: "pro-rata", infoRightsFrequency: "quarterly", spendingLimitBeforeBoard: "", expenseApprovalThreshold: "", relatedPartyDisclosure: true, companyName: "", incorporationJurisdiction: "federal-cbca", authorizedShares: "", shareClasses: ["common"], vestingSchedule: "4yr-1yr-cliff", vestingAccelerationTrigger: "double-trigger", nonCompeteDuration: "12", nonCompeteScope: "province", valuationMethod: "fair-market-value", valuationAppraiser: "mutual-agreement", dividendPolicy: "discretionary", dividendFrequency: "annual", shotgunNoticeMinDays: "60", shotgunFinancingDays: "45", keyManInsurance: false, keyManInsuranceAmount: "", ipAssignment: true, nonSolicitAfterExit: true, nonSolicitDuration: "12", foundingDocDate: "", companyFiscalYearEnd: "dec-31", bankingResolution: "two-directors", signingAuthority: "two-directors" });
+  const [investment, setInvestment] = useState<InvestmentData>({ investmentAmount: "", valuationCap: "", discountRate: 20, conversionTriggers: ["equity-financing"], mfnClause: "both", proRataThreshold: "5", infoFrequency: "quarterly", infoScope: ["P&L", "Balance sheet"], boardObserver: false, proRataRights: true, investorType: "accredited", exemptionBasis: "s2.3-accredited", qualifiedFinancingThreshold: "$1,000,000", maturityDate: "", interestRate: "", interestCalculation: "simple-daily", securityType: "unsecured", mostFavoredNation: true, antiDilution: "broad-weighted-avg", liquidationPreference: "1x-non-participating", dragAlongThreshold: "75", founderLockup: false, founderLockupMonths: "24", keyPersonProvision: false, keyPersonNames: "", closingConditions: ["legal-opinion"] });
+  const [commercial, setCommercial] = useState<CommercialData>({ serviceDescription: "", deploymentModel: "cloud", uptimeCommitment: 99.9, responseCritical: "1", responseHigh: "4", responseMedium: "8", responseLow: "24", serviceCreditSchedule: "tiered", pipeda: true, dataResidency: "canada", breachNotification: "72", casl: true, liabilityCap: "12mo", forceMajeure: true, consequentialDamages: true, dataBackupDR: true, serviceAvailability: "24-7", maintenanceWindow: "sunday-2am", changeManagement: true, escalationMatrix: false, customerAuditRights: false, dataEncryption: "both", subProcessorNotification: true, breachNotificationTimeline: "72h", dataPortability: true, dataDeletionTimeline: "30", crossBorderRestrictions: false, incidentSeverityLevels: true, disasterRecoveryRpo: "4h", disasterRecoveryRto: "8h", supportHours: "business-hours", supportChannels: ["email", "ticket-system"], uptimeMeasurement: "monthly", plannedMaintenanceNotice: "48h", serviceCreditCap: "10", terminationAssistance: true, terminationAssistancePeriod: "30", dataClassification: "confidential", penetrationTesting: false, complianceCertifications: [], dataProcessingAgreement: false, acceptanceTesting: false, acceptanceTestingDays: "30" });
+  const [platform, setPlatform] = useState<PlatformData>({ businessType: "saas", platformUrl: "", hasUserAccounts: true, collectsPersonalInfo: true, hasEcommerce: false, hasUGC: false, operatesInQuebec: false, hasInternationalUsers: false, acceptanceMechanism: "clickwrap", disputeResolution: "arbitration", dataStorage: "canada", partnershipType: "general", profitSplit: "equal", managementStructure: "all-partners", msaPaymentTerms: "net-30", msaIpOwnership: "client-owns", ageRestriction: false, cookieConsent: "banner", contentModeration: "post-moderation", apiAccess: false, rateLimiting: true, accountSuspensionRights: true, classActionWaiver: false, dataCategories: ["names-contact"], dataRetentionPeriod: "2-years", thirdPartyProcessors: false, crossBorderTransfers: false, crossBorderCountries: "", breachNotificationHours: "72", cookieCategories: ["necessary"], privacyOfficerDesignated: false, dataSubjectRights: ["access", "rectification", "deletion"], automatedDecisionMaking: false, childrenDataCollection: false, biometricData: false, consentMechanism: "opt-in", dataMinimization: true, pipedaCompliant: true, quebecLaw25Compliant: false, userRegistrationRequired: true, paymentProcessing: "stripe", refundPolicy: "pro-rata", autoRenewalDisclosure: false, autoRenewalPeriod: "monthly", governingLaw: "ontario", liabilityCapType: "fees-based", liabilityCapAmount: "", indemnificationScope: "mutual", dmcaTakedown: false, accessibilityCompliance: false, sowTemplate: true, changeOrderProcess: "formal-written", acceptanceCriteria: "written-signoff", warrantyPeriod: "90-days", insuranceRequirements: [], backgroundChecks: false, subcontractingAllowed: false, exitTransitionPeriod: "30-days", dataReturnOnTermination: true, performanceMetrics: false, escalationProcess: "internal-executive-mediation-arbitration" });
+  const [lending, setLending] = useState<LendingData>({ loanAmount: "", interestRateType: "fixed", interestRate: "", loanTerm: "", repaymentSchedule: "monthly", secured: false, collateralDescription: "", prepaymentPenalty: false, financialCovenants: [], reportingRequirements: "quarterly", eventsOfDefault: ["payment-default"], curePeriod: "30", defaultInterestPremium: "" });
   const [riskProfile, setRiskProfile] = useState<RiskProfile>({ tolerance: "balanced", priorities: [], context: "", experience: "first-time" });
   const [influencer, setInfluencer] = useState<InfluencerData>({ platforms: ["instagram"], contentTypes: ["photo"], campaignDuration: "3-months", postFrequency: "weekly", hasUsAudience: false, usAudiencePercent: "0", isRegulatedIndustry: false, regulatedCategory: "", collectsPersonalData: false, usesAiContent: false, hasQuebecAudience: false, compensationModel: "flat-fee", compensationAmount: "", paymentSchedule: "on-delivery", performanceMetrics: false, metricType: "", metricTarget: "", contentApproval: "brand-pre-approval", approvalDays: "3", revisionRounds: "2", ipOwnership: "brand-owns-license", usageRightsScope: "all-channels", usageRightsDuration: "campaign-plus-12", exclusivity: false, exclusivityScope: "", exclusivityDuration: "campaign-only", moralsClauseScope: "mutual", terminationNotice: "30", terminationForCause: [], whitelisting: false, whitelistingScope: "", boostingRights: false });
 
@@ -262,11 +295,14 @@ export default function WizardPage() {
       "inv-terms": "Investment Terms",
       "inv-conversion": "Conversion Mechanics",
       "inv-info": "Information Rights",
+      "inv-lending": "Loan Terms",
+      "inv-covenants": "Covenants & Default",
       "com-service": "Service Definition",
       "com-sla": "Service Levels",
       "com-data": "Data & Privacy",
       "com-liability": "Liability",
       "plat-business": "Business & Platform",
+      "plat-privacy": "Privacy & Data Protection",
       "plat-terms": "Terms & Privacy",
       "plat-structure": "Partnership / MSA",
       "inf-campaign": "Campaign & Platforms",
@@ -306,27 +342,60 @@ export default function WizardPage() {
     setIsGenerating(true);
     setError("");
     try {
-      const wizardData = { party, triggerAnswers, riskProfile, employment: hasEmployment ? employment : undefined, corporate: hasCorporate ? corporate : undefined, investment: hasInvestment ? investment : undefined, commercial: hasCommercial ? commercial : undefined, platform: hasPlatform ? platform : undefined, influencer: (hasInfluencer || hasCreator) ? influencer : undefined, activeModules: activeModules.map((m) => m.name), warnings, tier, clauseSelections, agreementIds: selectedIds };
+      const wizardData = { party, triggerAnswers, riskProfile, employment: hasEmployment ? employment : undefined, corporate: hasCorporate ? corporate : undefined, investment: hasInvestment ? investment : undefined, commercial: hasCommercial ? commercial : undefined, platform: hasPlatform ? platform : undefined, influencer: (hasInfluencer || hasCreator) ? influencer : undefined, lending: hasInvestment ? lending : undefined, activeModules: activeModules.map((m) => m.name), warnings, tier, clauseSelections, agreementIds: selectedIds };
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 120000);
-      console.log("[Ruby] Starting generation fetch...");
+
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ category: categories, agreementType: items.map((i) => i.title).join(", "), jurisdiction: party.jurisdiction, wizardData }),
+        body: JSON.stringify({ category: categories, agreementType: items.map((i) => i.title).join(", "), jurisdiction: party.jurisdiction, wizardData, stream: true }),
         signal: controller.signal,
       });
       clearTimeout(timeout);
-      console.log("[Ruby] Fetch complete, status:", res.status);
+
       if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || `Generation failed (${res.status})`); }
-      console.log("[Ruby] Reading response body...");
-      const text = await res.text();
-      console.log("[Ruby] Response body length:", text.length);
-      const data = JSON.parse(text);
-      sessionStorage.setItem("ruby-draft", data.draft);
+
+      // Read streaming response
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error("No response stream");
+
+      const decoder = new TextDecoder();
+      let draft = "";
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          try {
+            const event = JSON.parse(line.slice(6));
+            if (event.type === "delta") {
+              draft += event.text;
+            } else if (event.type === "error") {
+              throw new Error(event.error);
+            }
+            // "done" event — generation complete
+          } catch (parseErr) {
+            // Skip malformed events
+            if (parseErr instanceof Error && parseErr.message !== "Unexpected end of JSON input") {
+              throw parseErr;
+            }
+          }
+        }
+      }
+
+      if (!draft) throw new Error("No content generated");
+
+      sessionStorage.setItem("ruby-draft", draft);
       sessionStorage.setItem("ruby-contract-type", categories.join(","));
       sessionStorage.setItem("ruby-contract-title", items.map((i) => i.title).join(", "));
-      console.log("[Ruby] Draft stored, navigating to preview...");
       router.push("/preview");
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") {
@@ -390,6 +459,21 @@ export default function WizardPage() {
       case "emp-comp": return (
         <div className="space-y-6">
           <StepHeader title="Compensation & Benefits" subtitle="Core employment terms, compensation structure, bonuses, and allowances." />
+          <p className="text-[13px] font-medium uppercase tracking-[0.12em] text-neutral-500">Position Details</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+            <label className="block"><span className={labelClass}>Position Title</span><input type="text" value={employment.positionTitle} onChange={(e) => setEmployment({ ...employment, positionTitle: e.target.value })} placeholder="Senior Software Engineer" className={inputClass} /></label>
+            <label className="block"><span className={labelClass}>Department</span><input type="text" value={employment.department} onChange={(e) => setEmployment({ ...employment, department: e.target.value })} placeholder="Engineering" className={inputClass} /></label>
+            <label className="block"><span className={labelClass}>Reports To</span><input type="text" value={employment.reportingTo} onChange={(e) => setEmployment({ ...employment, reportingTo: e.target.value })} placeholder="VP Engineering" className={inputClass} /></label>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            <label className="block"><span className={labelClass}>Employment Type</span>
+              <select value={employment.employmentType} onChange={(e) => setEmployment({ ...employment, employmentType: e.target.value })} className={inputClass}>
+                <option value="full-time">Full-Time</option><option value="part-time">Part-Time</option><option value="casual">Casual</option>
+              </select>
+            </label>
+            <label className="block"><span className={labelClass}>Hours Per Week</span><input type="number" value={employment.hoursPerWeek} onChange={(e) => setEmployment({ ...employment, hoursPerWeek: e.target.value })} placeholder="40" className={inputClass} /></label>
+          </div>
+          <p className="text-[13px] font-medium uppercase tracking-[0.12em] text-neutral-500">Compensation</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
             <label className="block"><span className={labelClass}>Annual Salary (CAD)</span><input type="text" value={employment.salary} onChange={(e) => setEmployment({ ...employment, salary: e.target.value })} placeholder="$120,000" className={inputClass} /></label>
             <label className="block"><span className={labelClass}>Start Date</span><input type="date" value={employment.startDate} onChange={(e) => setEmployment({ ...employment, startDate: e.target.value })} className={inputClass} /></label>
@@ -453,6 +537,47 @@ export default function WizardPage() {
               <label className="block"><span className={labelClass}>Repayment if employee leaves within (months)</span><input type="number" value={employment.signingBonusRepayMonths} onChange={(e) => setEmployment({ ...employment, signingBonusRepayMonths: e.target.value })} placeholder="12" className={inputClass} /></label>
             )}
           </div>
+          <p className="text-[13px] font-medium uppercase tracking-[0.12em] text-neutral-500">Equity Compensation</p>
+          <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-5">
+            <div><p className="text-sm font-medium text-neutral-900">Equity Grant <HelpTip text="Whether the employee receives an ownership stake in the company — stock options, RSUs, or shares. Equity aligns long-term incentives but dilutes existing shareholders." /></p><p className="text-[13px] text-neutral-400">Include equity compensation in this offer</p></div>
+            <Toggle on={employment.equityGrant} onToggle={() => setEmployment({ ...employment, equityGrant: !employment.equityGrant })} />
+          </div>
+          {employment.equityGrant && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+              <label className="block"><span className={labelClass}>Equity Type</span>
+                <select value={employment.equityType} onChange={(e) => setEmployment({ ...employment, equityType: e.target.value })} className={inputClass}>
+                  <option value="stock-options">Stock Options</option><option value="rsus">RSUs (Restricted Stock Units)</option><option value="shares">Common Shares</option>
+                </select>
+              </label>
+              <label className="block"><span className={labelClass}>Vesting Schedule</span>
+                <select value={employment.equityVestingSchedule} onChange={(e) => setEmployment({ ...employment, equityVestingSchedule: e.target.value })} className={inputClass}>
+                  <option value="4yr-1yr-cliff">4-year / 1-year cliff</option><option value="3yr-monthly">3-year monthly vesting</option><option value="immediate">Immediate (fully vested)</option>
+                </select>
+              </label>
+              <label className="block"><span className={labelClass}>Number of Units</span><input type="text" value={employment.equityAmount} onChange={(e) => setEmployment({ ...employment, equityAmount: e.target.value })} placeholder="10,000" className={inputClass} /></label>
+            </div>
+          )}
+          <p className="text-[13px] font-medium uppercase tracking-[0.12em] text-neutral-500">Benefits & Insurance</p>
+          <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-5">
+            <div><p className="text-sm font-medium text-neutral-900">Group RRSP / Pension Plan <HelpTip text="A registered retirement savings plan with employer matching contributions. A strong retention tool that provides long-term value to the employee." /></p><p className="text-[13px] text-neutral-400">Employer-sponsored retirement savings with matching</p></div>
+            <Toggle on={employment.pensionPlan} onToggle={() => setEmployment({ ...employment, pensionPlan: !employment.pensionPlan })} />
+          </div>
+          {employment.pensionPlan && (
+            <label className="block"><span className={labelClass}>Employer Match Percentage (%)</span><input type="text" value={employment.pensionMatchPercent} onChange={(e) => setEmployment({ ...employment, pensionMatchPercent: e.target.value })} placeholder="5" className={inputClass} /></label>
+          )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {[
+              { key: "disabilityInsurance" as const, label: "Long-Term Disability", desc: "Income replacement if employee becomes unable to work due to illness or injury" },
+              { key: "lifeInsurance" as const, label: "Group Life Insurance", desc: "Death benefit paid to employee's beneficiaries" },
+              { key: "dentalVision" as const, label: "Dental & Vision Coverage", desc: "Extended health benefits for dental care, eyeglasses, and vision services" },
+              { key: "eapAccess" as const, label: "Employee Assistance Program", desc: "Confidential counselling, mental health, and wellness support services" },
+            ].map((item) => (
+              <div key={item.key} className="flex items-center justify-between rounded-xl border border-neutral-200 p-4">
+                <div><p className="text-sm font-medium text-neutral-900">{item.label}</p><p className="text-[13px] text-neutral-400">{item.desc}</p></div>
+                <Toggle on={employment[item.key]} onToggle={() => setEmployment({ ...employment, [item.key]: !employment[item.key] })} />
+              </div>
+            ))}
+          </div>
         </div>
       );
 
@@ -471,6 +596,20 @@ export default function WizardPage() {
               </div>
             </div>
           ))}
+          <p className="text-[13px] font-medium uppercase tracking-[0.12em] text-neutral-500">Notice Periods</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            <label className="block"><span className={labelClass}>Notice from Employer <HelpTip text="How much notice the employer must give before terminating the employee without cause. ESA minimum is the legal floor. Longer notice periods favour the employee and increase separation costs." /></span>
+              <select value={employment.noticeFromEmployer} onChange={(e) => setEmployment({ ...employment, noticeFromEmployer: e.target.value })} className={inputClass}>
+                <option value="esa-minimum">ESA Minimum</option><option value="2-weeks-per-year">2 Weeks per Year of Service</option><option value="1-month-per-year">1 Month per Year of Service</option><option value="custom">Custom</option>
+              </select>
+            </label>
+            <label className="block"><span className={labelClass}>Notice from Employee <HelpTip text="How much advance notice the employee must give before resigning. Longer notice periods protect the employer by ensuring time to find a replacement." /></span>
+              <select value={employment.noticeFromEmployee} onChange={(e) => setEmployment({ ...employment, noticeFromEmployee: e.target.value })} className={inputClass}>
+                <option value="2-weeks">2 Weeks</option><option value="1-month">1 Month</option><option value="2-months">2 Months</option>
+              </select>
+            </label>
+          </div>
+          <label className="block"><span className={labelClass}>Probation Period (months) <HelpTip text="The initial trial period during which termination obligations are reduced. During probation, the employer can end the relationship with minimal notice. Standard is 3 months; maximum is typically 6 months under ESA." /></span><input type="number" value={employment.probationMonths} onChange={(e) => setEmployment({ ...employment, probationMonths: e.target.value })} placeholder="3" className={inputClass} /></label>
         </div>
       );
 
@@ -545,24 +684,82 @@ export default function WizardPage() {
               </button>
             ))}
           </div>
+          <label className="block"><span className={labelClass}>Invention Disclosure Period <HelpTip text="The window of time after signing during which the employee must disclose any prior inventions they want excluded from the IP assignment. Shorter periods favour the employer; longer periods give the employee more time to review." /></span>
+            <select value={employment.inventionDisclosurePeriod} onChange={(e) => setEmployment({ ...employment, inventionDisclosurePeriod: e.target.value })} className={inputClass}>
+              <option value="30">30 Days</option><option value="60">60 Days</option><option value="90">90 Days</option>
+            </select>
+          </label>
+          <div className="rounded-xl border border-neutral-200 p-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <div><p className="text-sm font-medium text-neutral-900">Prior Inventions Exclusion <HelpTip text="Allows the employee to list inventions, patents, or IP they created before this employment that should be excluded from the IP assignment clause. Standard practice for technical hires." /></p><p className="text-[13px] text-neutral-400">Employee may list pre-existing inventions excluded from the IP assignment</p></div>
+              <Toggle on={employment.priorInventionsExclusion} onToggle={() => setEmployment({ ...employment, priorInventionsExclusion: !employment.priorInventionsExclusion })} />
+            </div>
+            {employment.priorInventionsExclusion && (
+              <textarea value={employment.priorInventionsDescription} onChange={(e) => setEmployment({ ...employment, priorInventionsDescription: e.target.value })} placeholder="Describe prior inventions to be excluded from the IP assignment..." rows={3} className={inputClass} />
+            )}
+          </div>
         </div>
       );
 
       case "corp-shareholders": return (
         <div className="space-y-6">
-          <StepHeader title="Shareholder Structure" subtitle="Define shareholders, ownership percentages, and roles. Must total 100%." />
-          {corporate.shareholders.map((sh, i) => (
-            <div key={i} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <input placeholder="Shareholder name" value={sh.name} onChange={(e) => { const s = [...corporate.shareholders]; s[i] = { ...s[i], name: e.target.value }; setCorporate({ ...corporate, shareholders: s }); }} className={inputClass} />
-              <input placeholder="Equity %" type="number" value={sh.equity} onChange={(e) => { const s = [...corporate.shareholders]; s[i] = { ...s[i], equity: e.target.value }; setCorporate({ ...corporate, shareholders: s }); }} className={inputClass} />
-              <div className="flex gap-3">
-                <input placeholder="Role" value={sh.role} onChange={(e) => { const s = [...corporate.shareholders]; s[i] = { ...s[i], role: e.target.value }; setCorporate({ ...corporate, shareholders: s }); }} className={`flex-1 ${inputClass}`} />
-                {corporate.shareholders.length > 1 && <button type="button" onClick={() => setCorporate({ ...corporate, shareholders: corporate.shareholders.filter((_, j) => j !== i) })} className="text-neutral-400 hover:text-red-500 text-sm font-medium transition-colors mt-1.5">Remove</button>}
+          <StepHeader title="Shareholder Structure" subtitle="Define the corporation, shareholders, ownership percentages, roles, and founder terms." />
+          <label className="block"><span className={labelClass}>Company Legal Name <HelpTip text="The full legal name of the corporation as it appears on the articles of incorporation. This must match your corporate registry filing exactly." /></span><input type="text" value={corporate.companyName} onChange={(e) => setCorporate({ ...corporate, companyName: e.target.value })} placeholder="Acme Technologies Inc." className={inputClass} /></label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            <label className="block"><span className={labelClass}>Incorporation Jurisdiction <HelpTip text="The jurisdiction under which the corporation was incorporated. Federal (CBCA) allows operation across all provinces. Provincial incorporation is governed by that province's business corporations act." /></span>
+              <select value={corporate.incorporationJurisdiction} onChange={(e) => setCorporate({ ...corporate, incorporationJurisdiction: e.target.value })} className={inputClass}>
+                <option value="federal-cbca">Federal (CBCA)</option><option value="ontario-obca">Ontario (OBCA)</option><option value="bc-bca">British Columbia (BCA)</option><option value="alberta-abca">Alberta (ABCA)</option><option value="quebec-bca-q">Quebec (BCA-Q)</option>
+              </select>
+            </label>
+            <label className="block"><span className={labelClass}>Founding Document Date <HelpTip text="The date of incorporation or the effective date of the shareholder agreement." /></span><input type="date" value={corporate.foundingDocDate} onChange={(e) => setCorporate({ ...corporate, foundingDocDate: e.target.value })} className={inputClass} /></label>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            <label className="block"><span className={labelClass}>Authorized Share Capital <HelpTip text="The total number of shares the corporation is authorized to issue under its articles. Unlimited is common for CBCA corporations." /></span><input type="text" value={corporate.authorizedShares} onChange={(e) => setCorporate({ ...corporate, authorizedShares: e.target.value })} placeholder="Unlimited or 10,000,000" className={inputClass} /></label>
+            <div>
+              <p className={`${labelClass} mb-2`}>Share Classes <HelpTip text="The classes of shares authorized in the articles. Common shares carry voting rights. Preferred classes may have special dividend, liquidation, or conversion rights." /></p>
+              <div className="flex flex-wrap gap-2">
+                {["common", "class-a-preferred", "class-b", "class-c", "founders-common"].map((cls) => (
+                  <button key={cls} type="button" onClick={() => setCorporate({ ...corporate, shareClasses: corporate.shareClasses.includes(cls) ? corporate.shareClasses.filter((c) => c !== cls) : [...corporate.shareClasses, cls] })} className={`text-sm rounded-lg px-3 py-1.5 border transition-all duration-200 ${corporate.shareClasses.includes(cls) ? "border-[#be123c] bg-[rgba(190,18,60,0.05)] text-[#be123c] font-medium" : "border-neutral-200 text-neutral-500 hover:border-neutral-300"}`}>
+                    {cls === "common" ? "Common" : cls === "class-a-preferred" ? "Class A Preferred" : cls === "class-b" ? "Class B" : cls === "class-c" ? "Class C" : "Founders Common"}
+                  </button>
+                ))}
               </div>
             </div>
-          ))}
-          <button type="button" onClick={() => setCorporate({ ...corporate, shareholders: [...corporate.shareholders, { name: "", equity: "", role: "" }] })} className="text-[15px] text-neutral-900 font-medium hover:text-[#be123c] transition-colors">+ Add Shareholder</button>
-          {(() => { const total = corporate.shareholders.reduce((s, sh) => s + (parseFloat(sh.equity) || 0), 0); return total !== 100 && total > 0 ? <p className="text-[15px] text-amber-700">Total equity: {total}% (must equal 100%)</p> : null; })()}
+          </div>
+          <div className="border-t border-neutral-100 pt-5">
+            <p className={`${labelClass} mb-3`}>Shareholders</p>
+            {corporate.shareholders.map((sh, i) => (
+              <div key={i} className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+                <input placeholder="Shareholder name" value={sh.name} onChange={(e) => { const s = [...corporate.shareholders]; s[i] = { ...s[i], name: e.target.value }; setCorporate({ ...corporate, shareholders: s }); }} className={inputClass} />
+                <input placeholder="Equity %" type="number" value={sh.equity} onChange={(e) => { const s = [...corporate.shareholders]; s[i] = { ...s[i], equity: e.target.value }; setCorporate({ ...corporate, shareholders: s }); }} className={inputClass} />
+                <div className="flex gap-3">
+                  <input placeholder="Role" value={sh.role} onChange={(e) => { const s = [...corporate.shareholders]; s[i] = { ...s[i], role: e.target.value }; setCorporate({ ...corporate, shareholders: s }); }} className={`flex-1 ${inputClass}`} />
+                  {corporate.shareholders.length > 1 && <button type="button" onClick={() => setCorporate({ ...corporate, shareholders: corporate.shareholders.filter((_, j) => j !== i) })} className="text-neutral-400 hover:text-red-500 text-sm font-medium transition-colors mt-1.5">Remove</button>}
+                </div>
+              </div>
+            ))}
+            <button type="button" onClick={() => setCorporate({ ...corporate, shareholders: [...corporate.shareholders, { name: "", equity: "", role: "" }] })} className="text-[15px] text-neutral-900 font-medium hover:text-[#be123c] transition-colors">+ Add Shareholder</button>
+            {(() => { const total = corporate.shareholders.reduce((s, sh) => s + (parseFloat(sh.equity) || 0), 0); return total !== 100 && total > 0 ? <p className="text-[15px] text-amber-700 mt-2">Total equity: {total}% (must equal 100%)</p> : null; })()}
+          </div>
+          <div className="border-t border-neutral-100 pt-5">
+            <p className={`${labelClass} mb-3`}>Founder Vesting & IP</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+              <label className="block"><span className={labelClass}>Vesting Schedule <HelpTip text="Determines how founders earn their equity over time. A 4-year schedule with 1-year cliff is standard for startups — no shares vest until the first anniversary, then monthly thereafter." /></span>
+                <select value={corporate.vestingSchedule} onChange={(e) => setCorporate({ ...corporate, vestingSchedule: e.target.value })} className={inputClass}>
+                  <option value="4yr-1yr-cliff">4-Year with 1-Year Cliff (standard)</option><option value="3yr-monthly">3-Year Monthly Vesting</option><option value="immediate">Immediate (fully vested)</option><option value="none">No Vesting</option>
+                </select>
+              </label>
+              <label className="block"><span className={labelClass}>Acceleration Trigger <HelpTip text="Single trigger: vesting accelerates on change of control alone. Double trigger: requires both change of control AND termination. Double trigger is more investor-friendly." /></span>
+                <select value={corporate.vestingAccelerationTrigger} onChange={(e) => setCorporate({ ...corporate, vestingAccelerationTrigger: e.target.value })} className={inputClass}>
+                  <option value="double-trigger">Double Trigger (CoC + termination)</option><option value="single-trigger">Single Trigger (CoC only)</option><option value="none">No Acceleration</option>
+                </select>
+              </label>
+            </div>
+            <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-5 mt-4">
+              <div><p className="text-sm font-medium text-neutral-900">IP Assignment to Company <HelpTip text="Requires all founders to assign their pre-existing and future intellectual property related to the business to the corporation. Standard for technology companies." /></p><p className="text-[14px] text-neutral-400 mt-0.5">Founders assign all relevant IP to the corporation</p></div>
+              <Toggle on={corporate.ipAssignment} onToggle={() => setCorporate({ ...corporate, ipAssignment: !corporate.ipAssignment })} />
+            </div>
+          </div>
         </div>
       );
 
@@ -579,6 +776,18 @@ export default function WizardPage() {
             </select>
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            <label className="block"><span className={labelClass}>Company Fiscal Year End <HelpTip text="The end date of the corporation's fiscal year. Determines when annual financial statements are prepared and tax filings are due. December 31 is most common." /></span>
+              <select value={corporate.companyFiscalYearEnd} onChange={(e) => setCorporate({ ...corporate, companyFiscalYearEnd: e.target.value })} className={inputClass}>
+                <option value="dec-31">December 31</option><option value="mar-31">March 31</option><option value="jun-30">June 30</option><option value="sep-30">September 30</option>
+              </select>
+            </label>
+            <label className="block"><span className={labelClass}>Signing Authority <HelpTip text="Who has authority to sign contracts, cheques, and banking documents on behalf of the corporation. Dual signing requirements provide stronger financial controls." /></span>
+              <select value={corporate.signingAuthority} onChange={(e) => setCorporate({ ...corporate, signingAuthority: e.target.value })} className={inputClass}>
+                <option value="single-director">Single Director</option><option value="two-directors">Two Directors (dual signing)</option><option value="officer-plus-director">Officer + Director</option>
+              </select>
+            </label>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
             <label className="block"><span className={labelClass}>Information Rights Frequency <HelpTip text="How often shareholders receive financial updates about the company. More frequent reporting keeps everyone informed but requires more administrative effort." /></span>
               <select value={corporate.infoRightsFrequency} onChange={(e) => setCorporate({ ...corporate, infoRightsFrequency: e.target.value })} className={inputClass}>
                 <option value="monthly">Monthly Financials</option><option value="quarterly">Quarterly Financials</option><option value="annual">Annual Financials Only</option>
@@ -587,6 +796,13 @@ export default function WizardPage() {
             <label className="block"><span className={labelClass}>Spending Limit Before Board Approval (CAD) <HelpTip text="The maximum dollar amount management can spend on a single expense or decision without needing the board's approval. Lower limits give the board more control." /></span><input type="text" value={corporate.spendingLimitBeforeBoard} onChange={(e) => setCorporate({ ...corporate, spendingLimitBeforeBoard: e.target.value })} placeholder="$25,000" className={inputClass} /></label>
           </div>
           <label className="block"><span className={labelClass}>Expense Approval Threshold (CAD) <HelpTip text="The dollar amount above which individual expenses need explicit approval. Keeps day-to-day spending flexible while preventing large unauthorized purchases." /></span><input type="text" value={corporate.expenseApprovalThreshold} onChange={(e) => setCorporate({ ...corporate, expenseApprovalThreshold: e.target.value })} placeholder="$5,000" className={inputClass} /></label>
+          <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-5">
+            <div><p className="text-sm font-medium text-neutral-900">Key Person Insurance <HelpTip text="Life and disability insurance on key founders or executives, payable to the corporation. Provides funds for the company to buy out a deceased or disabled shareholder's interest and continue operations." /></p><p className="text-[14px] text-neutral-400 mt-0.5">Require key person life/disability insurance on founders</p></div>
+            <Toggle on={corporate.keyManInsurance} onToggle={() => setCorporate({ ...corporate, keyManInsurance: !corporate.keyManInsurance })} />
+          </div>
+          {corporate.keyManInsurance && (
+            <label className="block"><span className={labelClass}>Key Person Insurance Amount (CAD) <HelpTip text="The face value of the key person insurance policy. Typically set at 2-5x the key person's annual compensation or tied to the company's valuation." /></span><input type="text" value={corporate.keyManInsuranceAmount} onChange={(e) => setCorporate({ ...corporate, keyManInsuranceAmount: e.target.value })} placeholder="$1,000,000" className={inputClass} /></label>
+          )}
           <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-5">
             <div><p className="text-sm font-medium text-neutral-900">Related Party Transaction Disclosure <HelpTip text="Requires shareholders and directors to disclose any deals between the company and themselves, their family members, or their other businesses. This prevents conflicts of interest and self-dealing." /></p><p className="text-[14px] text-neutral-400 mt-0.5">Require disclosure when a shareholder or director has a personal interest in a company transaction</p></div>
             <Toggle on={corporate.relatedPartyDisclosure} onToggle={() => setCorporate({ ...corporate, relatedPartyDisclosure: !corporate.relatedPartyDisclosure })} />
@@ -611,6 +827,39 @@ export default function WizardPage() {
               {corporate[item.key] && item.dur && <input type="number" value={corporate[item.dur]} onChange={(e) => setCorporate({ ...corporate, [item.dur!]: e.target.value })} placeholder={item.durLabel} className={`mt-3 w-48 ${inputClass}`} />}
             </div>
           ))}
+          <div className="border-t border-neutral-100 pt-5">
+            <p className={`${labelClass} mb-3`}>Valuation on Transfer</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+              <label className="block"><span className={labelClass}>Valuation Method <HelpTip text="How the share price is determined when a transfer is triggered. Fair market value uses current market conditions. Formula-based uses a pre-agreed calculation (e.g., multiple of revenue). Independent appraiser brings in a third party." /></span>
+                <select value={corporate.valuationMethod} onChange={(e) => setCorporate({ ...corporate, valuationMethod: e.target.value })} className={inputClass}>
+                  <option value="fair-market-value">Fair Market Value</option><option value="formula-based">Formula-Based (e.g., revenue multiple)</option><option value="independent-appraiser">Independent Appraiser</option>
+                </select>
+              </label>
+              <label className="block"><span className={labelClass}>Valuation Appraiser <HelpTip text="If a valuation is disputed, who performs the independent assessment. Mutual agreement means both parties must agree on the appraiser. Big 4 limits it to major accounting firms." /></span>
+                <select value={corporate.valuationAppraiser} onChange={(e) => setCorporate({ ...corporate, valuationAppraiser: e.target.value })} className={inputClass}>
+                  <option value="mutual-agreement">Mutual Agreement</option><option value="big-4">Big 4 Accounting Firm</option><option value="specific-firm">Specific Named Firm</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          <div className="border-t border-neutral-100 pt-5">
+            <p className={`${labelClass} mb-3`}>Restrictive Covenants Between Shareholders</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+              <label className="block"><span className={labelClass}>Non-Compete Duration (months) <HelpTip text="How long after a shareholder exits they are restricted from competing with the company. Canadian courts generally enforce 12-24 months if the scope is reasonable." /></span><input type="text" value={corporate.nonCompeteDuration} onChange={(e) => setCorporate({ ...corporate, nonCompeteDuration: e.target.value })} placeholder="12" className={inputClass} /></label>
+              <label className="block"><span className={labelClass}>Non-Compete Geographic Scope <HelpTip text="The geographic area where the departing shareholder cannot compete. Narrower scopes are more likely to be enforced by Canadian courts." /></span>
+                <select value={corporate.nonCompeteScope} onChange={(e) => setCorporate({ ...corporate, nonCompeteScope: e.target.value })} className={inputClass}>
+                  <option value="city">City / Metro Area</option><option value="province">Province</option><option value="national">National (Canada)</option><option value="north-america">North America</option>
+                </select>
+              </label>
+            </div>
+            <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-5 mt-4">
+              <div><p className="text-sm font-medium text-neutral-900">Non-Solicitation After Exit <HelpTip text="Prevents a departing shareholder from poaching employees or clients of the company after they leave. More commonly enforced than non-competes in Canada." /></p><p className="text-[14px] text-neutral-400 mt-0.5">Restrict departing shareholders from soliciting employees or clients</p></div>
+              <Toggle on={corporate.nonSolicitAfterExit} onToggle={() => setCorporate({ ...corporate, nonSolicitAfterExit: !corporate.nonSolicitAfterExit })} />
+            </div>
+            {corporate.nonSolicitAfterExit && (
+              <label className="block mt-3"><span className={labelClass}>Non-Solicitation Duration (months)</span><input type="text" value={corporate.nonSolicitDuration} onChange={(e) => setCorporate({ ...corporate, nonSolicitDuration: e.target.value })} placeholder="12" className={`w-48 ${inputClass}`} /></label>
+            )}
+          </div>
         </div>
       );
 
@@ -628,6 +877,8 @@ export default function WizardPage() {
               <option value="dissolution">Forced Dissolution — Wind up the company and distribute assets</option>
             </select>
           </label>
+          <div className="border-t border-neutral-100 pt-5"><p className={`${labelClass} mb-3`}>Shotgun Buy-Sell Terms</p><div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5"><label className="block"><span className={labelClass}>Shotgun Notice Period <HelpTip text="Minimum days of notice before a shotgun buy-sell can be initiated." /></span><select value={corporate.shotgunNoticeMinDays} onChange={(e) => setCorporate({ ...corporate, shotgunNoticeMinDays: e.target.value })} className={inputClass}><option value="30">30 days</option><option value="60">60 days</option><option value="90">90 days</option></select></label><label className="block"><span className={labelClass}>Financing Period <HelpTip text="Days to arrange financing after a shotgun notice." /></span><select value={corporate.shotgunFinancingDays} onChange={(e) => setCorporate({ ...corporate, shotgunFinancingDays: e.target.value })} className={inputClass}><option value="30">30 days</option><option value="45">45 days</option><option value="60">60 days</option><option value="90">90 days</option></select></label></div></div>
+          <div className="border-t border-neutral-100 pt-5"><p className={`${labelClass} mb-3`}>Dividend & Distribution Policy</p><div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5"><label className="block"><span className={labelClass}>Dividend Policy <HelpTip text="How profits are distributed to shareholders." /></span><select value={corporate.dividendPolicy} onChange={(e) => setCorporate({ ...corporate, dividendPolicy: e.target.value })} className={inputClass}><option value="discretionary">Discretionary (board decides)</option><option value="mandatory-percent">Mandatory % of Net Income</option><option value="reinvest">Reinvest All Earnings</option></select></label><label className="block"><span className={labelClass}>Dividend Frequency <HelpTip text="How often dividends are declared and paid." /></span><select value={corporate.dividendFrequency} onChange={(e) => setCorporate({ ...corporate, dividendFrequency: e.target.value })} className={inputClass}><option value="quarterly">Quarterly</option><option value="semi-annual">Semi-Annual</option><option value="annual">Annual</option></select></label></div></div>
         </div>
       );
 
@@ -638,7 +889,49 @@ export default function WizardPage() {
             <label className="block"><span className={labelClass}>Investment Amount (CAD)</span><input type="text" value={investment.investmentAmount} onChange={(e) => setInvestment({ ...investment, investmentAmount: e.target.value })} placeholder="$250,000" className={inputClass} /></label>
             <label className="block"><span className={labelClass}>Valuation Cap (CAD) <HelpTip text="The maximum company value used when calculating how many shares the investor gets. A lower cap is better for the investor." /></span><input type="text" value={investment.valuationCap} onChange={(e) => setInvestment({ ...investment, valuationCap: e.target.value })} placeholder="$5,000,000" className={inputClass} /></label>
           </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            <label className="block"><span className={labelClass}>Investor Type <HelpTip text="The classification of the investor under Canadian securities law. This determines which prospectus exemption applies and what disclosure is required." /></span>
+              <select value={investment.investorType} onChange={(e) => setInvestment({ ...investment, investorType: e.target.value })} className={inputClass}>
+                <option value="accredited">Accredited Investor</option><option value="friend-family">Friend / Family</option><option value="institutional">Institutional</option><option value="angel">Angel Investor</option>
+              </select>
+            </label>
+            <label className="block"><span className={labelClass}>Exemption Basis (NI 45-106) <HelpTip text="The specific National Instrument 45-106 exemption relied upon for this private placement. Each exemption has distinct filing, disclosure, and resale restriction requirements." /></span>
+              <select value={investment.exemptionBasis} onChange={(e) => setInvestment({ ...investment, exemptionBasis: e.target.value })} className={inputClass}>
+                <option value="s2.3-accredited">s.2.3 — Accredited Investor</option><option value="s2.5-family-friends">s.2.5 — Family, Friends & Business Associates</option><option value="s2.24-crowdfunding">s.2.24 — Crowdfunding</option>
+              </select>
+            </label>
+          </div>
           <label className="block"><span className={labelClass}>Discount Rate: {investment.discountRate}% <HelpTip text="The percentage discount the investor gets on the share price compared to future investors. A 20% discount means they pay 80 cents for every dollar future investors pay." /></span><input type="range" min="10" max="30" step="1" value={investment.discountRate} onChange={(e) => setInvestment({ ...investment, discountRate: parseInt(e.target.value) })} className="mt-2 block w-full accent-[#be123c]" /></label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            <label className="block"><span className={labelClass}>Security Type <HelpTip text="Whether the investment is unsecured or backed by a security interest registered under the Personal Property Security Act (PPSA). Secured investments give the investor priority over the company's assets in default." /></span>
+              <select value={investment.securityType} onChange={(e) => setInvestment({ ...investment, securityType: e.target.value })} className={inputClass}>
+                <option value="unsecured">Unsecured</option><option value="secured-ppsa">Secured (PPSA Registration)</option>
+              </select>
+            </label>
+            <label className="block"><span className={labelClass}>Qualified Financing Threshold (CAD) <HelpTip text="The minimum aggregate amount the company must raise in an equity financing round to trigger automatic conversion of the SAFE or convertible note. Typical thresholds range from $500K to $2M." /></span><input type="text" value={investment.qualifiedFinancingThreshold} onChange={(e) => setInvestment({ ...investment, qualifiedFinancingThreshold: e.target.value })} placeholder="$1,000,000" className={inputClass} /></label>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            <label className="block"><span className={labelClass}>Anti-Dilution Protection <HelpTip text="Protects the investor if the company issues shares at a lower price in the future. Full ratchet gives the strongest protection. Weighted average is more founder-friendly." /></span>
+              <select value={investment.antiDilution} onChange={(e) => setInvestment({ ...investment, antiDilution: e.target.value })} className={inputClass}>
+                <option value="broad-weighted-avg">Broad-Based Weighted Average</option><option value="narrow-weighted-avg">Narrow-Based Weighted Average</option><option value="full-ratchet">Full Ratchet</option><option value="none">No Anti-Dilution</option>
+              </select>
+            </label>
+            <label className="block"><span className={labelClass}>Liquidation Preference <HelpTip text="Determines what the investor gets back before common shareholders in a liquidation or exit. 1x non-participating means the investor gets their money back OR converts to common. Participating means they get their money back AND share in remaining proceeds." /></span>
+              <select value={investment.liquidationPreference} onChange={(e) => setInvestment({ ...investment, liquidationPreference: e.target.value })} className={inputClass}>
+                <option value="1x-non-participating">1x Non-Participating</option><option value="1x-participating">1x Participating</option><option value="2x-non-participating">2x Non-Participating</option><option value="2x-participating">2x Participating</option>
+              </select>
+            </label>
+          </div>
+          <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-5">
+            <div><p className="text-sm font-medium text-neutral-900">Key Person Provision <HelpTip text="Requires named founders or executives to remain actively involved in the company. If a key person departs, it can trigger investor protections such as accelerated vesting or conversion rights." /></p><p className="text-[14px] text-neutral-400 mt-0.5">Named individuals whose continued involvement is a condition of the investment</p></div>
+            <Toggle on={investment.keyPersonProvision} onToggle={() => setInvestment({ ...investment, keyPersonProvision: !investment.keyPersonProvision })} />
+          </div>
+          {investment.keyPersonProvision && (
+            <label className="block"><span className={labelClass}>Key Person Names</span><input type="text" value={investment.keyPersonNames} onChange={(e) => setInvestment({ ...investment, keyPersonNames: e.target.value })} placeholder="e.g. Jane Smith, Alex Chen" className={inputClass} /></label>
+          )}
+          <div><p className={`${labelClass} mb-3`}>Closing Conditions <HelpTip text="Conditions that must be satisfied before the investment closes. These protect the investor by ensuring the company meets certain requirements before funds are released." /></p>
+            {[{ id: "legal-opinion", label: "Legal Opinion", desc: "External counsel provides a formal opinion on the validity of the transaction" }, { id: "financial-statements", label: "Financial Statements", desc: "Delivery of audited or reviewed financial statements" }, { id: "due-diligence", label: "Due Diligence Completion", desc: "Satisfactory completion of investor's due diligence review" }, { id: "board-approval", label: "Board Approval", desc: "Formal board resolution approving the transaction" }, { id: "regulatory-approval", label: "Regulatory Approval", desc: "Any required regulatory filings or approvals are obtained" }].map((c) => (<label key={c.id} className="flex items-start gap-3 text-sm text-neutral-500 mb-3 cursor-pointer"><input type="checkbox" checked={investment.closingConditions.includes(c.id)} onChange={(e) => setInvestment({ ...investment, closingConditions: e.target.checked ? [...investment.closingConditions, c.id] : investment.closingConditions.filter((cc) => cc !== c.id) })} className="rounded border-neutral-300 accent-[#be123c] focus:ring-[rgba(190,18,60,0.1)] mt-0.5" /><div><span className="text-neutral-900 font-medium">{c.label}</span><p className="text-[13px] text-neutral-400">{c.desc}</p></div></label>))}
+          </div>
           <label className="block"><span className={labelClass}>Information Rights Frequency <HelpTip text="How often the investor receives financial and business updates. More frequent reporting builds trust but creates more work for the company." /></span>
             <select value={investment.infoFrequency} onChange={(e) => setInvestment({ ...investment, infoFrequency: e.target.value })} className={inputClass}>
               <option value="monthly">Monthly</option><option value="quarterly">Quarterly</option><option value="annual">Annual</option>
@@ -667,6 +960,25 @@ export default function WizardPage() {
             </select>
           </label>
           <label className="block"><span className={labelClass}>Pro Rata Threshold (%) <HelpTip text="The minimum ownership percentage an investor must hold to qualify for pro rata rights. A lower threshold gives more investors the right to participate in future rounds." /></span><input type="text" value={investment.proRataThreshold} onChange={(e) => setInvestment({ ...investment, proRataThreshold: e.target.value })} className={inputClass} /></label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            <label className="block"><span className={labelClass}>Maturity Date <HelpTip text="For convertible notes: the date by which the note must either convert or be repaid." /></span><input type="date" value={investment.maturityDate} onChange={(e) => setInvestment({ ...investment, maturityDate: e.target.value })} className={inputClass} /></label>
+            <label className="block"><span className={labelClass}>Interest Rate (Annual) <HelpTip text="For convertible notes: the annual interest rate. Under the Interest Act (Canada) s.4, interest must be expressed as an annual rate." /></span><input type="text" value={investment.interestRate} onChange={(e) => setInvestment({ ...investment, interestRate: e.target.value })} placeholder="e.g. 5%" className={inputClass} /></label>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            <label className="block"><span className={labelClass}>Interest Calculation Method <HelpTip text="Simple daily accrues on the original principal only (ACT/365). Compound monthly accrues on principal plus previously accrued interest." /></span>
+              <select value={investment.interestCalculation} onChange={(e) => setInvestment({ ...investment, interestCalculation: e.target.value })} className={inputClass}>
+                <option value="simple-daily">Simple Interest (daily, ACT/365)</option><option value="compound-monthly">Compound Interest (monthly)</option><option value="compound-quarterly">Compound Interest (quarterly)</option>
+              </select>
+            </label>
+            <label className="block"><span className={labelClass}>Drag-Along Threshold (%) <HelpTip text="The percentage of shareholders required to trigger a drag-along sale." /></span><input type="text" value={investment.dragAlongThreshold} onChange={(e) => setInvestment({ ...investment, dragAlongThreshold: e.target.value })} placeholder="e.g. 75" className={inputClass} /></label>
+          </div>
+          <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-5">
+            <div><p className="text-sm font-medium text-neutral-900">Founder Lock-Up <HelpTip text="Restricts founders from selling or transferring their shares for a specified period after closing." /></p><p className="text-[14px] text-neutral-400 mt-0.5">Founders cannot sell or transfer shares during the lock-up period</p></div>
+            <Toggle on={investment.founderLockup} onToggle={() => setInvestment({ ...investment, founderLockup: !investment.founderLockup })} />
+          </div>
+          {investment.founderLockup && (
+            <label className="block"><span className={labelClass}>Lock-Up Period (months)</span><input type="text" value={investment.founderLockupMonths} onChange={(e) => setInvestment({ ...investment, founderLockupMonths: e.target.value })} placeholder="e.g. 24" className={inputClass} /></label>
+          )}
         </div>
       );
 
@@ -682,15 +994,77 @@ export default function WizardPage() {
             {["P&L", "Balance sheet", "Cap table", "Material events"].map((s) => (<label key={s} className="flex items-center gap-3 text-sm text-neutral-500 mb-3 cursor-pointer"><input type="checkbox" checked={investment.infoScope.includes(s)} onChange={(e) => setInvestment({ ...investment, infoScope: e.target.checked ? [...investment.infoScope, s] : investment.infoScope.filter((i) => i !== s) })} className="rounded border-neutral-300 accent-[#be123c] focus:ring-[rgba(190,18,60,0.1)]" />{s}</label>))}
           </div>
           <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-5">
+            <div><p className="text-sm font-medium text-neutral-900">Most Favoured Nation (MFN) Clause <HelpTip text="If the company offers better terms to a subsequent investor, this investor automatically receives those improved terms. Provides strong protection for early-stage investors." /></p><p className="text-[14px] text-neutral-400 mt-0.5">Investor automatically receives any better terms offered to later investors</p></div>
+            <Toggle on={investment.mostFavoredNation} onToggle={() => setInvestment({ ...investment, mostFavoredNation: !investment.mostFavoredNation })} />
+          </div>
+          <label className="block"><span className={labelClass}>Financial Reporting Detail <HelpTip text="The level of financial detail the company must provide. Summary financials are lighter-weight; full audited statements require an external audit and are more expensive but provide greater investor assurance." /></span>
+            <select value={investment.infoScope.includes("Full audited") ? "full-audited" : investment.infoScope.includes("Quarterly + annual audited") ? "quarterly-annual-audited" : "summary"} onChange={(e) => { const val = e.target.value; const base = investment.infoScope.filter((s) => !["Full audited", "Quarterly + annual audited", "Summary financials"].includes(s)); if (val === "full-audited") setInvestment({ ...investment, infoScope: [...base, "Full audited"] }); else if (val === "quarterly-annual-audited") setInvestment({ ...investment, infoScope: [...base, "Quarterly + annual audited"] }); else setInvestment({ ...investment, infoScope: [...base, "Summary financials"] }); }} className={inputClass}>
+              <option value="summary">Summary Financials</option><option value="full-audited">Full Audited Financial Statements</option><option value="quarterly-annual-audited">Quarterly Unaudited + Annual Audited</option>
+            </select>
+          </label>
+          <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-5">
             <p className="text-sm font-medium text-neutral-900">Board Observer Rights</p>
             <Toggle on={investment.boardObserver} onToggle={() => setInvestment({ ...investment, boardObserver: !investment.boardObserver })} />
           </div>
         </div>
       );
 
+      case "inv-lending": return (
+        <div className="space-y-6">
+          <StepHeader title="Loan Terms" subtitle="Set the key financial terms for the lending arrangement. These determine the loan economics, repayment structure, and security." />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            <label className="block"><span className={labelClass}>Loan Amount <HelpTip text="The principal amount being lent. Include the currency (e.g. CAD). This is the maximum the borrower can draw." /></span><input type="text" value={lending.loanAmount} onChange={(e) => setLending({ ...lending, loanAmount: e.target.value })} placeholder="e.g. $500,000 CAD" className={inputClass} /></label>
+            <label className="block"><span className={labelClass}>Interest Rate <HelpTip text="The annual interest rate charged on the outstanding balance. Under the Interest Act s.4, this must be expressed as an annual rate." /></span><input type="text" value={lending.interestRate} onChange={(e) => setLending({ ...lending, interestRate: e.target.value })} placeholder="e.g. 5.5%" className={inputClass} /></label>
+          </div>
+          <div><p className={`${labelClass} mb-3`}>Interest Rate Type</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">{[{ id: "fixed", label: "Fixed Rate", desc: "Rate stays the same for the entire loan term" }, { id: "variable", label: "Variable Rate", desc: "Rate floats based on a reference rate (e.g. prime + spread)" }].map((m) => (<button key={m.id} type="button" onClick={() => setLending({ ...lending, interestRateType: m.id })} className={`text-left rounded-xl border p-4 transition-all duration-200 ${lending.interestRateType === m.id ? "border-[#be123c] text-[#be123c] bg-[rgba(190,18,60,0.03)]" : "border-neutral-200 bg-white text-neutral-500 hover:border-neutral-300"}`}><p className="text-sm font-medium">{m.label}</p><p className="text-[13px] text-neutral-400">{m.desc}</p></button>))}</div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            <label className="block"><span className={labelClass}>Loan Term <HelpTip text="The duration of the loan. For demand notes, this can be 'On demand'. For term loans, specify in months or years." /></span><input type="text" value={lending.loanTerm} onChange={(e) => setLending({ ...lending, loanTerm: e.target.value })} placeholder="e.g. 24 months" className={inputClass} /></label>
+            <label className="block"><span className={labelClass}>Repayment Schedule <HelpTip text="How often the borrower makes payments. Bullet repayment means the full amount is due at maturity." /></span>
+              <select value={lending.repaymentSchedule} onChange={(e) => setLending({ ...lending, repaymentSchedule: e.target.value })} className={inputClass}>
+                <option value="monthly">Monthly</option><option value="quarterly">Quarterly</option><option value="bullet">Bullet at maturity</option><option value="on-demand">On demand</option>
+              </select>
+            </label>
+          </div>
+          <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-5">
+            <div><p className="text-sm font-medium text-neutral-900">Secured Loan <HelpTip text="A secured loan is backed by collateral (assets the lender can seize if the borrower defaults). An unsecured loan relies solely on the borrower's creditworthiness." /></p><p className="text-[14px] text-neutral-400 mt-0.5">Loan is backed by collateral or security interest</p></div>
+            <Toggle on={lending.secured} onToggle={() => setLending({ ...lending, secured: !lending.secured })} />
+          </div>
+          {lending.secured && (
+            <label className="block"><span className={labelClass}>Collateral Description <HelpTip text="Describe the assets securing the loan. This could be a general security agreement over all assets, specific equipment, accounts receivable, real property, or personal guarantees." /></span><textarea value={lending.collateralDescription} onChange={(e) => setLending({ ...lending, collateralDescription: e.target.value })} placeholder="e.g. General security agreement over all present and after-acquired property of the borrower..." rows={3} className={inputClass} /></label>
+          )}
+          <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-5">
+            <div><p className="text-sm font-medium text-neutral-900">Prepayment Penalty <HelpTip text="Whether the borrower must pay a fee for repaying the loan early. No penalty gives the borrower flexibility; a penalty compensates the lender for lost interest income." /></p><p className="text-[14px] text-neutral-400 mt-0.5">Penalty applies if the borrower repays early</p></div>
+            <Toggle on={lending.prepaymentPenalty} onToggle={() => setLending({ ...lending, prepaymentPenalty: !lending.prepaymentPenalty })} />
+          </div>
+        </div>
+      );
+
+      case "inv-covenants": return (
+        <div className="space-y-6">
+          <StepHeader title="Covenants & Default" subtitle="Define the ongoing obligations the borrower must satisfy, reporting requirements, and what happens if things go wrong." />
+          <div><p className={`${labelClass} mb-3`}>Financial Covenants <HelpTip text="Ongoing financial tests the borrower must pass. Failing a covenant can trigger a default. More covenants mean more lender protection but less operational flexibility for the borrower." /></p>
+            {[{ id: "debt-to-equity", label: "Debt-to-Equity Ratio", desc: "Total debt divided by total equity must stay below a threshold" }, { id: "current-ratio", label: "Current Ratio", desc: "Current assets divided by current liabilities must exceed a minimum" }, { id: "interest-coverage", label: "Interest Coverage Ratio", desc: "EBITDA divided by interest expense must exceed a minimum" }, { id: "min-cash", label: "Minimum Cash Balance", desc: "Borrower must maintain a minimum cash balance at all times" }].map((c) => (<label key={c.id} className="flex items-start gap-3 text-sm text-neutral-500 mb-3 cursor-pointer"><input type="checkbox" checked={lending.financialCovenants.includes(c.id)} onChange={(e) => setLending({ ...lending, financialCovenants: e.target.checked ? [...lending.financialCovenants, c.id] : lending.financialCovenants.filter((fc) => fc !== c.id) })} className="rounded border-neutral-300 accent-[#be123c] focus:ring-[rgba(190,18,60,0.1)] mt-0.5" /><div><span className="text-neutral-900 font-medium">{c.label}</span><p className="text-[13px] text-neutral-400">{c.desc}</p></div></label>))}
+          </div>
+          <label className="block"><span className={labelClass}>Reporting Requirements <HelpTip text="How often the borrower must deliver financial statements and compliance certificates to the lender." /></span>
+            <select value={lending.reportingRequirements} onChange={(e) => setLending({ ...lending, reportingRequirements: e.target.value })} className={inputClass}>
+              <option value="monthly">Monthly</option><option value="quarterly">Quarterly</option><option value="annual">Annual</option>
+            </select>
+          </label>
+          <div><p className={`${labelClass} mb-3`}>Events of Default <HelpTip text="Circumstances that allow the lender to accelerate the loan (demand immediate full repayment). Select all that should trigger default." /></p>
+            {[{ id: "payment-default", label: "Payment Default", desc: "Borrower fails to make a scheduled payment" }, { id: "covenant-breach", label: "Covenant Breach", desc: "Borrower fails to satisfy a financial or operational covenant" }, { id: "material-adverse-change", label: "Material Adverse Change", desc: "A significant negative change in the borrower's financial condition or business" }, { id: "cross-default", label: "Cross-Default", desc: "Borrower defaults on another loan or material obligation" }, { id: "insolvency", label: "Insolvency", desc: "Borrower becomes insolvent, files for bankruptcy, or a receiver is appointed" }].map((d) => (<label key={d.id} className="flex items-start gap-3 text-sm text-neutral-500 mb-3 cursor-pointer"><input type="checkbox" checked={lending.eventsOfDefault.includes(d.id)} onChange={(e) => setLending({ ...lending, eventsOfDefault: e.target.checked ? [...lending.eventsOfDefault, d.id] : lending.eventsOfDefault.filter((ed) => ed !== d.id) })} className="rounded border-neutral-300 accent-[#be123c] focus:ring-[rgba(190,18,60,0.1)] mt-0.5" /><div><span className="text-neutral-900 font-medium">{d.label}</span><p className="text-[13px] text-neutral-400">{d.desc}</p></div></label>))}
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            <label className="block"><span className={labelClass}>Cure Period <HelpTip text="The number of days the borrower has to fix a default before the lender can exercise remedies like acceleration. A longer cure period favours the borrower." /></span><input type="text" value={lending.curePeriod} onChange={(e) => setLending({ ...lending, curePeriod: e.target.value })} placeholder="e.g. 30 days" className={inputClass} /></label>
+            <label className="block"><span className={labelClass}>Default Interest Rate Premium <HelpTip text="The additional interest rate charged on the outstanding balance during an event of default. This compensates the lender for the increased risk." /></span><input type="text" value={lending.defaultInterestPremium} onChange={(e) => setLending({ ...lending, defaultInterestPremium: e.target.value })} placeholder="e.g. +2%" className={inputClass} /></label>
+          </div>
+        </div>
+      );
+
       case "com-service": return (
         <div className="space-y-6">
-          <StepHeader title="Service Definition" subtitle="Describe the services, deployment model, availability, and operational commitments." />
+          <StepHeader title="Service Definition" subtitle="Describe the services, deployment model, availability, support structure, and operational commitments." />
           <label className="block"><span className={labelClass}>Service Description</span><textarea value={commercial.serviceDescription} onChange={(e) => setCommercial({ ...commercial, serviceDescription: e.target.value })} placeholder="Describe the services being provided..." rows={4} className={inputClass} /></label>
           <div><p className={`${labelClass} mb-3`}>Deployment Model</p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">{[{ id: "cloud", label: "Cloud" }, { id: "on-premise", label: "On-Premise" }, { id: "hybrid", label: "Hybrid" }].map((m) => (<button key={m.id} type="button" onClick={() => setCommercial({ ...commercial, deploymentModel: m.id })} className={`rounded-xl border p-4 text-sm font-medium transition-all duration-200 ${commercial.deploymentModel === m.id ? "border-[#be123c] text-[#be123c] bg-[rgba(190,18,60,0.03)]" : "border-neutral-200 bg-white text-neutral-500 hover:border-neutral-300"}`}>{m.label}</button>))}</div>
@@ -707,12 +1081,29 @@ export default function WizardPage() {
               </select>
             </label>
           </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            <label className="block"><span className={labelClass}>Support Hours <HelpTip text="When your support team is available to respond to tickets and inquiries. Distinct from service availability -- this is human response availability." /></span>
+              <select value={commercial.supportHours} onChange={(e) => setCommercial({ ...commercial, supportHours: e.target.value })} className={inputClass}>
+                <option value="24-7">24/7 Support</option><option value="business-hours">Business Hours (Mon-Fri 9am-5pm)</option><option value="extended">Extended Hours (7am-11pm)</option>
+              </select>
+            </label>
+            <div>
+              <p className={`${labelClass} mb-2`}>Support Channels <HelpTip text="Which communication channels will be available for support requests. More channels increase customer satisfaction but also operational overhead." /></p>
+              <div className="flex flex-wrap gap-2">
+                {[{ id: "email", label: "Email" }, { id: "phone", label: "Phone" }, { id: "live-chat", label: "Live Chat" }, { id: "ticket-system", label: "Ticket System" }, { id: "dedicated-am", label: "Dedicated Account Manager" }].map((ch) => (
+                  <button key={ch.id} type="button" onClick={() => setCommercial({ ...commercial, supportChannels: commercial.supportChannels.includes(ch.id) ? commercial.supportChannels.filter((c) => c !== ch.id) : [...commercial.supportChannels, ch.id] })} className={`rounded-lg border px-3 py-1.5 text-[13px] font-medium transition-all duration-200 ${commercial.supportChannels.includes(ch.id) ? "border-[#be123c] text-[#be123c] bg-[rgba(190,18,60,0.03)]" : "border-neutral-200 bg-white text-neutral-500 hover:border-neutral-300"}`}>{ch.label}</button>
+                ))}
+              </div>
+            </div>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
               { key: "dataBackupDR" as const, label: "Data Backup & Disaster Recovery", desc: "Commit to regular data backups and a plan to restore service after an outage or disaster" },
               { key: "changeManagement" as const, label: "Change Management Process", desc: "Commit to notifying the customer before making significant changes to the service" },
               { key: "escalationMatrix" as const, label: "Escalation Matrix", desc: "Define escalation levels with named contacts and response times for different severity issues" },
               { key: "customerAuditRights" as const, label: "Customer Audit Rights", desc: "Allow the customer to audit your security practices, compliance, or service delivery" },
+              { key: "incidentSeverityLevels" as const, label: "P1/P2/P3/P4 Severity Classification", desc: "Include a formal incident severity matrix defining Critical, High, Medium, and Low priority levels with corresponding response obligations" },
+              { key: "acceptanceTesting" as const, label: "Formal Acceptance Testing (UAT)", desc: "Require a user acceptance testing period before services are deemed accepted and billing begins" },
             ].map((item) => (
               <div key={item.key} className="flex items-center justify-between rounded-xl border border-neutral-200 p-4">
                 <div className="min-w-0 pr-3"><p className="text-sm font-medium text-neutral-900">{item.label}</p><p className="text-[13px] text-neutral-400">{item.desc}</p></div>
@@ -720,22 +1111,74 @@ export default function WizardPage() {
               </div>
             ))}
           </div>
+          {commercial.acceptanceTesting && (
+            <label className="block"><span className={labelClass}>Acceptance Testing Period (days) <HelpTip text="The number of calendar days the customer has to test and formally accept deliverables before they are deemed accepted." /></span>
+              <select value={commercial.acceptanceTestingDays} onChange={(e) => setCommercial({ ...commercial, acceptanceTestingDays: e.target.value })} className={inputClass}>
+                <option value="10">10 days</option><option value="14">14 days</option><option value="21">21 days</option><option value="30">30 days</option><option value="45">45 days</option><option value="60">60 days</option>
+              </select>
+            </label>
+          )}
         </div>
       );
 
       case "com-sla": return (
         <div className="space-y-6">
-          <StepHeader title="Service Levels" subtitle="Uptime commitments and response time SLOs." />
+          <StepHeader title="Service Levels" subtitle="Uptime commitments, response time SLOs, service credits, and disaster recovery objectives." />
           <label className="block"><span className={labelClass}>Uptime Commitment: {commercial.uptimeCommitment}%</span><input type="range" min="99.5" max="99.99" step="0.01" value={commercial.uptimeCommitment} onChange={(e) => setCommercial({ ...commercial, uptimeCommitment: parseFloat(e.target.value) })} className="mt-2 block w-full accent-[#be123c]" /></label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            <label className="block"><span className={labelClass}>Uptime Measurement Period <HelpTip text="The time period over which uptime is calculated. Monthly is the most common and gives tighter accountability. Annual measurement smooths out short outages." /></span>
+              <select value={commercial.uptimeMeasurement} onChange={(e) => setCommercial({ ...commercial, uptimeMeasurement: e.target.value })} className={inputClass}>
+                <option value="monthly">Monthly</option><option value="quarterly">Quarterly</option><option value="annual">Annual</option>
+              </select>
+            </label>
+            <label className="block"><span className={labelClass}>Planned Maintenance Notice Period <HelpTip text="How far in advance the provider must notify the customer before scheduled maintenance. Longer notice periods give customers time to plan around downtime." /></span>
+              <select value={commercial.plannedMaintenanceNotice} onChange={(e) => setCommercial({ ...commercial, plannedMaintenanceNotice: e.target.value })} className={inputClass}>
+                <option value="24h">24 hours</option><option value="48h">48 hours</option><option value="72h">72 hours</option><option value="7d">7 days</option>
+              </select>
+            </label>
+          </div>
           <div><p className={`${labelClass} mb-3`}>Response Times (hours)</p>
             <div className="grid grid-cols-4 gap-4">{[{ key: "responseCritical" as const, label: "Critical" }, { key: "responseHigh" as const, label: "High" }, { key: "responseMedium" as const, label: "Medium" }, { key: "responseLow" as const, label: "Low" }].map((t) => (<label key={t.key} className="block"><span className="text-[14px] text-neutral-500">{t.label}</span><input type="number" value={commercial[t.key]} onChange={(e) => setCommercial({ ...commercial, [t.key]: e.target.value })} className={inputClass} /></label>))}</div>
           </div>
+          <label className="block"><span className={labelClass}>Service Credit Cap (% of monthly fees) <HelpTip text="The maximum service credits a customer can claim per measurement period when uptime falls below the committed level. Higher caps mean greater provider liability." /></span>
+            <select value={commercial.serviceCreditCap} onChange={(e) => setCommercial({ ...commercial, serviceCreditCap: e.target.value })} className={inputClass}>
+              <option value="5">5% of monthly fees</option><option value="10">10% of monthly fees</option><option value="15">15% of monthly fees</option><option value="20">20% of monthly fees</option><option value="100">100% of monthly fees (full credit)</option>
+            </select>
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            <label className="block"><span className={labelClass}>Disaster Recovery RPO <HelpTip text="Recovery Point Objective -- the maximum acceptable amount of data loss measured in time. A 1-hour RPO means backups occur at least every hour, so at most 1 hour of data could be lost." /></span>
+              <select value={commercial.disasterRecoveryRpo} onChange={(e) => setCommercial({ ...commercial, disasterRecoveryRpo: e.target.value })} className={inputClass}>
+                <option value="0h">0 hours (zero data loss)</option><option value="1h">1 hour</option><option value="4h">4 hours</option><option value="12h">12 hours</option><option value="24h">24 hours</option>
+              </select>
+            </label>
+            <label className="block"><span className={labelClass}>Disaster Recovery RTO <HelpTip text="Recovery Time Objective -- the maximum acceptable downtime after a disaster before service must be restored. Shorter RTOs require more redundancy and cost more." /></span>
+              <select value={commercial.disasterRecoveryRto} onChange={(e) => setCommercial({ ...commercial, disasterRecoveryRto: e.target.value })} className={inputClass}>
+                <option value="1h">1 hour</option><option value="4h">4 hours</option><option value="8h">8 hours</option><option value="24h">24 hours</option><option value="72h">72 hours</option>
+              </select>
+            </label>
+          </div>
+          <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-5">
+            <div className="min-w-0 pr-3"><p className="text-sm font-medium text-neutral-900">Termination Assistance</p><p className="text-[13px] text-neutral-400">Provider must assist with transition to a new provider or in-house solution upon termination, including data migration, knowledge transfer, and parallel running</p></div>
+            <Toggle on={commercial.terminationAssistance} onToggle={() => setCommercial({ ...commercial, terminationAssistance: !commercial.terminationAssistance })} />
+          </div>
+          {commercial.terminationAssistance && (
+            <label className="block"><span className={labelClass}>Termination Assistance Period <HelpTip text="How long the provider must continue providing transition assistance after termination. Longer periods reduce migration risk but extend provider obligations." /></span>
+              <select value={commercial.terminationAssistancePeriod} onChange={(e) => setCommercial({ ...commercial, terminationAssistancePeriod: e.target.value })} className={inputClass}>
+                <option value="30">30 days</option><option value="60">60 days</option><option value="90">90 days</option><option value="180">180 days</option><option value="365">12 months</option>
+              </select>
+            </label>
+          )}
         </div>
       );
 
       case "com-data": return (
         <div className="space-y-5">
-          <StepHeader title="Data & Privacy" subtitle="Privacy compliance, data handling, breach response, and data lifecycle management." />
+          <StepHeader title="Data & Privacy" subtitle="Privacy compliance, data classification, security certifications, breach response, and data lifecycle management." />
+          <label className="block"><span className={labelClass}>Data Classification Level <HelpTip text="The sensitivity level of data being processed under this agreement. Higher classifications trigger stricter security controls, access restrictions, and handling requirements." /></span>
+            <select value={commercial.dataClassification} onChange={(e) => setCommercial({ ...commercial, dataClassification: e.target.value })} className={inputClass}>
+              <option value="public">Public -- no restrictions on disclosure</option><option value="internal">Internal -- limited to authorized personnel</option><option value="confidential">Confidential -- business-sensitive, NDA-protected</option><option value="restricted">Restricted -- highest sensitivity (PII, financial, health)</option>
+            </select>
+          </label>
           {[{ key: "pipeda" as const, label: "PIPEDA Compliance", desc: "Federal privacy legislation for commercial activities" }, { key: "casl" as const, label: "CASL Compliance", desc: "Canada Anti-Spam Legislation for electronic messaging" }].map((item) => (
             <div key={item.key} className="flex items-center justify-between rounded-xl border border-neutral-200 p-5">
               <div><p className="text-sm font-medium text-neutral-900">{item.label}</p><p className="text-[14px] text-neutral-400 mt-0.5">{item.desc}</p></div>
@@ -754,6 +1197,14 @@ export default function WizardPage() {
               </select>
             </label>
           </div>
+          <div>
+            <p className={`${labelClass} mb-2`}>Compliance Certifications Required <HelpTip text="Security and compliance certifications the provider must hold. These are independently audited standards that demonstrate security maturity and regulatory compliance." /></p>
+            <div className="flex flex-wrap gap-2">
+              {[{ id: "soc2", label: "SOC 2 Type II" }, { id: "iso27001", label: "ISO 27001" }, { id: "pci-dss", label: "PCI-DSS" }, { id: "hipaa", label: "HIPAA" }].map((cert) => (
+                <button key={cert.id} type="button" onClick={() => setCommercial({ ...commercial, complianceCertifications: commercial.complianceCertifications.includes(cert.id) ? commercial.complianceCertifications.filter((c) => c !== cert.id) : [...commercial.complianceCertifications, cert.id] })} className={`rounded-lg border px-3 py-1.5 text-[13px] font-medium transition-all duration-200 ${commercial.complianceCertifications.includes(cert.id) ? "border-[#be123c] text-[#be123c] bg-[rgba(190,18,60,0.03)]" : "border-neutral-200 bg-white text-neutral-500 hover:border-neutral-300"}`}>{cert.label}</button>
+              ))}
+            </div>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
             <label className="block"><span className={labelClass}>Breach Notification Timeline <HelpTip text="How quickly you must notify the other party after discovering a data breach. Shorter timelines are more protective for the customer but harder to comply with." /></span>
               <select value={commercial.breachNotificationTimeline} onChange={(e) => setCommercial({ ...commercial, breachNotificationTimeline: e.target.value })} className={inputClass}>
@@ -768,9 +1219,11 @@ export default function WizardPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
+              { key: "crossBorderRestrictions" as const, label: "Cross-Border Data Transfer Restrictions", desc: "Limit data transfers outside Canada unless specific safeguards are in place -- critical for PIPEDA compliance and provincial privacy laws" },
               { key: "subProcessorNotification" as const, label: "Sub-Processor Notification", desc: "Notify the customer before sharing their data with any new third-party service provider" },
               { key: "dataPortability" as const, label: "Data Portability on Termination", desc: "Customer can export all their data in a standard format when the agreement ends" },
-              { key: "crossBorderRestrictions" as const, label: "Cross-Border Data Transfer Restrictions", desc: "Limit data transfers outside Canada unless specific safeguards are in place" },
+              { key: "penetrationTesting" as const, label: "Regular Penetration Testing", desc: "Require the provider to conduct regular third-party penetration testing and share summary results" },
+              { key: "dataProcessingAgreement" as const, label: "Separate Data Processing Agreement", desc: "Require a standalone DPA with detailed processing instructions, sub-processor lists, and DPIA obligations" },
             ].map((item) => (
               <div key={item.key} className="flex items-center justify-between rounded-xl border border-neutral-200 p-4">
                 <div className="min-w-0 pr-3"><p className="text-sm font-medium text-neutral-900">{item.label}</p><p className="text-[13px] text-neutral-400">{item.desc}</p></div>
@@ -825,9 +1278,136 @@ export default function WizardPage() {
         </div>
       );
 
+      case "plat-privacy": return (
+        <div className="space-y-5">
+          <StepHeader title="Privacy & Data Protection" subtitle="Define exactly what data you collect, how you handle it, and which privacy frameworks apply." />
+          <LegalTermsBar stepId="plat-privacy" />
+          <div>
+            <p className={`${labelClass} mb-3`}>Categories of Personal Data Collected <HelpTip text="Select every type of personal data your platform collects. This determines the scope of your privacy policy disclosures and which regulatory frameworks apply." /></p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[
+                { id: "names-contact", label: "Names & Contact Info", desc: "Full name, email, phone, mailing address" },
+                { id: "financial", label: "Financial Data", desc: "Credit card numbers, bank accounts, transaction history" },
+                { id: "health", label: "Health & Medical", desc: "Health conditions, prescriptions, fitness data" },
+                { id: "location", label: "Location Data", desc: "GPS coordinates, IP-based geolocation, travel history" },
+                { id: "biometric", label: "Biometric Data", desc: "Fingerprints, facial recognition, voiceprints" },
+                { id: "behavioral", label: "Behavioral & Analytics", desc: "Browsing patterns, click data, usage analytics" },
+                { id: "device-info", label: "Device Information", desc: "Device IDs, OS version, browser fingerprinting" },
+                { id: "social-media", label: "Social Media Data", desc: "Social profiles, connections, content from linked accounts" },
+              ].map((cat) => {
+                const isOn = platform.dataCategories.includes(cat.id);
+                return (
+                  <div key={cat.id} className={`flex items-center justify-between rounded-xl border p-4 transition-all duration-200 ${isOn ? "border-[#be123c] bg-[rgba(190,18,60,0.02)]" : "border-neutral-200"}`}>
+                    <div className="min-w-0 pr-3"><p className="text-sm font-medium text-neutral-900">{cat.label}</p><p className="text-[13px] text-neutral-400">{cat.desc}</p></div>
+                    <Toggle on={isOn} onToggle={() => setPlatform({ ...platform, dataCategories: isOn ? platform.dataCategories.filter((c) => c !== cat.id) : [...platform.dataCategories, cat.id] })} />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <label className="block"><span className={labelClass}>Data Retention Period <HelpTip text="How long you keep personal data after collection. PIPEDA requires you to retain data only as long as necessary for the purpose it was collected." /></span>
+            <select value={platform.dataRetentionPeriod} onChange={(e) => setPlatform({ ...platform, dataRetentionPeriod: e.target.value })} className={inputClass}>
+              <option value="6-months">6 Months</option><option value="1-year">1 Year</option><option value="2-years">2 Years</option><option value="3-years">3 Years</option><option value="5-years">5 Years</option><option value="account-lifetime">Duration of Account + Grace Period</option><option value="as-required-by-law">As Required by Applicable Law</option>
+            </select>
+          </label>
+          <label className="block"><span className={labelClass}>Breach Notification Timeline <HelpTip text="Under PIPEDA, breaches must be reported as soon as feasible. Quebec Law 25 requires notification to the CAI. Best practice is 72 hours." /></span>
+            <select value={platform.breachNotificationHours} onChange={(e) => setPlatform({ ...platform, breachNotificationHours: e.target.value })} className={inputClass}>
+              <option value="24">24 Hours (aggressive)</option><option value="48">48 Hours</option><option value="72">72 Hours (GDPR-aligned)</option><option value="asap">As Soon As Feasible (PIPEDA default)</option>
+            </select>
+          </label>
+          <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-5">
+            <div><p className="text-sm font-medium text-neutral-900">Cross-Border Data Transfers <HelpTip text="If personal data is stored or processed outside Canada, PIPEDA requires comparable protection. Quebec Law 25 requires a privacy impact assessment." /></p><p className="text-[14px] text-neutral-400 mt-0.5">Personal data is transferred or stored outside Canada</p></div>
+            <Toggle on={platform.crossBorderTransfers} onToggle={() => setPlatform({ ...platform, crossBorderTransfers: !platform.crossBorderTransfers })} />
+          </div>
+          {platform.crossBorderTransfers && (
+            <label className="block"><span className={labelClass}>Countries Where Data Is Transferred</span>
+              <input type="text" value={platform.crossBorderCountries} onChange={(e) => setPlatform({ ...platform, crossBorderCountries: e.target.value })} placeholder="e.g., United States, Ireland, Singapore" className={inputClass} />
+            </label>
+          )}
+          <div>
+            <p className={`${labelClass} mb-3`}>Cookie Categories Used</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[
+                { id: "necessary", label: "Strictly Necessary", desc: "Session management, security, load balancing" },
+                { id: "analytics", label: "Analytics / Performance", desc: "Google Analytics, Mixpanel, Hotjar" },
+                { id: "functional", label: "Functional", desc: "Language preferences, saved settings, chat widgets" },
+                { id: "advertising", label: "Advertising / Targeting", desc: "Ad networks, retargeting pixels, conversion tracking" },
+                { id: "social", label: "Social Media", desc: "Share buttons, embedded feeds, social login SDKs" },
+              ].map((cat) => {
+                const isOn = platform.cookieCategories.includes(cat.id);
+                return (
+                  <div key={cat.id} className={`flex items-center justify-between rounded-xl border p-4 transition-all duration-200 ${isOn ? "border-[#be123c] bg-[rgba(190,18,60,0.02)]" : "border-neutral-200"}`}>
+                    <div className="min-w-0 pr-3"><p className="text-sm font-medium text-neutral-900">{cat.label}</p><p className="text-[13px] text-neutral-400">{cat.desc}</p></div>
+                    <Toggle on={isOn} onToggle={() => setPlatform({ ...platform, cookieCategories: isOn ? platform.cookieCategories.filter((c) => c !== cat.id) : [...platform.cookieCategories, cat.id] })} />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div>
+            <p className={`${labelClass} mb-3`}>Data Subject Rights Supported</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[
+                { id: "access", label: "Right of Access", desc: "Individuals can request a copy of their personal data" },
+                { id: "rectification", label: "Right to Rectification", desc: "Correct inaccurate personal data" },
+                { id: "deletion", label: "Right to Deletion / Erasure", desc: "Request data be deleted" },
+                { id: "portability", label: "Right to Data Portability", desc: "Receive data in machine-readable format" },
+                { id: "restrict-processing", label: "Right to Restrict Processing", desc: "Limit how data is used" },
+                { id: "object-processing", label: "Right to Object", desc: "Object to certain data uses (e.g., marketing)" },
+                { id: "withdraw-consent", label: "Right to Withdraw Consent", desc: "Withdraw previously given consent" },
+              ].map((right) => {
+                const isOn = platform.dataSubjectRights.includes(right.id);
+                return (
+                  <div key={right.id} className={`flex items-center justify-between rounded-xl border p-4 transition-all duration-200 ${isOn ? "border-[#be123c] bg-[rgba(190,18,60,0.02)]" : "border-neutral-200"}`}>
+                    <div className="min-w-0 pr-3"><p className="text-sm font-medium text-neutral-900">{right.label}</p><p className="text-[13px] text-neutral-400">{right.desc}</p></div>
+                    <Toggle on={isOn} onToggle={() => setPlatform({ ...platform, dataSubjectRights: isOn ? platform.dataSubjectRights.filter((r) => r !== right.id) : [...platform.dataSubjectRights, right.id] })} />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <label className="block"><span className={labelClass}>Consent Mechanism</span>
+            <select value={platform.consentMechanism} onChange={(e) => setPlatform({ ...platform, consentMechanism: e.target.value })} className={inputClass}>
+              <option value="opt-in">Opt-In (express affirmative consent)</option><option value="opt-out">Opt-Out (implied consent, option to refuse)</option><option value="layered">Layered (short notice + full policy)</option><option value="granular">Granular (per-purpose consent toggles)</option>
+            </select>
+          </label>
+          <div className="space-y-3">
+            {([
+              { key: "privacyOfficerDesignated" as const, label: "Designated Privacy Officer", desc: "Named individual responsible for privacy compliance" },
+              { key: "automatedDecisionMaking" as const, label: "Automated Decision-Making / Profiling", desc: "Platform uses algorithms or AI to make decisions affecting users" },
+              { key: "childrenDataCollection" as const, label: "Children\u2019s Data Collection (Under 13)", desc: "Triggers COPPA-like requirements and parental consent obligations" },
+              { key: "biometricData" as const, label: "Biometric Data Processing", desc: "Collects biometric identifiers (fingerprints, facial geometry, voiceprints)" },
+              { key: "dataMinimization" as const, label: "Data Minimization Commitment", desc: "Collect only minimum personal data necessary for stated purposes" },
+              { key: "thirdPartyProcessors" as const, label: "Third-Party Data Processors", desc: "Data shared with third-party service providers (hosting, analytics, payments)" },
+            ] as const).map((item) => (
+              <div key={item.key} className="flex items-center justify-between rounded-xl border border-neutral-200 p-5">
+                <div className="min-w-0 pr-3"><p className="text-sm font-medium text-neutral-900">{item.label}</p><p className="text-[14px] text-neutral-400 mt-0.5">{item.desc}</p></div>
+                <Toggle on={platform[item.key]} onToggle={() => setPlatform({ ...platform, [item.key]: !platform[item.key] })} />
+              </div>
+            ))}
+          </div>
+          <p className="text-[13px] font-medium uppercase tracking-[0.12em] text-neutral-500 mt-2">Canadian Privacy Compliance</p>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-5">
+              <div className="min-w-0 pr-3"><p className="text-sm font-medium text-neutral-900">PIPEDA Compliance</p><p className="text-[14px] text-neutral-400 mt-0.5">Align with PIPEDA's 10 fair information principles</p></div>
+              <Toggle on={platform.pipedaCompliant} onToggle={() => setPlatform({ ...platform, pipedaCompliant: !platform.pipedaCompliant })} />
+            </div>
+            <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-5">
+              <div className="min-w-0 pr-3"><p className="text-sm font-medium text-neutral-900">Quebec Law 25 Compliance</p><p className="text-[14px] text-neutral-400 mt-0.5">Include PIAs, CAI breach reporting, and de-indexation rights</p></div>
+              <Toggle on={platform.quebecLaw25Compliant} onToggle={() => setPlatform({ ...platform, quebecLaw25Compliant: !platform.quebecLaw25Compliant })} />
+            </div>
+          </div>
+        </div>
+      );
+
       case "plat-terms": return (
         <div className="space-y-5">
-          <StepHeader title="Terms & Privacy" subtitle="How users accept your terms, how disputes are handled, and platform-specific protections." />
+          <StepHeader title="Terms & Conditions" subtitle="Acceptance mechanisms, liability allocation, dispute resolution, and platform-specific protections." />
+          <label className="block"><span className={labelClass}>Governing Law / Province <HelpTip text="The province whose laws govern the interpretation and enforcement of the terms." /></span>
+            <select value={platform.governingLaw} onChange={(e) => setPlatform({ ...platform, governingLaw: e.target.value })} className={inputClass}>
+              <option value="ontario">Ontario</option><option value="british-columbia">British Columbia</option><option value="quebec">Quebec</option><option value="alberta">Alberta</option><option value="manitoba">Manitoba</option><option value="saskatchewan">Saskatchewan</option><option value="nova-scotia">Nova Scotia</option><option value="new-brunswick">New Brunswick</option><option value="pei">Prince Edward Island</option><option value="newfoundland">Newfoundland and Labrador</option><option value="federal">Federal (Canada)</option>
+            </select>
+          </label>
           <label className="block"><span className={labelClass}>Acceptance Mechanism <HelpTip text="Clickwrap (checkbox + button) is the strongest in court. Browsewrap (just a footer link) is the weakest and often unenforceable. Sign-in wrap is in between." /></span>
             <select value={platform.acceptanceMechanism} onChange={(e) => setPlatform({ ...platform, acceptanceMechanism: e.target.value })} className={inputClass}>
               <option value="clickwrap">Clickwrap (checkbox + "I agree" button)</option><option value="sign-in-wrap">Sign-in Wrap (agreeing by creating account)</option><option value="browsewrap">Browsewrap (terms link in footer — weakest)</option>
@@ -859,6 +1439,60 @@ export default function WizardPage() {
               </select>
             </label>
           )}
+          <p className="text-[13px] font-medium uppercase tracking-[0.12em] text-neutral-500 mt-2">Liability & Indemnification</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            <label className="block"><span className={labelClass}>Liability Cap Type <HelpTip text="How you limit your maximum financial exposure. Fixed amount sets a dollar ceiling. Fees-based ties it to what the user paid." /></span>
+              <select value={platform.liabilityCapType} onChange={(e) => setPlatform({ ...platform, liabilityCapType: e.target.value })} className={inputClass}>
+                <option value="fixed-amount">Fixed Dollar Amount</option><option value="fees-based">Multiple of Fees Paid (e.g., 12 months)</option><option value="unlimited">Unlimited (not recommended)</option>
+              </select>
+            </label>
+            {platform.liabilityCapType === "fixed-amount" && (
+              <label className="block"><span className={labelClass}>Liability Cap Amount (CAD)</span>
+                <input type="text" value={platform.liabilityCapAmount} onChange={(e) => setPlatform({ ...platform, liabilityCapAmount: e.target.value })} placeholder="$50,000" className={inputClass} />
+              </label>
+            )}
+          </div>
+          <label className="block"><span className={labelClass}>Indemnification Scope <HelpTip text="Mutual means both parties indemnify each other. One-way means only the user indemnifies the platform." /></span>
+            <select value={platform.indemnificationScope} onChange={(e) => setPlatform({ ...platform, indemnificationScope: e.target.value })} className={inputClass}>
+              <option value="mutual">Mutual Indemnification</option><option value="one-way-user">One-Way (user indemnifies platform)</option><option value="none">No Indemnification Clause</option>
+            </select>
+          </label>
+
+          <p className="text-[13px] font-medium uppercase tracking-[0.12em] text-neutral-500 mt-2">Payment & Refunds</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            <label className="block"><span className={labelClass}>Payment Processing Method</span>
+              <select value={platform.paymentProcessing} onChange={(e) => setPlatform({ ...platform, paymentProcessing: e.target.value })} className={inputClass}>
+                <option value="stripe">Stripe</option><option value="paypal">PayPal</option><option value="square">Square</option><option value="braintree">Braintree</option><option value="direct-bank">Direct Bank / ACH</option><option value="other">Other</option><option value="none">No Payment Processing</option>
+              </select>
+            </label>
+            <label className="block"><span className={labelClass}>Refund Policy <HelpTip text="Full refund gives the most consumer protection. Pro-rata refunds for unused time. No refund is strongest for the platform." /></span>
+              <select value={platform.refundPolicy} onChange={(e) => setPlatform({ ...platform, refundPolicy: e.target.value })} className={inputClass}>
+                <option value="full-refund">Full Refund (within cooling-off period)</option><option value="pro-rata">Pro-Rata (refund for unused portion)</option><option value="no-refund">No Refunds</option><option value="custom">Custom Refund Policy</option>
+              </select>
+            </label>
+          </div>
+
+          <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-5">
+            <div><p className="text-sm font-medium text-neutral-900">Auto-Renewal Disclosure <HelpTip text="Many provinces require clear disclosure when subscriptions auto-renew. Ontario's Consumer Protection Act requires explicit consent and easy cancellation." /></p><p className="text-[14px] text-neutral-400 mt-0.5">Include automatic renewal terms with required consumer disclosures</p></div>
+            <Toggle on={platform.autoRenewalDisclosure} onToggle={() => setPlatform({ ...platform, autoRenewalDisclosure: !platform.autoRenewalDisclosure })} />
+          </div>
+          {platform.autoRenewalDisclosure && (
+            <label className="block"><span className={labelClass}>Auto-Renewal Period</span>
+              <select value={platform.autoRenewalPeriod} onChange={(e) => setPlatform({ ...platform, autoRenewalPeriod: e.target.value })} className={inputClass}>
+                <option value="monthly">Monthly</option><option value="quarterly">Quarterly</option><option value="annually">Annually</option>
+              </select>
+            </label>
+          )}
+
+          <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-5">
+            <div><p className="text-sm font-medium text-neutral-900">DMCA / Copyright Takedown Process <HelpTip text="Include a formal notice-and-takedown procedure for copyright infringement claims." /></p><p className="text-[14px] text-neutral-400 mt-0.5">Include a copyright notice-and-takedown procedure for infringing content</p></div>
+            <Toggle on={platform.dmcaTakedown} onToggle={() => setPlatform({ ...platform, dmcaTakedown: !platform.dmcaTakedown })} />
+          </div>
+          <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-5">
+            <div><p className="text-sm font-medium text-neutral-900">Accessibility Compliance (AODA / WCAG) <HelpTip text="Ontario's AODA requires organizations to make websites accessible. Including an accessibility commitment demonstrates compliance." /></p><p className="text-[14px] text-neutral-400 mt-0.5">Commit to WCAG 2.1 AA accessibility standards in your terms</p></div>
+            <Toggle on={platform.accessibilityCompliance} onToggle={() => setPlatform({ ...platform, accessibilityCompliance: !platform.accessibilityCompliance })} />
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
               { key: "apiAccess" as const, label: "API Access Terms", desc: "Include terms governing third-party access to your platform via API" },
@@ -880,7 +1514,7 @@ export default function WizardPage() {
 
       case "plat-structure": return (
         <div className="space-y-5">
-          <StepHeader title="Partnership & MSA Terms" subtitle="Structure for partnership agreements and master service agreements." />
+          <StepHeader title="Partnership & MSA Terms" subtitle="Structure for partnership agreements and master service agreements, including SOW frameworks, change management, and exit provisions." />
           <label className="block"><span className={labelClass}>Partnership Type</span>
             <select value={platform.partnershipType} onChange={(e) => setPlatform({ ...platform, partnershipType: e.target.value })} className={inputClass}>
               <option value="general">General Partnership</option><option value="limited">Limited Partnership</option><option value="llp">Limited Liability Partnership (LLP)</option>
@@ -904,6 +1538,76 @@ export default function WizardPage() {
           <label className="block"><span className={labelClass}>IP Ownership (MSA)</span>
             <select value={platform.msaIpOwnership} onChange={(e) => setPlatform({ ...platform, msaIpOwnership: e.target.value })} className={inputClass}>
               <option value="client-owns">Client Owns All Work Product</option><option value="shared">Client Owns Deliverables, Provider Keeps Tools</option><option value="provider-owns">Provider Retains IP, Client Gets License</option>
+            </select>
+          </label>
+
+          <p className="text-[13px] font-medium uppercase tracking-[0.12em] text-neutral-500 mt-2">SOW & Delivery</p>
+          <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-5">
+            <div><p className="text-sm font-medium text-neutral-900">SOW Template Inclusion <HelpTip text="Include a Statement of Work template as an exhibit. SOWs define specific project scope, deliverables, timelines, and pricing for each engagement." /></p><p className="text-[14px] text-neutral-400 mt-0.5">Attach a standardized SOW template for project engagements</p></div>
+            <Toggle on={platform.sowTemplate} onToggle={() => setPlatform({ ...platform, sowTemplate: !platform.sowTemplate })} />
+          </div>
+          <label className="block"><span className={labelClass}>Change Order Process <HelpTip text="How changes to scope, timeline, or budget are handled after a SOW is signed." /></span>
+            <select value={platform.changeOrderProcess} onChange={(e) => setPlatform({ ...platform, changeOrderProcess: e.target.value })} className={inputClass}>
+              <option value="formal-written">Formal Written Change Order (signed by both parties)</option><option value="email-approval">Email Approval (written but less formal)</option><option value="verbal-ok">Verbal Approval (not recommended)</option>
+            </select>
+          </label>
+          <label className="block"><span className={labelClass}>Acceptance Criteria <HelpTip text="How deliverables are formally accepted. Written signoff requires explicit approval. Deemed acceptance means silence equals approval after a set period." /></span>
+            <select value={platform.acceptanceCriteria} onChange={(e) => setPlatform({ ...platform, acceptanceCriteria: e.target.value })} className={inputClass}>
+              <option value="written-signoff">Written Signoff Required</option><option value="deemed-acceptance-5">Deemed Accepted After 5 Business Days</option><option value="deemed-acceptance-10">Deemed Accepted After 10 Business Days</option><option value="deemed-acceptance-30">Deemed Accepted After 30 Days</option><option value="testing-period">Testing Period with Acceptance Criteria</option>
+            </select>
+          </label>
+          <label className="block"><span className={labelClass}>Warranty Period <HelpTip text="Period after delivery during which the provider must fix defects at no additional cost." /></span>
+            <select value={platform.warrantyPeriod} onChange={(e) => setPlatform({ ...platform, warrantyPeriod: e.target.value })} className={inputClass}>
+              <option value="30-days">30 Days</option><option value="60-days">60 Days</option><option value="90-days">90 Days</option><option value="6-months">6 Months</option><option value="12-months">12 Months</option><option value="none">No Warranty Period</option>
+            </select>
+          </label>
+
+          <p className="text-[13px] font-medium uppercase tracking-[0.12em] text-neutral-500 mt-2">Insurance & Risk</p>
+          <div>
+            <p className={`${labelClass} mb-3`}>Insurance Requirements <HelpTip text="Types of insurance the service provider must maintain. CGL covers third-party injury/damage. E&O covers professional mistakes. Cyber covers data breaches." /></p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[
+                { id: "cgl", label: "Commercial General Liability (CGL)", desc: "Third-party bodily injury and property damage" },
+                { id: "eo", label: "Errors & Omissions (E&O)", desc: "Professional liability for mistakes or negligence" },
+                { id: "cyber", label: "Cyber Liability", desc: "Data breach response, notification costs, cyber extortion" },
+                { id: "workers-comp", label: "Workers Compensation", desc: "Employee workplace injuries and illness" },
+              ].map((ins) => {
+                const isOn = platform.insuranceRequirements.includes(ins.id);
+                return (
+                  <div key={ins.id} className={`flex items-center justify-between rounded-xl border p-4 transition-all duration-200 ${isOn ? "border-[#be123c] bg-[rgba(190,18,60,0.02)]" : "border-neutral-200"}`}>
+                    <div className="min-w-0 pr-3"><p className="text-sm font-medium text-neutral-900">{ins.label}</p><p className="text-[13px] text-neutral-400">{ins.desc}</p></div>
+                    <Toggle on={isOn} onToggle={() => setPlatform({ ...platform, insuranceRequirements: isOn ? platform.insuranceRequirements.filter((i) => i !== ins.id) : [...platform.insuranceRequirements, ins.id] })} />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-5">
+            <div><p className="text-sm font-medium text-neutral-900">Background Checks Required</p><p className="text-[14px] text-neutral-400 mt-0.5">Provider must perform background checks on assigned personnel</p></div>
+            <Toggle on={platform.backgroundChecks} onToggle={() => setPlatform({ ...platform, backgroundChecks: !platform.backgroundChecks })} />
+          </div>
+          <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-5">
+            <div><p className="text-sm font-medium text-neutral-900">Subcontracting Allowed <HelpTip text="Whether the provider can delegate work to subcontractors. If allowed, typically requires prior written consent." /></p><p className="text-[14px] text-neutral-400 mt-0.5">Provider may engage subcontractors (with prior written consent)</p></div>
+            <Toggle on={platform.subcontractingAllowed} onToggle={() => setPlatform({ ...platform, subcontractingAllowed: !platform.subcontractingAllowed })} />
+          </div>
+
+          <p className="text-[13px] font-medium uppercase tracking-[0.12em] text-neutral-500 mt-2">Termination & Exit</p>
+          <label className="block"><span className={labelClass}>Exit / Transition Period <HelpTip text="Period after termination during which the provider assists with transition to a new provider or in-house team." /></span>
+            <select value={platform.exitTransitionPeriod} onChange={(e) => setPlatform({ ...platform, exitTransitionPeriod: e.target.value })} className={inputClass}>
+              <option value="15-days">15 Days</option><option value="30-days">30 Days</option><option value="60-days">60 Days</option><option value="90-days">90 Days</option><option value="none">No Transition Period</option>
+            </select>
+          </label>
+          <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-5">
+            <div><p className="text-sm font-medium text-neutral-900">Data Return on Termination <HelpTip text="Require the provider to return all client data in a usable format and certify deletion of copies." /></p><p className="text-[14px] text-neutral-400 mt-0.5">Provider must return all data and certify deletion upon contract end</p></div>
+            <Toggle on={platform.dataReturnOnTermination} onToggle={() => setPlatform({ ...platform, dataReturnOnTermination: !platform.dataReturnOnTermination })} />
+          </div>
+          <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-5">
+            <div><p className="text-sm font-medium text-neutral-900">Performance Metrics / SLA <HelpTip text="Define measurable service levels with consequences for failure." /></p><p className="text-[14px] text-neutral-400 mt-0.5">Include quantitative performance metrics with remedies for non-compliance</p></div>
+            <Toggle on={platform.performanceMetrics} onToggle={() => setPlatform({ ...platform, performanceMetrics: !platform.performanceMetrics })} />
+          </div>
+          <label className="block"><span className={labelClass}>Escalation Process <HelpTip text="Steps for resolving disputes, starting with project-level discussions and escalating through management, executive, and formal dispute resolution." /></span>
+            <select value={platform.escalationProcess} onChange={(e) => setPlatform({ ...platform, escalationProcess: e.target.value })} className={inputClass}>
+              <option value="internal-executive-mediation-arbitration">Internal → Executive → Mediation → Arbitration</option><option value="internal-executive-court">Internal → Executive → Litigation</option><option value="mediation-arbitration">Mediation → Arbitration (skip internal)</option><option value="direct-arbitration">Direct to Arbitration</option>
             </select>
           </label>
         </div>
@@ -1295,9 +1999,10 @@ export default function WizardPage() {
             <GenerationProgress isActive={isGenerating} />
           ) : (
             <div className="text-center pt-6">
-              <button type="button" onClick={handleGenerate} disabled={isGenerating} className="bg-neutral-900 text-white hover:bg-neutral-800 rounded-xl !px-10 !py-4 text-sm font-medium transition-colors disabled:opacity-50">
-                Generate Draft
+              <button type="button" onClick={handleGenerate} disabled={isGenerating} className="bg-[#be123c] text-white hover:bg-[#9f1239] rounded-xl px-12 py-4 text-[15px] font-semibold tracking-wide transition-all disabled:opacity-50 shadow-lg shadow-[#be123c]/20 hover:shadow-xl hover:shadow-[#be123c]/30">
+                Let Ruby Draft My Agreement
               </button>
+              <p className="text-[12px] text-neutral-400 mt-3">Ruby drafts in about 30-60 seconds</p>
             </div>
           )}
           {error && <p className="mt-4 text-sm text-red-600 text-center">{error}</p>}
@@ -1305,7 +2010,7 @@ export default function WizardPage() {
           {/* Layer 2 — Customize CTA */}
           <div className="mt-10 border border-dashed border-neutral-300 rounded-xl p-6 text-center bg-neutral-50/50">
             <p className="text-[15px] text-neutral-600 leading-relaxed max-w-md mx-auto">
-              Need something the standard options don&apos;t cover? Customize your contract with our AI-powered modification tools.
+              Need something the standard options don&apos;t cover? Customize your contract with Ruby&apos;s modification tools.
             </p>
             <button
               type="button"

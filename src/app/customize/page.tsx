@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 
 // ─── Types ───
@@ -15,41 +15,57 @@ interface ModificationCategory {
 }
 
 interface ChatMessage {
-  role: "ai" | "user" | "system";
+  id: string;
+  role: "ruby" | "user" | "system";
   content: string;
   timestamp: Date;
   riskFlag?: string;
   draftVersion?: number;
+  quickActions?: QuickAction[];
+  clausePreview?: ClausePreview;
+  provinceTip?: string;
 }
 
-interface ModificationRequest {
+interface QuickAction {
+  label: string;
+  value: string;
+}
+
+interface ClausePreview {
+  title: string;
+  current: string;
+  proposed: string;
+}
+
+interface ModificationRecord {
   id: string;
-  category: ModificationCategory;
-  intakeType: string;
-  intakeData: Record<string, string>;
-  messages: ChatMessage[];
+  category: string;
   summary: string;
-  structureScope: string;
   complexityTier: "simple" | "standard" | "complex";
-  riskFlags: string[];
   baseFee: number;
-  volumeDiscount: number;
-  autoResolved: boolean;
+  riskFlags: string[];
   requiresLawyerReview: boolean;
-  expanded: boolean;
+  messages: ChatMessage[];
 }
 
 interface SessionData {
   contractType: string;
   contractTitle: string;
-  wizardSelections: Record<string, unknown>;
-  clauseManifest: string[];
-  regModulesActivated: string[];
+  tier: string;
   governingLaw: string;
-  parties: string[];
+  selected: Record<string, unknown>;
 }
 
-// ─── Dynamic Categories (mapped from clause library per spec §4.1) ───
+interface PendingChange {
+  id: string;
+  category: ModificationCategory;
+  description: string;
+  riskFlags: string[];
+  provinceTip: string | null;
+  confirmed: boolean;
+}
+
+// ─── Modification Categories (mapped from clause library) ───
 const UNIVERSAL_CATEGORIES: ModificationCategory[] = [
   { id: "custom-schedule", name: "Custom Schedule or Exhibit", description: "Create a non-standard payment schedule, milestone table, deliverables schedule, or exhibit.", example: "Add a milestone-based payment schedule tied to project deliverables.", icon: "CS" },
   { id: "something-else", name: "Something Else", description: "Describe what you need in your own words. Ruby will help structure your request.", example: "I need a revenue-sharing earn-out tied to Q3 and Q4 performance metrics.", icon: "SE" },
@@ -99,17 +115,195 @@ const CONTRACT_CATEGORIES: Record<string, ModificationCategory[]> = {
   ],
 };
 
-// ─── Intake Type Definitions (per spec §5.1) ───
-const INTAKE_TYPES = [
-  { id: "modify", label: "Modify Existing", desc: "Change a clause in your contract", icon: "ME" },
-  { id: "add", label: "Add New Provision", desc: "Add something that's not there yet", icon: "AP" },
-  { id: "remove", label: "Remove a Clause", desc: "Take out a clause you don't need", icon: "RM" },
-  { id: "add-party", label: "Add a Party", desc: "Add a guarantor, co-signer, etc.", icon: "PY" },
-  { id: "custom-schedule", label: "Custom Schedule", desc: "Payment, milestone, or exhibit", icon: "CS" },
-  { id: "freeform", label: "Something Else", desc: "Describe it in your own words", icon: "FE" },
-];
+// ─── Suggestion Chips per Category ───
+const SUGGESTION_CHIPS: Record<string, string[]> = {
+  "emp-termination": [
+    "Increase severance to 2 weeks per year of service",
+    "Add change-of-control termination trigger",
+    "Extend notice period to 6 months",
+    "Add garden leave provision",
+    "Remove termination without cause clause",
+  ],
+  "emp-covenants": [
+    "Narrow non-solicit to direct clients only",
+    "Reduce non-compete from 24 to 12 months",
+    "Add carve-out for personal projects",
+    "Remove non-compete entirely (non-C-suite)",
+    "Limit geographic scope to GTA only",
+  ],
+  "emp-compensation": [
+    "Add signing bonus with 12-month clawback",
+    "Add equity vesting with 1-year cliff",
+    "Include performance bonus structure",
+    "Add car allowance or expense provisions",
+    "Change salary review frequency to annual",
+  ],
+  "emp-ip": [
+    "Carve out personal projects from IP assignment",
+    "Add pre-existing IP schedule",
+    "Modify moral rights waiver scope",
+    "Add open-source contribution policy",
+  ],
+  "corp-transfer": [
+    "Extend ROFR period to 90 days",
+    "Lower drag-along threshold to 66.7%",
+    "Add tag-along rights for minority holders",
+    "Add shotgun buy-sell mechanism",
+    "Include put/call option on death or disability",
+  ],
+  "corp-governance": [
+    "Add board observer rights for 10%+ shareholders",
+    "Expand reserved matters list",
+    "Change voting threshold to supermajority",
+    "Add casting vote for board chair",
+  ],
+  "corp-deadlock": [
+    "Replace shotgun with mediation then arbitration",
+    "Add mandatory cooling-off period",
+    "Add expert determination for valuation disputes",
+  ],
+  "corp-dividends": [
+    "Add minimum annual distribution of 30% net profits",
+    "Create preferred distribution waterfall",
+    "Add reinvestment threshold before distributions",
+  ],
+  "inv-interest": [
+    "Lower interest rate to 6%",
+    "Switch from bullet to amortizing repayment",
+    "Add PIK (payment-in-kind) interest option",
+    "Change day-count to actual/365",
+  ],
+  "inv-conversion": [
+    "Lower valuation cap",
+    "Increase discount rate to 25%",
+    "Add most-favoured-nation clause",
+    "Add automatic conversion at maturity",
+  ],
+  "inv-rights": [
+    "Add board observer rights for investors above $500K",
+    "Add pro-rata participation rights",
+    "Require monthly financial reporting",
+    "Add information rights for all investors",
+  ],
+  "inv-default": [
+    "Extend cure period to 15 days",
+    "Add MAC exclusion for pandemic events",
+    "Remove cross-default provision",
+    "Add grace period for payment defaults",
+  ],
+  "inv-security": [
+    "Switch from all-assets GSA to specific pledge",
+    "Add PPSA registration requirements",
+    "Add permitted encumbrances schedule",
+  ],
+  "inv-parties": [
+    "Add co-founder as personal guarantor",
+    "Add co-borrower with joint liability",
+    "Add corporate guarantor subsidiary",
+  ],
+  "com-sla": [
+    "Increase uptime to 99.95%",
+    "Add enhanced service credits schedule",
+    "Tighten P1 response time to 15 minutes",
+    "Add disaster recovery RPO/RTO commitments",
+  ],
+  "com-liability": [
+    "Increase liability cap to 24 months of fees",
+    "Add IP indemnification carve-out",
+    "Remove consequential damages exclusion for data breach",
+  ],
+  "com-data": [
+    "Add Canada-only data residency requirement",
+    "Tighten breach notification to 48 hours",
+    "Add data deletion on termination clause",
+    "Require SOC 2 Type II certification",
+  ],
+  "com-ip": [
+    "Change IP ownership to client-owns-all-deliverables",
+    "Add open-source audit obligation",
+    "Narrow license grant to term of agreement only",
+  ],
+  "inf-exclusivity": [
+    "Limit exclusivity to direct competitors only",
+    "Add geographic carve-out for European brands",
+    "Reduce exclusivity period to campaign duration only",
+  ],
+  "inf-compensation": [
+    "Add 5% affiliate commission on sales",
+    "Add performance bonus at 100K views",
+    "Switch to hybrid flat fee plus commission",
+  ],
+  "inf-content": [
+    "Limit brand usage to social media only",
+    "Require creator approval for paid advertising use",
+    "Add content revision caps (max 2 rounds)",
+    "Specify content ownership after campaign",
+  ],
+  "inf-compliance": [
+    "Add AGCO-compliant messaging for iGaming",
+    "Add French-language disclosure for Quebec audience",
+    "Update FTC disclosure requirements",
+  ],
+  "plat-terms": [
+    "Switch from browsewrap to clickwrap acceptance",
+    "Add version tracking for terms changes",
+    "Modify auto-renewal disclosure per Ontario CPA",
+    "Add specific prohibited conduct list",
+  ],
+  "plat-disputes": [
+    "Add 30-day informal resolution period",
+    "Switch to arbitration under ADR Institute rules",
+    "Remove class action waiver (post Uber v. Heller)",
+    "Add mediation step before litigation",
+  ],
+  "plat-content": [
+    "Add DMCA/Copyright Act takedown procedure",
+    "Modify UGC license scope and duration",
+    "Add content moderation appeal process",
+  ],
+  "plat-privacy": [
+    "Add biometric data collection disclosure",
+    "Expand cookie categories and consent options",
+    "Add Quebec Law 25 privacy impact provisions",
+    "Specify PIPEDA-compliant retention schedule",
+  ],
+  "plat-sharing": [
+    "Add named third-party processor list",
+    "Restrict cross-border data transfers",
+    "Add data processing agreement requirements",
+  ],
+  "plat-retention": [
+    "Shorten retention to 18 months",
+    "Add automatic deletion on account closure",
+    "Create tiered retention by data category",
+  ],
+  "plat-userrights": [
+    "Add GDPR-style data portability right",
+    "Add right to explanation for automated decisions",
+    "Add Quebec Law 25 access request process",
+  ],
+  "custom-schedule": [
+    "Milestone-based payment schedule",
+    "Vesting schedule with acceleration triggers",
+    "Service credit calculation table",
+    "Deliverables and acceptance criteria schedule",
+  ],
+  "something-else": [
+    "Add a revenue-sharing earn-out provision",
+    "Include an arbitration clause with specific rules",
+    "Add a most-favoured-customer pricing provision",
+    "Include a force majeure clause with pandemic carve-out",
+  ],
+  default: [
+    "Modify a specific clause or threshold",
+    "Add a new provision or schedule",
+    "Adjust payment or compensation terms",
+    "Change dispute resolution mechanism",
+    "Modify termination or exit provisions",
+  ],
+};
 
-// ─── Complexity Pricing (per spec §7.4) ───
+// ─── Complexity Pricing ───
 const COMPLEXITY_PRICING: Record<string, { base: number; label: string }> = {
   simple: { base: 49, label: "Simple" },
   standard: { base: 129, label: "Standard" },
@@ -124,253 +318,136 @@ function volumeDiscount(index: number): number {
   return 0.4;
 }
 
-// ─── Suggestion Chips per Category ───
-const SUGGESTION_CHIPS: Record<string, string[]> = {
-  'emp-termination': [
-    'Increase severance to 2 weeks per year of service',
-    'Add change-of-control termination trigger',
-    'Extend notice period to 6 months',
-    'Add garden leave provision',
-    'Remove termination without cause clause',
-  ],
-  'emp-covenants': [
-    'Narrow non-solicit to direct clients only',
-    'Reduce non-compete from 24 to 12 months',
-    'Add carve-out for personal projects',
-    'Remove non-compete entirely (non-C-suite)',
-    'Limit geographic scope to GTA only',
-  ],
-  'emp-compensation': [
-    'Add signing bonus with 12-month clawback',
-    'Add equity vesting with 1-year cliff',
-    'Include performance bonus structure',
-    'Add car allowance or expense provisions',
-    'Change salary review frequency to annual',
-  ],
-  'emp-ip': [
-    'Carve out personal projects from IP assignment',
-    'Add pre-existing IP schedule',
-    'Modify moral rights waiver scope',
-    'Add open-source contribution policy',
-  ],
-  'corp-transfer': [
-    'Extend ROFR period to 90 days',
-    'Lower drag-along threshold to 66.7%',
-    'Add tag-along rights for minority holders',
-    'Add shotgun buy-sell mechanism',
-    'Include put/call option on death or disability',
-  ],
-  'corp-governance': [
-    'Add board observer rights for 10%+ shareholders',
-    'Expand reserved matters list',
-    'Change voting threshold to supermajority',
-    'Add casting vote for board chair',
-  ],
-  'corp-deadlock': [
-    'Replace shotgun with mediation then arbitration',
-    'Add mandatory cooling-off period',
-    'Add expert determination for valuation disputes',
-  ],
-  'corp-dividends': [
-    'Add minimum annual distribution of 30% net profits',
-    'Create preferred distribution waterfall',
-    'Add reinvestment threshold before distributions',
-  ],
-  'inv-interest': [
-    'Lower interest rate to 6%',
-    'Switch from bullet to amortizing repayment',
-    'Add PIK (payment-in-kind) interest option',
-    'Change day-count to actual/365',
-  ],
-  'inv-conversion': [
-    'Lower valuation cap',
-    'Increase discount rate to 25%',
-    'Add most-favoured-nation clause',
-    'Add automatic conversion at maturity',
-  ],
-  'inv-rights': [
-    'Add board observer rights for investors above $500K',
-    'Add pro-rata participation rights',
-    'Require monthly financial reporting',
-    'Add information rights for all investors',
-  ],
-  'com-sla': [
-    'Increase uptime to 99.95%',
-    'Add enhanced service credits schedule',
-    'Tighten P1 response time to 15 minutes',
-    'Add disaster recovery RPO/RTO commitments',
-  ],
-  'com-liability': [
-    'Increase liability cap to 24 months of fees',
-    'Add IP indemnification carve-out',
-    'Remove consequential damages exclusion for data breach',
-  ],
-  'com-data': [
-    'Add Canada-only data residency requirement',
-    'Tighten breach notification to 48 hours',
-    'Add data deletion on termination clause',
-    'Require SOC 2 Type II certification',
-  ],
-  'inf-exclusivity': [
-    'Limit exclusivity to direct competitors only',
-    'Add geographic carve-out for European brands',
-    'Reduce exclusivity period to campaign duration only',
-  ],
-  'inf-compensation': [
-    'Add 5% affiliate commission on sales',
-    'Add performance bonus at 100K views',
-    'Switch to hybrid flat fee plus commission',
-  ],
-  'custom-schedule': [
-    'Milestone-based payment schedule',
-    'Vesting schedule with acceleration triggers',
-    'Service credit calculation table',
-    'Deliverables and acceptance criteria schedule',
-  ],
-  'something-else': [
-    'Add a revenue-sharing earn-out provision',
-    'Include an arbitration clause with specific rules',
-    'Add a most-favoured-customer pricing provision',
-    'Include a force majeure clause with pandemic carve-out',
-  ],
-  'plat-terms': [
-    'Switch from browsewrap to clickwrap acceptance',
-    'Add version tracking for terms changes',
-    'Modify auto-renewal disclosure per Ontario CPA',
-    'Add specific prohibited conduct list',
-  ],
-  'plat-disputes': [
-    'Add 30-day informal resolution period',
-    'Switch to arbitration under ADR Institute rules',
-    'Remove class action waiver (post Uber v. Heller)',
-    'Add mediation step before litigation',
-  ],
-  'plat-content': [
-    'Add DMCA/Copyright Act takedown procedure',
-    'Modify UGC license scope and duration',
-    'Add content moderation appeal process',
-  ],
-  'plat-privacy': [
-    'Add biometric data collection disclosure',
-    'Expand cookie categories and consent options',
-    'Add Quebec Law 25 privacy impact provisions',
-    'Specify PIPEDA-compliant retention schedule',
-  ],
-  'plat-sharing': [
-    'Add named third-party processor list',
-    'Restrict cross-border data transfers',
-    'Add data processing agreement requirements',
-  ],
-  'plat-retention': [
-    'Shorten retention to 18 months',
-    'Add automatic deletion on account closure',
-    'Create tiered retention by data category',
-  ],
-  'plat-userrights': [
-    'Add GDPR-style data portability right',
-    'Add right to explanation for automated decisions',
-    'Add Quebec Law 25 access request process',
-  ],
-  'inf-content': [
-    'Limit brand usage to social media only',
-    'Require creator approval for paid advertising use',
-    'Add content revision caps (max 2 rounds)',
-    'Specify content ownership after campaign',
-  ],
-  'inf-compliance': [
-    'Add AGCO-compliant messaging for iGaming',
-    'Add French-language disclosure for Quebec audience',
-    'Update FTC disclosure requirements',
-  ],
-  'inv-default': [
-    'Extend cure period to 15 days',
-    'Add MAC exclusion for pandemic events',
-    'Remove cross-default provision',
-    'Add grace period for payment defaults',
-  ],
-  'inv-security': [
-    'Switch from all-assets GSA to specific pledge',
-    'Add PPSA registration requirements',
-    'Add permitted encumbrances schedule',
-  ],
-  'inv-parties': [
-    'Add co-founder as personal guarantor',
-    'Add co-borrower with joint liability',
-    'Add corporate guarantor subsidiary',
-  ],
-  'default': [
-    'Modify a specific clause or threshold',
-    'Add a new provision or schedule',
-    'Adjust payment or compensation terms',
-    'Change dispute resolution mechanism',
-    'Modify termination or exit provisions',
-  ],
+const COMPLEXITY_COLORS: Record<string, { bg: string; text: string }> = {
+  simple: { bg: "bg-emerald-50", text: "text-emerald-700" },
+  standard: { bg: "bg-amber-50", text: "text-amber-700" },
+  complex: { bg: "bg-rose-50", text: "text-rose-700" },
 };
 
-// ─── Shared UI ───
-const inputClass = "mt-1.5 block w-full border border-neutral-200 bg-white rounded-lg px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 focus:ring-2 focus:ring-[rgba(190,18,60,0.1)] focus:border-[#be123c] outline-none transition-all duration-200";
-const labelClass = "text-[14px] font-medium text-neutral-700";
-
-const COMPLEXITY_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  simple: { bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200" },
-  standard: { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200" },
-  complex: { bg: "bg-rose-50", text: "text-rose-700", border: "border-rose-200" },
-};
-
-// ─── Risk Detection (per spec §6.4) ───
-function detectRisks(intakeData: Record<string, string>, category: ModificationCategory | null): string[] {
+// ─── Risk Detection ───
+function detectRisks(text: string, category: ModificationCategory | null): string[] {
   const flags: string[] = [];
-  const desc = (intakeData.description || "").toLowerCase();
-  if (desc.includes("remove") && desc.includes("savings clause")) flags.push("Regulatory: Removing Criminal Code s.347 savings clause is not permitted.");
-  if (desc.includes("interest") && desc.includes("real property")) flags.push("Regulatory: Interest Act s.8 restricts default interest on real-property-secured instruments.");
-  if (desc.includes("remove") && desc.includes("non-compete") && desc.includes("non-solicit")) flags.push("Internal consistency: Removing non-solicitation may conflict with non-compete clause.");
-  if (desc.includes("securities") && (desc.includes("weaken") || desc.includes("remove"))) flags.push("Regulatory: NI 45-106 investor accreditation verification must not be weakened.");
+  const lower = text.toLowerCase();
+  if (lower.includes("remove") && lower.includes("savings clause")) flags.push("Removing the Criminal Code s.347 savings clause is not permitted under Canadian law.");
+  if (lower.includes("interest") && lower.includes("real property")) flags.push("Interest Act s.8 restricts default interest on real-property-secured instruments.");
+  if (lower.includes("remove") && lower.includes("non-compete") && lower.includes("non-solicit")) flags.push("Removing non-solicitation may conflict with the existing non-compete clause.");
+  if (lower.includes("securities") && (lower.includes("weaken") || lower.includes("remove"))) flags.push("NI 45-106 investor accreditation verification must not be weakened.");
   if (category?.regModuleIds && category.regModuleIds.length > 0) flags.push("This modification may trigger additional regulatory compliance requirements.");
   return flags;
 }
 
-// ─── Mandatory Lawyer Review Check (per spec §12.6) ───
-function requiresMandatoryLawyerReview(intakeData: Record<string, string>, category: ModificationCategory | null): boolean {
-  const desc = (intakeData.description || "").toLowerCase();
-  if (desc.includes("savings clause") || desc.includes("s.347")) return true;
-  if (desc.includes("real property") && desc.includes("interest")) return true;
-  if (desc.includes("securities") && desc.includes("accreditation")) return true;
+// ─── Mandatory Lawyer Review ───
+function requiresMandatoryLawyerReview(text: string, category: ModificationCategory | null): boolean {
+  const lower = text.toLowerCase();
+  if (lower.includes("savings clause") || lower.includes("s.347")) return true;
+  if (lower.includes("real property") && lower.includes("interest")) return true;
+  if (lower.includes("securities") && lower.includes("accreditation")) return true;
   if (category?.regModuleIds?.includes("RM-IA8")) return true;
   return false;
 }
 
-// ─── Auto-Resolution Check (per spec §5.2) ───
-function canAutoResolve(intakeType: string, intakeData: Record<string, string>): boolean {
-  return intakeType === "modify" && intakeData.isThreshold === "true" && !!intakeData.currentValue && !!intakeData.desiredValue;
-}
-
-// ─── Complexity Tier Determination (per spec §7.2) ───
+// ─── Complexity Determination ───
 function determineComplexity(
-  intakeType: string,
-  messages: ChatMessage[],
+  messageCount: number,
   category: ModificationCategory | null,
   riskFlags: string[]
 ): "simple" | "standard" | "complex" {
-  // Novel / multi-clause / regulatory triggers → complex
   if (riskFlags.length >= 2) return "complex";
   if (category?.regModuleIds && category.regModuleIds.length >= 2) return "complex";
   if (category?.clauseIds && category.clauseIds.length >= 5) return "complex";
-  if (intakeType === "freeform") return "complex";
-  // Threshold change, single removal → simple
-  if (intakeType === "modify" && messages.length <= 2) return "simple";
-  if (intakeType === "remove") return "simple";
-  // Everything else → standard
-  return "standard";
+  if (messageCount <= 3) return "simple";
+  if (messageCount <= 6) return "standard";
+  return "complex";
 }
 
-// ─── Structure/Scope Generator (per spec §7.1) ───
-function generateStructureScope(mod: ModificationRequest): string {
-  if (mod.autoResolved) return `Single value change: ${mod.intakeData.currentValue} → ${mod.intakeData.desiredValue}`;
-  if (mod.intakeType === "remove") return `Clause removal from ${mod.category.name} section`;
-  if (mod.intakeType === "add-party") return `${mod.intakeData.partyRole || "New party"} addition with signing blocks and representations`;
-  if (mod.intakeType === "custom-schedule") return `${mod.intakeData.scheduleType || "Custom"} schedule with ${mod.intakeData.entryCount || "multiple"} entries`;
-  if (mod.intakeType === "add") return `New provision in ${mod.category.name}, ${mod.intakeData.protects === "me" ? "favouring your position" : mod.intakeData.protects === "other" ? "balanced toward other party" : "balanced for both parties"}`;
-  return `Modified provision in ${mod.category.name} section`;
+// ─── Category Detection from User Input ───
+function detectCategory(text: string, categories: ModificationCategory[]): ModificationCategory | null {
+  const lower = text.toLowerCase();
+  const keywords: Record<string, string[]> = {
+    "emp-termination": ["termination", "severance", "notice period", "fired", "let go", "terminate", "garden leave"],
+    "emp-covenants": ["non-compete", "non-solicit", "restrictive", "covenant", "confidentiality"],
+    "emp-compensation": ["salary", "bonus", "compensation", "equity", "vesting", "benefits", "signing bonus", "clawback", "stock option"],
+    "emp-ip": ["intellectual property", "ip assignment", "invention", "moral rights", "patent", "open source", "personal project"],
+    "corp-transfer": ["rofr", "right of first refusal", "tag-along", "drag-along", "share transfer", "exit", "buy-sell", "shotgun"],
+    "corp-governance": ["board", "voting", "governance", "reserved matter", "observer", "director", "supermajority"],
+    "corp-deadlock": ["deadlock", "mediation", "arbitration", "dispute between shareholders"],
+    "corp-dividends": ["dividend", "distribution", "profit sharing", "reinvestment"],
+    "inv-interest": ["interest rate", "payment schedule", "amortiz", "repayment", "bullet", "pik"],
+    "inv-default": ["default", "cure period", "acceleration", "event of default", "cross-default", "mac"],
+    "inv-security": ["security", "collateral", "gsa", "ppsa", "pledge", "encumbrance"],
+    "inv-conversion": ["valuation cap", "conversion", "discount rate", "mfn", "most favoured"],
+    "inv-rights": ["board observer", "pro-rata", "information rights", "investor rights", "lender rights"],
+    "inv-parties": ["guarantor", "co-borrower", "co-signer", "add a party", "new party"],
+    "com-sla": ["uptime", "sla", "service level", "response time", "rpo", "rto", "service credit"],
+    "com-liability": ["liability cap", "indemnif", "damages", "limitation of liability"],
+    "com-data": ["data residency", "breach notification", "data handling", "soc 2", "data deletion"],
+    "com-ip": ["ip ownership", "work product", "license grant", "open-source", "deliverables"],
+    "plat-terms": ["browsewrap", "clickwrap", "terms of service", "acceptance", "auto-renewal"],
+    "plat-disputes": ["dispute resolution", "class action", "arbitration clause", "mediation"],
+    "plat-content": ["ugc", "user content", "takedown", "content moderation", "dmca"],
+    "plat-privacy": ["personal data", "biometric", "cookie", "privacy", "pipeda", "law 25"],
+    "plat-sharing": ["third-party sharing", "data sharing", "processor", "cross-border"],
+    "plat-retention": ["retention period", "data retention", "auto-deletion", "how long"],
+    "plat-userrights": ["data portability", "access request", "right to delete", "automated decision"],
+    "inf-compensation": ["commission", "affiliate", "performance bonus", "flat fee", "creator pay"],
+    "inf-content": ["usage rights", "whitelisting", "brand usage", "content ownership", "revision cap"],
+    "inf-exclusivity": ["exclusivity", "exclusive", "competitor", "category exclusivity"],
+    "inf-compliance": ["disclosure", "agco", "gambling", "ftc", "french-language"],
+    "custom-schedule": ["schedule", "milestone", "payment table", "exhibit", "deliverables table"],
+  };
+
+  let bestMatch: { id: string; score: number } | null = null;
+  for (const [catId, terms] of Object.entries(keywords)) {
+    let score = 0;
+    for (const term of terms) {
+      if (lower.includes(term)) score++;
+    }
+    if (score > 0 && (!bestMatch || score > bestMatch.score)) {
+      bestMatch = { id: catId, score };
+    }
+  }
+
+  if (bestMatch) {
+    return categories.find((c) => c.id === bestMatch!.id) || null;
+  }
+  return null;
+}
+
+// ─── Province Tips ───
+function getProvinceTip(text: string, province: string): string | null {
+  const lower = text.toLowerCase();
+
+  if (province === "Ontario" || province === "ontario") {
+    if (lower.includes("non-compete")) return "In Ontario, non-compete clauses for employees are unenforceable under the ESA (s.67.2) unless the employee is a C-suite executive. Consider a non-solicit instead.";
+    if (lower.includes("termination") || lower.includes("severance")) return "Ontario's Employment Standards Act sets minimum notice/severance requirements. Common law reasonable notice typically exceeds ESA minimums significantly.";
+    if (lower.includes("auto-renewal") || lower.includes("subscription")) return "Ontario's Consumer Protection Act requires specific disclosure for auto-renewal agreements and a simple cancellation mechanism.";
+  }
+
+  if (province === "Quebec" || province === "quebec" || province === "Qu\u00e9bec") {
+    if (lower.includes("privacy") || lower.includes("data") || lower.includes("personal information")) return "Quebec's Law 25 (in force since September 2023) imposes strict requirements including privacy impact assessments, consent management, and data portability rights.";
+    if (lower.includes("non-compete")) return "Under the Civil Code of Quebec (art. 2089), non-compete clauses must be limited in time, territory, and activity, and must be in writing.";
+    if (lower.includes("language") || lower.includes("french")) return "Quebec's Charter of the French Language requires consumer-facing agreements to be available in French.";
+  }
+
+  if (province === "British Columbia" || province === "BC") {
+    if (lower.includes("termination") || lower.includes("severance")) return "BC's Employment Standards Act sets minimum notice requirements. Unlike Ontario, BC does not have a separate statutory severance pay obligation.";
+  }
+
+  if (province === "Alberta" || province === "alberta") {
+    if (lower.includes("non-compete")) return "Alberta courts have historically been strict about enforcing non-compete clauses, requiring narrow scope, limited duration, and a legitimate business interest.";
+  }
+
+  if (lower.includes("securities") || lower.includes("accredited investor")) return "National Instrument 45-106 governs prospectus exemptions across Canadian provinces. Accredited investor verification requirements cannot be weakened.";
+  if (lower.includes("ppsa") || lower.includes("security interest")) return `The ${province} Personal Property Security Act governs security interest registration. Ensure PPSA registrations are filed in the correct province.`;
+
+  return null;
+}
+
+// ─── Message ID generator ───
+let msgIdCounter = 0;
+function nextMsgId(): string {
+  msgIdCounter++;
+  return `msg-${Date.now()}-${msgIdCounter}`;
 }
 
 let modIdCounter = 0;
@@ -379,907 +456,551 @@ function nextModId(): string {
   return `mod-${modIdCounter}`;
 }
 
-// ─── HIGH COMPLEXITY Contract Types (per spec §3.3) ───
-const HIGH_COMPLEXITY_TYPES = ["convertible-note", "bilateral-loan", "revolving-credit", "convertible_note", "bilateral_loan", "revolving_credit"];
-const SIMPLE_TYPES = ["demand-note", "demand_note", "privacy-policy", "privacy_policy"];
+let pendingIdCounter = 0;
+function nextPendingId(): string {
+  pendingIdCounter++;
+  return `pending-${Date.now()}-${pendingIdCounter}`;
+}
 
-// ─── Component ───
-export default function CustomizePage() {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [session, setSession] = useState<SessionData>({
-    contractType: "", contractTitle: "", wizardSelections: {}, clauseManifest: [], regModulesActivated: [], governingLaw: "Ontario", parties: [],
+// ─── Simulated Ruby Response (placeholder for real AI integration) ───
+function generateRubyResponse(
+  userText: string,
+  session: SessionData,
+  detectedCategory: ModificationCategory | null,
+  messageHistory: ChatMessage[],
+  userMessageCount: number
+): { content: string; quickActions?: QuickAction[]; clausePreview?: ClausePreview; provinceTip?: string; riskFlag?: string } {
+  const lower = userText.toLowerCase();
+  const province = session.governingLaw || "Ontario";
+
+  // Province tip detection
+  const provinceTip = getProvinceTip(userText, province) || undefined;
+
+  // Risk detection
+  const risks = detectRisks(userText, detectedCategory);
+  const riskFlag = risks.length > 0 ? risks[0] : undefined;
+
+  // Determine response based on context
+  const catName = detectedCategory?.name || "your contract";
+
+  // Handle threshold / numeric changes
+  if (lower.match(/\b(change|increase|decrease|extend|reduce|shorten|raise|lower)\b.*\b(\d+)\b/)) {
+    const match = lower.match(/\b(change|increase|decrease|extend|reduce|shorten|raise|lower)\b/);
+    const numMatch = lower.match(/\b(\d+)\b/);
+    const action = match ? match[1] : "change";
+    const number = numMatch ? numMatch[1] : "";
+
+    return {
+      content: `I can ${action} that to ${number}. Let me show you how the clause would read with this change.`,
+      clausePreview: {
+        title: `${catName} - Proposed Change`,
+        current: `[Current clause language will be populated from your contract template]`,
+        proposed: `[Updated language reflecting the ${action} to ${number} will appear here]`,
+      },
+      quickActions: [
+        { label: "Looks good, apply this", value: "apply" },
+        { label: "Adjust the number", value: "adjust" },
+        { label: "Show me the full clause", value: "full-clause" },
+      ],
+      provinceTip,
+      riskFlag,
+    };
+  }
+
+  // Handle non-compete discussions
+  if (lower.includes("non-compete")) {
+    const isOntario = province === "Ontario";
+    return {
+      content: isOntario
+        ? `I should flag something important: since your agreement is governed by Ontario law, non-compete clauses for employees are **unenforceable under the ESA (s.67.2)** unless the employee is a C-suite executive (i.e., Chief Executive Officer, President, Chief Administrative Officer, Chief Operating Officer, Chief Financial Officer, Chief Information Officer, Chief Legal Officer, Chief Human Resources Officer, or Chief Corporate Development Officer).\n\nWould you like me to:\n- Draft a **non-solicitation clause** instead (which is enforceable in Ontario)\n- Proceed with the non-compete if this is for a C-suite executive\n- Draft a narrower **non-competition** clause appropriate for a C-suite role`
+        : `I can adjust the non-compete clause in your ${catName} section. To draft the best version, I need to understand the scope you're looking for.`,
+      quickActions: isOntario
+        ? [
+            { label: "Draft a non-solicit instead", value: "I'd like a non-solicitation clause instead of a non-compete" },
+            { label: "This is for C-suite", value: "This is for a C-suite executive, proceed with non-compete" },
+            { label: "Tell me more about the rules", value: "What are the specific rules around non-competes in Ontario?" },
+          ]
+        : [
+            { label: "12-month duration", value: "Set the non-compete duration to 12 months" },
+            { label: "24-month duration", value: "Set the non-compete duration to 24 months" },
+            { label: "Custom period", value: "I want a custom non-compete period" },
+          ],
+      provinceTip,
+      riskFlag,
+    };
+  }
+
+  // Handle termination/severance
+  if (lower.includes("termination") || lower.includes("severance") || lower.includes("notice period")) {
+    return {
+      content: `I can customize the termination and severance provisions in your ${session.contractTitle}. Under ${province} law, there are both statutory minimums and common law considerations to keep in mind.\n\nWhat specifically would you like to adjust?`,
+      quickActions: [
+        { label: "Increase severance formula", value: "Increase the severance formula to 2 weeks per year of service" },
+        { label: "Extend notice period", value: "Extend the notice period to 6 months" },
+        { label: "Add change-of-control trigger", value: "Add a double-trigger change of control provision" },
+        { label: "Add garden leave", value: "Add a garden leave provision during the notice period" },
+      ],
+      provinceTip,
+      riskFlag,
+    };
+  }
+
+  // Handle "apply" or acceptance
+  if (lower.includes("looks good") || lower.includes("apply") || lower === "yes" || lower.includes("that works") || lower.includes("perfect")) {
+    return {
+      content: `I've recorded that modification. You can continue making more changes, or click **Confirm & Proceed** when you're ready to review pricing and proceed.\n\nIs there anything else you'd like to adjust?`,
+      quickActions: [
+        { label: "Make another change", value: "I'd like to make another change" },
+        { label: "Show me what changed", value: "Show me a summary of all changes so far" },
+      ],
+      provinceTip,
+      riskFlag,
+    };
+  }
+
+  // Handle removal requests
+  if (lower.includes("remove") || lower.includes("delete") || lower.includes("take out")) {
+    return {
+      content: `I can remove that provision. Before I do, I want to make sure you understand the implications:\n\n- Removing clauses may affect the enforceability or balance of your agreement\n- Some clauses serve as protective "savings" provisions required by regulation\n\nWould you like me to proceed with the removal, or would you prefer to modify the clause instead of removing it entirely?`,
+      quickActions: [
+        { label: "Proceed with removal", value: "Yes, remove the clause entirely" },
+        { label: "Modify instead", value: "Let's modify it instead of removing it" },
+        { label: "What are the risks?", value: "What specific risks come with removing this clause?" },
+      ],
+      provinceTip,
+      riskFlag,
+    };
+  }
+
+  // Handle addition requests
+  if (lower.includes("add") || lower.includes("include") || lower.includes("insert") || lower.includes("new provision") || lower.includes("new clause")) {
+    return {
+      content: `I can add that to your ${session.contractTitle}. To draft the best version, could you tell me:\n\n1. **Who should this provision primarily protect?** (you, the other party, or both equally)\n2. **Any specific thresholds or numbers** you have in mind?\n\nOr I can draft a balanced version and you can adjust from there.`,
+      quickActions: [
+        { label: "Protect me (my company)", value: "Draft it to protect me / my company" },
+        { label: "Balanced for both parties", value: "Draft a balanced version for both parties" },
+        { label: "Draft it and I'll adjust", value: "Just draft a balanced version and I'll adjust" },
+      ],
+      provinceTip,
+      riskFlag,
+    };
+  }
+
+  // Handle summary requests
+  if (lower.includes("summary") || lower.includes("what changed") || lower.includes("changes so far")) {
+    const userMsgCount = messageHistory.filter((m) => m.role === "user").length;
+    return {
+      content: `Here's a summary of the modifications discussed so far:\n\n${userMsgCount > 0 ? `We've discussed **${userMsgCount} change${userMsgCount > 1 ? "s" : ""}** to your ${session.contractTitle}.\n\nClick **Finalize Changes** in the header to see the full breakdown with pricing.` : "No modifications have been finalized yet. Tell me what you'd like to change and I'll draft it for you."}`,
+      provinceTip,
+      riskFlag,
+    };
+  }
+
+  // Generic / first-time response with contextual guidance
+  if (detectedCategory) {
+    const chips = SUGGESTION_CHIPS[detectedCategory.id] || [];
+    return {
+      content: `I can see this relates to **${detectedCategory.name}**. ${detectedCategory.clauseIds ? `This section involves ${detectedCategory.clauseIds.length} related provisions in your agreement.` : ""}\n\nCould you be more specific about what you'd like to change? For example, are you looking to modify an existing term, add something new, or remove a provision?`,
+      quickActions: chips.slice(0, 3).map((c) => ({ label: c, value: c })),
+      provinceTip,
+      riskFlag,
+    };
+  }
+
+  // Fallback with helpful suggestions
+  return {
+    content: `I'd be happy to help with that. To make sure I draft the right modification, could you tell me a bit more about:\n\n- **Which part** of the agreement you'd like to change\n- **What outcome** you're looking for\n\nOr you can pick one of the common modifications below and I'll guide you through it.`,
+    quickActions: [
+      { label: "Show me common changes for this contract", value: `What are the most common modifications for a ${session.contractTitle}?` },
+      { label: "I'll describe what I need", value: "Let me describe what I need in my own words" },
+    ],
+    provinceTip,
+    riskFlag,
+  };
+}
+
+// ─── Render Markdown-light (bold only) ───
+function renderContent(text: string) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return (
+        <strong key={i} className="font-semibold">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    return <span key={i}>{part}</span>;
   });
+}
+
+// ─── Step definitions ───
+const STEPS = [
+  { number: 1, label: "Your Contract" },
+  { number: 2, label: "Select Category" },
+  { number: 3, label: "Describe Change" },
+  { number: 4, label: "Review with Ruby" },
+  { number: 5, label: "Order & Pay" },
+];
+
+// ═══════════════════════════════════════════════════════════
+// ═══ Main Component ═══
+// ═══════════════════════════════════════════════════════════
+export default function CustomizePage() {
+  // ─── State ───
+  const [session, setSession] = useState<SessionData>({
+    contractType: "",
+    contractTitle: "",
+    tier: "",
+    governingLaw: "Ontario",
+    selected: {},
+  });
+
+  // Wizard state
+  const [currentStep, setCurrentStep] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<ModificationCategory | null>(null);
-  const [intakeType, setIntakeType] = useState("modify");
-  const [intakeData, setIntakeData] = useState<Record<string, string>>({});
+  const [pendingChanges, setPendingChanges] = useState<PendingChange[]>([]);
+
+  // Step 3 state
+  const [changeDescription, setChangeDescription] = useState("");
+
+  // Step 4 chat state
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState("");
-  const [isAiTyping, setIsAiTyping] = useState(false);
-  const [draftCount, setDraftCount] = useState(0);
-  const [exchangeCount, setExchangeCount] = useState(0);
-  const [modifications, setModifications] = useState<ModificationRequest[]>([]);
-  const [editingModIndex, setEditingModIndex] = useState<number | null>(null);
+  const [isTyping, setIsTyping] = useState(false);
+  const [detectedCategory, setDetectedCategory] = useState<ModificationCategory | null>(null);
+
+  // Step 5 / order state
+  const [modifications, setModifications] = useState<ModificationRecord[]>([]);
+  const [showOrderSummary, setShowOrderSummary] = useState(false);
   const [deliveryTier, setDeliveryTier] = useState<"ai-only" | "lawyer-standard" | "lawyer-priority">("ai-only");
-  const [showRedirect, setShowRedirect] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
-  const [attachedFiles, setAttachedFiles] = useState<string[]>([]);
+
   const chatEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const descInputRef = useRef<HTMLTextAreaElement>(null);
 
+  // ─── Load session data ───
   useEffect(() => {
     const type = sessionStorage.getItem("ruby-contract-type") || "employment";
-    const title = sessionStorage.getItem("ruby-contract-title") || "Your Agreement";
-    setSession((prev) => ({ ...prev, contractType: type, contractTitle: title }));
+    const title = sessionStorage.getItem("ruby-contract-title") || "Standard Employment Agreement";
+    const tier = sessionStorage.getItem("ruby-tier") || "standard";
+    let selected: Record<string, unknown> = {};
+    try {
+      const raw = sessionStorage.getItem("ruby-selected");
+      if (raw) selected = JSON.parse(raw);
+    } catch {
+      // ignore parse errors
+    }
+    const governingLaw = (selected?.province as string) || (selected?.governingLaw as string) || (selected?.jurisdiction as string) || "Ontario";
+    setSession({ contractType: type, contractTitle: title, tier, governingLaw, selected });
   }, []);
 
-  useEffect(() => {
-    const container = chatContainerRef.current;
-    if (container) {
-      container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
-    }
-  }, [messages]);
-
-  // Scroll to top on step change
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [currentStep]);
-
+  // ─── Categories for this contract type ───
   const categories = [
     ...(CONTRACT_CATEGORIES[session.contractType] || CONTRACT_CATEGORIES["employment"] || []),
     ...UNIVERSAL_CATEGORIES,
   ];
 
+  // ─── Scroll to latest message ───
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({ top: chatContainerRef.current.scrollHeight, behavior: "smooth" });
+    }
+  }, [messages, isTyping]);
+
+  // ─── Any modification requires lawyer? ───
   const anyRequiresLawyer = modifications.some((m) => m.requiresLawyerReview);
 
-  // ─── Handlers ───
-  function handleCategorySelect(cat: ModificationCategory) {
-    setSelectedCategory(selectedCategory?.id === cat.id ? null : cat);
-  }
-
-  function handleCategoryNext() {
-    if (!selectedCategory) return;
-    setShowRedirect(false);
-    setCurrentStep(2);
-  }
-
-  function handleDismissRedirect() {
-    setShowRedirect(false);
-  }
-
-  function handleIntakeSubmit() {
-    const risks = detectRisks(intakeData, selectedCategory);
-    const mandatoryLawyer = requiresMandatoryLawyerReview(intakeData, selectedCategory);
-
-    // Auto-resolution check (per spec §5.2)
-    if (canAutoResolve(intakeType, intakeData)) {
-      const mod: ModificationRequest = {
-        id: nextModId(),
-        category: selectedCategory!,
-        intakeType,
-        intakeData,
-        messages: [],
-        summary: `Change ${intakeData.clauseName || "value"} from ${intakeData.currentValue} to ${intakeData.desiredValue}`,
-        structureScope: `Single value change: ${intakeData.currentValue} → ${intakeData.desiredValue}`,
-        complexityTier: "simple",
-        riskFlags: risks,
-        baseFee: COMPLEXITY_PRICING.simple.base,
-        volumeDiscount: volumeDiscount(modifications.length),
-        autoResolved: true,
-        requiresLawyerReview: mandatoryLawyer,
-        expanded: true,
-      };
-      setModifications((prev) => [...prev, mod]);
-      setCurrentStep(4);
-      return;
-    }
-
-    setCurrentStep(3);
-    setDraftCount(0);
-    setExchangeCount(0);
-
-    const opening: ChatMessage = {
-      role: "ai",
-      content: buildOpeningMessage(),
-      timestamp: new Date(),
-    };
-    const msgs: ChatMessage[] = [opening];
-    if (risks.length > 0) {
-      msgs.push({
-        role: "system",
-        content: risks.join("\n"),
-        timestamp: new Date(),
-        riskFlag: risks[0],
-      });
-    }
-    setMessages(msgs);
-  }
-
-  function buildOpeningMessage(): string {
-    const action = intakeType === "modify" ? "modify" : intakeType === "add" ? "add a new provision to" : intakeType === "remove" ? "remove a clause from" : intakeType === "add-party" ? "add a party to" : intakeType === "custom-schedule" ? "create a custom schedule for" : "customize";
-    let msg = `I can see you'd like to ${action} your ${session.contractTitle}`;
-    if (selectedCategory) msg += ` — specifically in the area of **${selectedCategory.name}**`;
-    msg += ".";
-
-    // Show contract context (per spec §6.3.1)
-    if (session.governingLaw) msg += ` Your contract is governed by **${session.governingLaw}** law.`;
-
-    if (intakeData.description) msg += `\n\nYou mentioned: "${intakeData.description}"`;
-    if (intakeType === "add-party" && intakeData.partyName) msg += `\n\nI'll be drafting provisions for **${intakeData.partyName}** as a ${intakeData.partyRole || "new party"}.`;
-    if (intakeType === "add" && intakeData.protects) {
-      const lean = intakeData.protects === "me" ? "favouring your position" : intakeData.protects === "other" ? "balanced towards the other party" : "balanced for both parties";
-      msg += `\n\nI'll draft this ${lean}.`;
-    }
-
-    // Per spec §6.3.1 — go directly to drafting if enough context, or ask one clarifying question
-    if (intakeData.description && intakeData.description.length > 50) {
-      msg += "\n\nI have enough context to draft something for you. Let me work on that now.";
-    } else {
-      msg += "\n\nBefore I draft, let me make sure I understand your needs. Could you provide a bit more detail about what specific outcome you're looking for?";
-    }
-    return msg;
-  }
-
-  function handleSendMessage() {
-    if (!chatInput.trim() || isAiTyping) return;
-    if (exchangeCount >= 8) return;
-
-    const userMsg: ChatMessage = { role: "user", content: chatInput.trim(), timestamp: new Date() };
-    setMessages((prev) => [...prev, userMsg]);
-    setChatInput("");
-    setIsAiTyping(true);
-    const newExchangeCount = exchangeCount + 1;
-    setExchangeCount(newExchangeCount);
-
-    // Inline risk detection during conversation (per spec §6.4)
-    const conversationRisks = detectRisks({ description: chatInput }, selectedCategory);
-
-    setTimeout(() => {
-      let aiContent: string;
-      const newDraftCount = draftCount + 1;
-      setDraftCount(newDraftCount);
-
-      if (newDraftCount >= 3) {
-        aiContent = "I've captured your requirements. The language has been refined based on your feedback.\n\n**Final draft ready.** Click \"Looks Good\" below to proceed to the summary and pricing screen.";
-      } else if (newExchangeCount >= 8) {
-        aiContent = "We've reached the conversation limit. I've drafted the best version based on our discussion.\n\n**Draft finalized.** Click \"Looks Good\" to continue.";
-      } else {
-        aiContent = `I've drafted an updated version incorporating your feedback.\n\n**Modified clause (Draft ${newDraftCount}):** The provision now includes your requested adjustments while maintaining compliance with applicable Canadian regulatory requirements.`;
-        if (selectedCategory?.clauseIds) {
-          aiContent += `\n\nThis draws from our clause library (${selectedCategory.clauseIds.length} related provisions) to ensure the language is well-established.`;
-        }
-        aiContent += `\n\nDoes this look right, or would you like me to adjust anything?`;
-      }
-
-      const newMsgs: ChatMessage[] = [];
-      newMsgs.push({ role: "ai", content: aiContent, timestamp: new Date(), draftVersion: newDraftCount });
-
-      if (conversationRisks.length > 0) {
-        newMsgs.push({
-          role: "system",
-          content: conversationRisks.join("\n"),
-          timestamp: new Date(),
-          riskFlag: conversationRisks[0],
-        });
-      }
-
-      setMessages((prev) => [...prev, ...newMsgs]);
-      setIsAiTyping(false);
-    }, 1800);
-  }
-
-  function handleFileAttach() {
-    fileInputRef.current?.click();
-  }
-
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = e.target.files;
-    if (!files) return;
-    const names = Array.from(files).map((f) => f.name);
-    setAttachedFiles((prev) => [...prev, ...names]);
-    // Add system message about file (per spec §6.1)
-    const msg: ChatMessage = {
-      role: "system",
-      content: `File attached: ${names.join(", ")}. This will be referenced in the drafting conversation.`,
-      timestamp: new Date(),
-    };
-    setMessages((prev) => [...prev, msg]);
-  }
-
-  function handleFinishChat() {
-    const risks = detectRisks(intakeData, selectedCategory);
-    const allConversationRisks = messages.filter((m) => m.riskFlag).map((m) => m.riskFlag!);
-    const combinedRisks = [...new Set([...risks, ...allConversationRisks])];
-    const tier = determineComplexity(intakeType, messages, selectedCategory, combinedRisks);
-    const mandatoryLawyer = requiresMandatoryLawyerReview(intakeData, selectedCategory);
-
-    const mod: ModificationRequest = {
-      id: nextModId(),
-      category: selectedCategory!,
-      intakeType,
-      intakeData,
-      messages,
-      summary: intakeData.description || "Custom modification",
-      structureScope: "",
-      complexityTier: tier,
-      riskFlags: combinedRisks,
-      baseFee: COMPLEXITY_PRICING[tier].base,
-      volumeDiscount: volumeDiscount(editingModIndex !== null ? editingModIndex : modifications.length),
-      autoResolved: false,
-      requiresLawyerReview: mandatoryLawyer,
-      expanded: true,
-    };
-    mod.structureScope = generateStructureScope(mod);
-
-    if (editingModIndex !== null) {
-      setModifications((prev) => prev.map((m, i) => (i === editingModIndex ? mod : m)));
-      setEditingModIndex(null);
-    } else {
-      setModifications((prev) => [...prev, mod]);
-    }
-    setCurrentStep(4);
-  }
-
-  function handleAddAnother() {
-    setSelectedCategory(null);
-    setIntakeType("modify");
-    setIntakeData({});
-    setMessages([]);
-    setChatInput("");
-    setDraftCount(0);
-    setExchangeCount(0);
-    setAttachedFiles([]);
-    setEditingModIndex(null);
-    setCurrentStep(1);
-  }
-
-  function handleEditMod(index: number) {
-    const mod = modifications[index];
-    setSelectedCategory(mod.category);
-    setIntakeType(mod.intakeType);
-    setIntakeData(mod.intakeData);
-    setMessages(mod.messages);
-    setDraftCount(mod.messages.filter((m) => m.draftVersion).length);
-    setExchangeCount(mod.messages.filter((m) => m.role === "user").length);
-    setEditingModIndex(index);
-    setCurrentStep(3);
-  }
-
-  function handleRemoveMod(index: number) {
-    setModifications((prev) => prev.filter((_, i) => i !== index));
-  }
-
-  function toggleModExpanded(index: number) {
-    setModifications((prev) => prev.map((m, i) => (i === index ? { ...m, expanded: !m.expanded } : m)));
-  }
-
-  function handleCheckout() {
-    setOrderComplete(true);
-    setCurrentStep(5);
-  }
-
-  // ─── Pricing Calculations ───
+  // ─── Pricing ───
   const subtotal = modifications.reduce((sum, mod, i) => {
     const discount = volumeDiscount(i);
     return sum + mod.baseFee * (1 - discount);
   }, 0);
   const lawyerAddon = deliveryTier === "lawyer-standard" ? LAWYER_ADDON.standard : deliveryTier === "lawyer-priority" ? LAWYER_ADDON.priority : 0;
-  const total = subtotal + (lawyerAddon * modifications.length);
+  const total = subtotal + lawyerAddon * modifications.length;
 
-  const STEPS = ["Contract Delivered", "Select Category", "Describe Change", "Ruby Drafting", "Review & Pay", "Confirmed"];
+  // ─── Send message handler (Step 4 chat) ───
+  const handleSend = useCallback(
+    (text?: string) => {
+      const content = (text || chatInput).trim();
+      if (!content || isTyping) return;
 
-  // Mobile step indicator
-  const stepName = STEPS[currentStep] || "";
+      const userMsg: ChatMessage = {
+        id: nextMsgId(),
+        role: "user",
+        content,
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, userMsg]);
+      setChatInput("");
+      setIsTyping(true);
 
-  return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-12 pb-28 md:pb-12">
+      if (inputRef.current) {
+        inputRef.current.style.height = "auto";
+      }
 
-        {/* ─── Progress Bar ─── */}
-        {currentStep < 5 && (
-          <div className="mb-6 sm:mb-10">
-            {/* Mobile: compact step indicator */}
-            <div className="sm:hidden mb-4">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-[15px] font-semibold text-neutral-900">{stepName}</p>
-                <p className="text-[13px] text-neutral-400">Step {currentStep + 1} of 5</p>
-              </div>
-              <div className="h-1 bg-neutral-100 rounded-full overflow-hidden">
-                <div className="h-full bg-[#be123c] rounded-full transition-all duration-500" style={{ width: `${((currentStep + 1) / 5) * 100}%` }} />
-              </div>
-            </div>
-            {/* Desktop: full step indicators */}
-            <div className="hidden sm:flex items-center gap-2">
-              {STEPS.slice(0, 5).map((s, i) => (
-                <div key={s} className="flex items-center gap-2 flex-1 min-w-0">
-                  <div className={`flex items-center justify-center w-7 h-7 rounded-full text-[13px] font-semibold shrink-0 ${i <= currentStep ? "bg-[#be123c] text-white" : "bg-neutral-100 text-neutral-400"}`}>
-                    {i < currentStep ? <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg> : i + 1}
-                  </div>
-                  <span className={`text-[14px] font-medium truncate ${i <= currentStep ? "text-neutral-900" : "text-neutral-400"}`}>{s}</span>
-                  {i < 4 && <div className={`flex-1 h-px min-w-2 ${i < currentStep ? "bg-[#be123c]" : "bg-neutral-200"}`} />}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+      const detected = detectCategory(content, categories);
+      if (detected) setDetectedCategory(detected);
 
-        {/* ═══ Step 0: Contract Delivery (spec §3.1) ═══ */}
-        {currentStep === 0 && (
-          <div className="space-y-8">
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-50 mb-6">
-                <svg className="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-semibold text-neutral-900 mb-3">Your {session.contractTitle} is ready</h1>
-              <p className="text-neutral-500 max-w-lg mx-auto text-sm sm:text-base leading-relaxed">Your base contract has been generated and is ready to download. You can use it as-is, or customize it further.</p>
-            </div>
+      setTimeout(() => {
+        const response = generateRubyResponse(content, session, detected || detectedCategory, messages, messages.filter((m) => m.role === "user").length + 1);
 
-            {/* Key Terms Summary (per spec §3.1) */}
-            <div className="max-w-md mx-auto bg-neutral-50 border border-neutral-200 rounded-xl p-5">
-              <p className="text-[14px] font-semibold text-neutral-500 uppercase tracking-wide mb-3">Key Terms</p>
-              <div className="space-y-2.5 text-sm">
-                <div className="flex justify-between"><span className="text-neutral-500">Contract Type</span><span className="text-neutral-900 font-medium">{session.contractTitle}</span></div>
-                <div className="flex justify-between"><span className="text-neutral-500">Governing Law</span><span className="text-neutral-900 font-medium">{session.governingLaw}</span></div>
-                <div className="flex justify-between"><span className="text-neutral-500">Status</span><span className="text-emerald-600 font-medium">Complete</span></div>
-              </div>
-            </div>
+        const rubyMsg: ChatMessage = {
+          id: nextMsgId(),
+          role: "ruby",
+          content: response.content,
+          timestamp: new Date(),
+          quickActions: response.quickActions,
+          clausePreview: response.clausePreview,
+          provinceTip: response.provinceTip,
+          riskFlag: response.riskFlag,
+        };
 
-            {/* Display condition note (per spec §3.3) */}
-            {HIGH_COMPLEXITY_TYPES.includes(session.contractType) && (
-              <div className="max-w-md mx-auto bg-blue-50 border border-blue-200 rounded-xl px-4 py-3">
-                <p className="text-[14px] text-blue-700 leading-relaxed">Customizations to this instrument type are common and expected. Many clients tailor specific clauses to their deal terms.</p>
-              </div>
-            )}
-            {SIMPLE_TYPES.includes(session.contractType) && (
-              <div className="max-w-md mx-auto bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3">
-                <p className="text-[14px] text-neutral-500 leading-relaxed">Most clients proceed without customization, but the option is available if you need it.</p>
-              </div>
-            )}
+        setMessages((prev) => [...prev, rubyMsg]);
+        setIsTyping(false);
 
-            <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
-              <button className="inline-flex items-center justify-center gap-2 border border-neutral-200 rounded-xl px-6 py-3.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                Download Contract
-              </button>
-              <button onClick={() => setCurrentStep(1)} className="inline-flex items-center justify-center gap-2 bg-[#be123c] text-white rounded-xl px-6 py-3.5 text-sm font-semibold hover:bg-[#9f1239] transition-colors">
-                Customize This Contract
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-              </button>
-            </div>
-            {/* Spec §3.2 — supporting copy */}
-            <p className="text-center text-[14px] text-neutral-400 max-w-md mx-auto leading-relaxed">Need something the standard options don&apos;t cover? Ruby will craft custom provisions for you, with optional lawyer review.</p>
-          </div>
-        )}
+        // Track modification if response indicates a change was captured
+        if (content.toLowerCase().includes("apply") || content.toLowerCase() === "yes" || content.toLowerCase().includes("looks good") || content.toLowerCase().includes("that works")) {
+          const prevUserMessages = messages.filter((m) => m.role === "user");
+          const lastSubstantive = prevUserMessages[prevUserMessages.length - 1];
+          if (lastSubstantive) {
+            const cat = detected || detectedCategory;
+            const risks = detectRisks(lastSubstantive.content, cat);
+            const tier = determineComplexity(messages.length, cat, risks);
+            const mod: ModificationRecord = {
+              id: nextModId(),
+              category: cat?.name || "Custom Modification",
+              summary: lastSubstantive.content.length > 80 ? lastSubstantive.content.slice(0, 77) + "..." : lastSubstantive.content,
+              complexityTier: tier,
+              baseFee: COMPLEXITY_PRICING[tier].base,
+              riskFlags: risks,
+              requiresLawyerReview: requiresMandatoryLawyerReview(lastSubstantive.content, cat),
+              messages: [...messages, userMsg, rubyMsg],
+            };
+            setModifications((prev) => [...prev, mod]);
+            // Also mark the pending change as confirmed
+            setPendingChanges((prev) => prev.map((pc) => ({ ...pc, confirmed: true })));
+          }
+        }
+      }, 1200 + Math.random() * 800);
+    },
+    [chatInput, isTyping, categories, session, detectedCategory, messages]
+  );
 
-        {/* ═══ Step 1: Category Selection (spec §4) ═══ */}
-        {currentStep === 1 && (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-semibold text-neutral-900 mb-2">What would you like to customize?</h2>
-              <p className="text-[15px] sm:text-[14px] text-neutral-500 leading-relaxed">Select the area of your contract you&apos;d like to modify. Categories are tailored to your {session.contractTitle}.</p>
-            </div>
+  // ─── Keyboard handler for textarea ───
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
 
-            {/* Existing modifications banner */}
-            {modifications.length > 0 && (
-              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-center justify-between">
-                <p className="text-[15px] text-emerald-700"><span className="font-semibold">{modifications.length} modification{modifications.length > 1 ? "s" : ""}</span> already added to this session</p>
-                <button onClick={() => setCurrentStep(4)} className="text-[14px] text-emerald-700 font-medium underline underline-offset-2 hover:text-emerald-800">View summary</button>
-              </div>
-            )}
+  // ─── Auto-resize textarea ───
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setChatInput(e.target.value);
+    const el = e.target;
+    el.style.height = "auto";
+    el.style.height = Math.min(el.scrollHeight, 120) + "px";
+  };
 
-            {/* Category grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {categories.map((cat) => {
-                const isSelected = selectedCategory?.id === cat.id;
-                return (
-                  <button key={cat.id} type="button" onClick={() => handleCategorySelect(cat)} className={`text-left bg-white rounded-xl p-5 sm:p-6 transition-all duration-200 group ${isSelected ? "border-2 border-[#be123c] shadow-sm bg-[rgba(190,18,60,0.02)]" : "border border-neutral-200 hover:border-[#be123c]/30 hover:shadow-sm"}`}>
-                    <div className="flex items-start justify-between">
-                      <h3 className={`text-sm font-semibold transition-colors mb-1.5 ${isSelected ? "text-[#be123c]" : "text-neutral-900 group-hover:text-[#be123c]"}`}>{cat.name}</h3>
-                      {isSelected && (
-                        <div className="flex items-center justify-center w-5 h-5 rounded-full bg-[#be123c] shrink-0 mt-0.5">
-                          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                        </div>
-                      )}
-                    </div>
-                    <p className="text-[14px] text-neutral-500 leading-relaxed mb-3">{cat.description}</p>
-                    <p className="text-[13px] text-neutral-400 leading-relaxed border-t border-neutral-100 pt-3">
-                      <span className="font-medium text-neutral-500">e.g.</span> {cat.example}
-                    </p>
-                  </button>
-                );
-              })}
-            </div>
+  // ─── Finalize / checkout ───
+  const handleCheckout = () => {
+    setOrderComplete(true);
+  };
 
-            {/* Navigation */}
-            <div className="flex flex-col-reverse sm:flex-row justify-between gap-3">
-              <button onClick={() => setCurrentStep(0)} className="inline-flex items-center justify-center gap-2 border border-neutral-200 rounded-xl px-5 py-3 text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-                Back to contract
-              </button>
-              <button onClick={handleCategoryNext} disabled={!selectedCategory} className="inline-flex items-center justify-center gap-2 bg-[#be123c] text-white rounded-xl px-6 py-3 text-sm font-semibold hover:bg-[#9f1239] transition-colors disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]">
-                Continue
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-              </button>
-            </div>
-          </div>
-        )}
+  // ─── Move to Step 4 with opening message ───
+  const initializeRubyChat = useCallback((change: PendingChange) => {
+    const province = session.governingLaw || "Ontario";
+    const risks = change.riskFlags;
+    const complexity = determineComplexity(1, change.category, risks);
+    const needsLawyer = requiresMandatoryLawyerReview(change.description, change.category);
 
-        {/* ═══ Step 2: Structured Intake (spec §5) ═══ */}
-        {currentStep === 2 && (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-semibold text-neutral-900 mb-2">{selectedCategory?.name}</h2>
-              <p className="text-[15px] sm:text-[14px] text-neutral-500 leading-relaxed">Tell us what you&apos;d like to change. The more specific you are, the better Ruby can tailor your modification.</p>
-            </div>
+    let reviewContent = `I've reviewed your proposed modification:\n\n`;
+    reviewContent += `**Category:** ${change.category.name}\n`;
+    reviewContent += `**Your request:** "${change.description}"\n\n`;
 
-            {/* Customization upsell context */}
+    if (change.category.clauseIds && change.category.clauseIds.length > 0) {
+      reviewContent += `This touches **${change.category.clauseIds.length} related clause${change.category.clauseIds.length > 1 ? "s" : ""}** in your agreement. `;
+    }
 
-            <div className="bg-white border border-neutral-200 rounded-xl p-4 sm:p-6 lg:p-8 space-y-6">
-              {/* Modification type selector (spec §5.1) */}
-              <div>
-                <p className={`${labelClass} mb-3`}>What type of modification?</p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
-                  {INTAKE_TYPES.map((opt) => (
-                    <button key={opt.id} type="button" onClick={() => setIntakeType(opt.id)} className={`rounded-xl border p-3 sm:p-4 text-left transition-all ${intakeType === opt.id ? "border-[#be123c] bg-[rgba(190,18,60,0.02)]" : "border-neutral-200 hover:border-neutral-300"}`}>
-                      <p className={`text-[14px] sm:text-[15px] font-semibold ${intakeType === opt.id ? "text-[#be123c]" : "text-neutral-900"}`}>{opt.label}</p>
-                      <p className="text-[10px] sm:text-[13px] text-neutral-400 mt-0.5">{opt.desc}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
+    reviewContent += `I've assessed this as a **${COMPLEXITY_PRICING[complexity].label}** modification ($${COMPLEXITY_PRICING[complexity].base} CAD).\n\n`;
 
-              {/* Description field — all types */}
-              <label className="block">
-                <span className={labelClass}>{intakeType === "remove" ? "Which clause do you want to remove, and why?" : intakeType === "add-party" ? "Describe the party you want to add and their role" : "Describe what you want to change"}</span>
-                <textarea value={intakeData.description || ""} onChange={(e) => setIntakeData({ ...intakeData, description: e.target.value })} placeholder={`e.g. "${selectedCategory?.example || "Describe your modification..."}"` } rows={3} className={inputClass} />
-                <p className="text-[10px] text-neutral-400 mt-1.5">{intakeType === "freeform" ? "Max 1,000 characters" : "Max 500 characters"}</p>
-              </label>
+    if (risks.length > 0) {
+      reviewContent += `I've flagged ${risks.length} risk consideration${risks.length > 1 ? "s" : ""} for you to review.\n\n`;
+    }
 
-              {/* Quick suggestion chips — help clients know what's possible */}
-              {selectedCategory && (
-                <div>
-                  <p className="text-[11px] font-medium uppercase tracking-wider text-neutral-400 mb-2">Common customizations for this section</p>
-                  <div className="flex flex-wrap gap-2">
-                    {(SUGGESTION_CHIPS[selectedCategory.id] || SUGGESTION_CHIPS['default']).map((chip) => (
-                      <button
-                        key={chip}
-                        type="button"
-                        onClick={() => setIntakeData({ ...intakeData, description: chip })}
-                        className="text-[12px] px-3 py-1.5 rounded-full border border-neutral-200 text-neutral-600 hover:border-[#be123c] hover:text-[#be123c] hover:bg-[rgba(190,18,60,0.03)] transition-all"
-                      >
-                        {chip}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
+    if (needsLawyer) {
+      reviewContent += `**Note:** This modification requires mandatory lawyer review due to regulatory requirements.\n\n`;
+    }
 
-              {/* ─── Conditional fields per intake type (spec §5.1.1–5.1.6) ─── */}
+    if (change.provinceTip) {
+      reviewContent += `I also have a ${province}-specific consideration to flag.\n\n`;
+    }
 
-              {/* Modify: threshold toggle + values */}
-              {intakeType === "modify" && (
-                <>
-                  <div className="flex items-center gap-3 rounded-xl border border-neutral-200 p-4">
-                    <input type="checkbox" checked={intakeData.isThreshold === "true"} onChange={(e) => setIntakeData({ ...intakeData, isThreshold: e.target.checked ? "true" : "false" })} className="rounded accent-[#be123c] shrink-0 w-4 h-4" />
-                    <div>
-                      <p className="text-sm font-medium text-neutral-900">This is a simple number or threshold change</p>
-                      <p className="text-[13px] text-neutral-400">If yes, we may process this instantly without a drafting conversation</p>
-                    </div>
-                  </div>
-                  {intakeData.isThreshold === "true" && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <label className="block">
-                        <span className={labelClass}>Current Value</span>
-                        <input type="text" value={intakeData.currentValue || ""} onChange={(e) => setIntakeData({ ...intakeData, currentValue: e.target.value })} placeholder="e.g. 30 days" className={inputClass} />
-                      </label>
-                      <label className="block">
-                        <span className={labelClass}>Desired Value</span>
-                        <input type="text" value={intakeData.desiredValue || ""} onChange={(e) => setIntakeData({ ...intakeData, desiredValue: e.target.value })} placeholder="e.g. 90 days" className={inputClass} />
-                      </label>
-                    </div>
-                  )}
-                </>
-              )}
+    reviewContent += `Would you like me to proceed with drafting this change, or would you like to refine anything first?`;
 
-              {/* Add: who does it protect (spec §5.1.2) */}
-              {intakeType === "add" && (
-                <label className="block">
-                  <span className={labelClass}>Who does this provision protect?</span>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
-                    {[{ id: "me", label: "Me (my company)" }, { id: "other", label: "The other party" }, { id: "both", label: "Both parties equally" }].map((opt) => (
-                      <button key={opt.id} type="button" onClick={() => setIntakeData({ ...intakeData, protects: opt.id })} className={`rounded-xl border px-4 py-3 text-[15px] font-medium transition-all active:scale-[0.97] ${intakeData.protects === opt.id ? "border-[#be123c] text-[#be123c] bg-[rgba(190,18,60,0.02)]" : "border-neutral-200 text-neutral-600 hover:border-neutral-300"}`}>{opt.label}</button>
-                    ))}
-                  </div>
-                </label>
-              )}
+    const openingMsg: ChatMessage = {
+      id: nextMsgId(),
+      role: "ruby",
+      content: reviewContent,
+      timestamp: new Date(),
+      riskFlag: risks.length > 0 ? risks[0] : undefined,
+      provinceTip: change.provinceTip || undefined,
+      clausePreview: {
+        title: `${change.category.name} - Proposed Change`,
+        current: `[Current clause language from your ${session.contractTitle}]`,
+        proposed: `[Draft reflecting: "${change.description}"]`,
+      },
+      quickActions: [
+        { label: "Looks good, apply this", value: "Looks good, apply this change" },
+        { label: "I want to adjust this", value: "I'd like to refine what I described" },
+        { label: "Tell me more about the risks", value: "What specific risks should I know about?" },
+      ],
+    };
 
-              {/* Remove: reason + risk acknowledgement (spec §5.1.3) */}
-              {intakeType === "remove" && (
-                <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-4">
-                  <p className="text-[14px] text-amber-800 font-medium mb-1">Important</p>
-                  <p className="text-[14px] text-amber-700 leading-relaxed">Removing clauses may affect the enforceability of your agreement. Ruby will flag any risks, and you&apos;ll have the option to add lawyer review.</p>
-                </div>
-              )}
+    setMessages([openingMsg]);
+    setDetectedCategory(change.category);
+    setCurrentStep(4);
+  }, [session]);
 
-              {/* Add Party (spec §5.1.5) */}
-              {intakeType === "add-party" && (
-                <div className="space-y-4">
-                  <label className="block">
-                    <span className={labelClass}>Role of new party</span>
-                    <select value={intakeData.partyRole || ""} onChange={(e) => setIntakeData({ ...intakeData, partyRole: e.target.value })} className={inputClass}>
-                      <option value="">Select role...</option>
-                      <option value="co-borrower">Co-Borrower</option>
-                      <option value="guarantor">Guarantor</option>
-                      <option value="co-signer">Co-Signer</option>
-                      <option value="additional-lender">Additional Lender</option>
-                      <option value="assignee">Assignee</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <label className="block">
-                      <span className={labelClass}>Full legal name of new party</span>
-                      <input type="text" value={intakeData.partyName || ""} onChange={(e) => setIntakeData({ ...intakeData, partyName: e.target.value })} placeholder="e.g. Jane Smith" className={inputClass} />
-                    </label>
-                    <label className="block">
-                      <span className={labelClass}>Individual or corporation?</span>
-                      <div className="flex gap-3 mt-2.5">
-                        {["Individual", "Corporation"].map((opt) => (
-                          <button key={opt} type="button" onClick={() => setIntakeData({ ...intakeData, partyType: opt.toLowerCase() })} className={`flex-1 rounded-xl border px-4 py-3 text-[15px] font-medium transition-all active:scale-[0.97] ${intakeData.partyType === opt.toLowerCase() ? "border-[#be123c] text-[#be123c] bg-[rgba(190,18,60,0.02)]" : "border-neutral-200 text-neutral-600 hover:border-neutral-300"}`}>{opt}</button>
-                        ))}
-                      </div>
-                    </label>
-                  </div>
-                  {intakeData.partyRole === "guarantor" && (
-                    <label className="block">
-                      <span className={labelClass}>Scope of guarantee</span>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
-                        {[{ id: "full", label: "Full amount" }, { id: "partial", label: "Partial (specify amount)" }, { id: "specific", label: "Specific obligations only" }].map((opt) => (
-                          <button key={opt.id} type="button" onClick={() => setIntakeData({ ...intakeData, guaranteeScope: opt.id })} className={`rounded-xl border px-4 py-3 text-[15px] font-medium transition-all active:scale-[0.97] ${intakeData.guaranteeScope === opt.id ? "border-[#be123c] text-[#be123c] bg-[rgba(190,18,60,0.02)]" : "border-neutral-200 text-neutral-600 hover:border-neutral-300"}`}>{opt.label}</button>
-                        ))}
-                      </div>
-                    </label>
+  // ─── Handle adding a change from Step 3 ───
+  const handleAddChange = () => {
+    if (!changeDescription.trim() || !selectedCategory) return;
+
+    const risks = detectRisks(changeDescription, selectedCategory);
+    const tip = getProvinceTip(changeDescription, session.governingLaw);
+
+    const newChange: PendingChange = {
+      id: nextPendingId(),
+      category: selectedCategory,
+      description: changeDescription.trim(),
+      riskFlags: risks,
+      provinceTip: tip,
+      confirmed: false,
+    };
+
+    setPendingChanges((prev) => [...prev, newChange]);
+    setChangeDescription("");
+
+    // Move to Step 4 to review with Ruby
+    initializeRubyChat(newChange);
+  };
+
+  // ─── Handle chip click in Step 3 ───
+  const handleStep3ChipClick = (chip: string) => {
+    setChangeDescription(chip);
+  };
+
+  // ─── Navigate steps ───
+  const goToStep = (step: number) => {
+    if (step >= 1 && step <= 5) {
+      setCurrentStep(step);
+    }
+  };
+
+  // ─── Tier label ───
+  const tierLabel = session.tier === "standard" ? "Standard" : session.tier === "premium" ? "Premium" : session.tier === "basic" ? "Basic" : session.tier || "Standard";
+
+  // ═══════════════════════════════════════════════════════════
+  // ═══ Progress Bar Component ═══
+  // ═══════════════════════════════════════════════════════════
+  const ProgressBar = () => (
+    <div className="bg-white border-b border-neutral-200 py-4 px-4 sm:px-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex items-center justify-between">
+          {STEPS.map((step, idx) => (
+            <div key={step.number} className="flex items-center flex-1 last:flex-initial">
+              <div className="flex flex-col items-center">
+                <div
+                  className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
+                    currentStep === step.number
+                      ? "bg-[#be123c] text-white shadow-md shadow-rose-200"
+                      : currentStep > step.number
+                      ? "bg-emerald-500 text-white"
+                      : "bg-white border-2 border-neutral-300 text-neutral-400"
+                  }`}
+                >
+                  {currentStep > step.number ? (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    step.number
                   )}
                 </div>
-              )}
-
-              {/* Custom Schedule (spec §5.1.4) */}
-              {intakeType === "custom-schedule" && (
-                <div className="space-y-4">
-                  <label className="block">
-                    <span className={labelClass}>Schedule type</span>
-                    <select value={intakeData.scheduleType || ""} onChange={(e) => setIntakeData({ ...intakeData, scheduleType: e.target.value })} className={inputClass}>
-                      <option value="">Select type...</option>
-                      <option value="payment">Payment Schedule</option>
-                      <option value="milestone">Milestone Table</option>
-                      <option value="deliverables">Deliverables Schedule</option>
-                      <option value="collateral">Collateral Description</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </label>
-                  <label className="block">
-                    <span className={labelClass}>Approximate number of entries</span>
-                    <input type="number" min={1} max={50} value={intakeData.entryCount || ""} onChange={(e) => setIntakeData({ ...intakeData, entryCount: e.target.value })} placeholder="e.g. 12" className={inputClass} />
-                  </label>
-                </div>
+                <span className={`text-[10px] sm:text-[11px] mt-1.5 font-medium whitespace-nowrap ${
+                  currentStep === step.number ? "text-[#be123c]" : currentStep > step.number ? "text-emerald-600" : "text-neutral-400"
+                }`}>
+                  {step.label}
+                </span>
+              </div>
+              {idx < STEPS.length - 1 && (
+                <div className={`flex-1 h-0.5 mx-2 sm:mx-3 mt-[-18px] ${
+                  currentStep > step.number ? "bg-emerald-400" : "bg-neutral-200"
+                }`} />
               )}
             </div>
+          ))}
+        </div>
+        {pendingChanges.length > 0 && (
+          <div className="mt-2 text-center">
+            <span className="text-[11px] font-medium text-[#be123c] bg-rose-50 px-2.5 py-0.5 rounded-full">
+              {pendingChanges.length} modification{pendingChanges.length !== 1 ? "s" : ""}
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 
-            {/* Navigation */}
-            <div className="flex flex-col-reverse sm:flex-row justify-between gap-3">
-              <button onClick={() => { setCurrentStep(1); setIntakeData({}); setShowRedirect(false); }} className="inline-flex items-center justify-center gap-2 border border-neutral-200 rounded-xl px-5 py-3 text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-                Back
+  // ═══════════════════════════════════════════════════════════
+  // ═══ Pending Changes Sidebar ═══
+  // ═══════════════════════════════════════════════════════════
+  const PendingChangesSidebar = () => {
+    if (pendingChanges.length === 0 || currentStep < 2 || currentStep > 4) return null;
+    return (
+      <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-4 mb-4">
+        <p className="text-[12px] font-semibold text-neutral-500 uppercase tracking-wide mb-2">Modifications ({pendingChanges.length})</p>
+        <div className="space-y-2">
+          {pendingChanges.map((pc) => (
+            <div key={pc.id} className="flex items-center gap-2 text-[13px]">
+              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${pc.confirmed ? "bg-emerald-500" : "bg-amber-400"}`} />
+              <span className="text-neutral-600 truncate flex-1">{pc.category.name}: {pc.description.length > 40 ? pc.description.slice(0, 37) + "..." : pc.description}</span>
+              {pc.confirmed && (
+                <svg className="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+              <button
+                onClick={() => setPendingChanges((prev) => prev.filter((p) => p.id !== pc.id))}
+                className="text-neutral-300 hover:text-red-500 transition-colors shrink-0"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
-              <button onClick={handleIntakeSubmit} disabled={!intakeData.description} className="inline-flex items-center justify-center gap-2 bg-[#be123c] text-white rounded-xl px-6 py-3 text-sm font-semibold hover:bg-[#9f1239] transition-colors disabled:opacity-50 active:scale-[0.98]">
-                {canAutoResolve(intakeType, intakeData) ? "Apply Change Instantly" : "Continue to Drafting"}
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-              </button>
             </div>
-          </div>
-        )}
+          ))}
+        </div>
+      </div>
+    );
+  };
 
-        {/* ═══ Step 3: AI Conversation (spec §6) ═══ */}
-        {currentStep === 3 && (
-          <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2">
-              <div>
-                <h2 className="text-lg sm:text-xl font-semibold text-neutral-900">Ruby Drafting Engine</h2>
-                <p className="text-[13px] sm:text-[14px] text-neutral-400 mt-1">Shape your modification through conversation with Ruby.</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 text-[13px] text-neutral-400">
-                  <span className="bg-neutral-100 px-2 py-0.5 rounded-full">{exchangeCount}/8</span>
-                  <span className="bg-neutral-100 px-2 py-0.5 rounded-full">{draftCount}/3</span>
-                </div>
-                <button onClick={handleFinishChat} className="inline-flex items-center gap-2 bg-[#be123c] text-white rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-[#9f1239] transition-colors whitespace-nowrap active:scale-[0.97]">
-                  Looks Good
-                </button>
-              </div>
-            </div>
-
-            {/* Intake context sidebar (per spec §6.1 — remains visible) */}
-            <div className="bg-neutral-50 border border-neutral-200 rounded-lg px-4 py-3 flex flex-wrap gap-x-6 gap-y-1 text-[13px] text-neutral-500">
-              <span><span className="font-medium text-neutral-600">Category:</span> {selectedCategory?.name}</span>
-              <span><span className="font-medium text-neutral-600">Type:</span> {INTAKE_TYPES.find(t => t.id === intakeType)?.label}</span>
-              <span><span className="font-medium text-neutral-600">Contract:</span> {session.contractTitle}</span>
-              <span><span className="font-medium text-neutral-600">Law:</span> {session.governingLaw}</span>
-            </div>
-
-            {/* Chat messages */}
-            <div className="bg-white border border-neutral-200 rounded-xl overflow-hidden">
-              <div ref={chatContainerRef} className="max-h-[50vh] sm:max-h-[480px] overflow-y-auto p-4 sm:p-6 space-y-4">
-                {messages.map((msg, i) => (
-                  <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                    {msg.role === "system" ? (
-                      <div className="w-full rounded-lg bg-amber-50 border border-amber-200 px-4 py-3">
-                        <div className="flex items-start gap-2">
-                          <span className="text-amber-500 shrink-0 mt-0.5">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
-                          </span>
-                          <p className="text-[14px] text-amber-800 leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className={`max-w-[85%] sm:max-w-[80%] rounded-xl px-4 sm:px-5 py-3 ${msg.role === "user" ? "bg-neutral-900 text-white" : "bg-neutral-50 border border-neutral-200 text-neutral-900"}`}>
-                        <p className="text-[14px] sm:text-[15px] leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                        {msg.draftVersion && <p className="text-[10px] mt-2 opacity-50">Draft v{msg.draftVersion}</p>}
-                      </div>
-                    )}
-                  </div>
-                ))}
-                {isAiTyping && (
-                  <div className="flex justify-start">
-                    <div className="bg-neutral-50 border border-neutral-200 rounded-xl px-5 py-3.5">
-                      <div className="flex gap-1.5">
-                        <div className="w-2 h-2 bg-neutral-300 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                        <div className="w-2 h-2 bg-neutral-300 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                        <div className="w-2 h-2 bg-neutral-300 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
-                      </div>
-                    </div>
-                  </div>
-                )}
-                <div ref={chatEndRef} />
-              </div>
-
-              {/* Attached files display */}
-              {attachedFiles.length > 0 && (
-                <div className="border-t border-neutral-100 px-4 py-2 flex flex-wrap gap-2">
-                  {attachedFiles.map((f, i) => (
-                    <span key={i} className="inline-flex items-center gap-1.5 bg-neutral-100 text-neutral-600 text-[13px] rounded-lg px-2.5 py-1">
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
-                      {f}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {/* Chat input (per spec §6.1) */}
-              <div className="border-t border-neutral-200 p-3 sm:p-4 flex gap-2 sm:gap-3">
-                {/* File upload (per spec §6.1 — clients can attach files) */}
-                <input ref={fileInputRef} type="file" className="hidden" accept=".pdf,.docx,.doc,.png,.jpg" onChange={handleFileChange} />
-                <button onClick={handleFileAttach} className="shrink-0 flex items-center justify-center w-10 h-10 rounded-lg border border-neutral-200 text-neutral-400 hover:text-neutral-600 hover:border-neutral-300 transition-colors" title="Attach file (PDF, DOCX, PNG, JPG — max 10MB)">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
-                </button>
-                <input type="text" value={chatInput} onChange={(e) => setChatInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSendMessage()} placeholder={exchangeCount >= 8 ? "Conversation limit reached" : "Describe your adjustment..."} className="flex-1 min-w-0 border border-neutral-200 rounded-lg px-3 sm:px-4 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:ring-2 focus:ring-[rgba(190,18,60,0.1)] focus:border-[#be123c] outline-none" disabled={isAiTyping || exchangeCount >= 8} />
-                <button onClick={handleSendMessage} disabled={!chatInput.trim() || isAiTyping || exchangeCount >= 8} className="bg-neutral-900 text-white rounded-lg px-4 sm:px-5 py-2.5 text-sm font-medium hover:bg-neutral-800 disabled:opacity-50 transition-colors shrink-0 active:scale-[0.97]">
-                  Send
-                </button>
-              </div>
-            </div>
-
-            <p className="text-[13px] text-neutral-400 text-center">Accepted files: PDF, DOCX, PNG, JPG (max 10MB). Files are reference material only.</p>
-          </div>
-        )}
-
-        {/* ═══ Step 4: Summary + Quote (spec §7) ═══ */}
-        {currentStep === 4 && (
-          <div className="space-y-6">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <h2 className="text-xl sm:text-2xl font-semibold text-neutral-900">Review & Pay</h2>
-                <span className="inline-flex items-center justify-center h-7 min-w-7 px-2 rounded-full bg-[#be123c] text-white text-xs font-bold">{modifications.length}</span>
-                <span className="text-sm text-neutral-400">{modifications.length === 1 ? 'modification' : 'modifications'}</span>
-              </div>
-              <p className="text-sm text-neutral-500 leading-relaxed">Review your customizations, add more if needed, then choose a delivery option.</p>
-            </div>
-
-            {/* Modification cards (spec §7.1 — expandable/collapsible) */}
-            <div className="space-y-3">
-              {modifications.map((mod, i) => {
-                const tier = COMPLEXITY_COLORS[mod.complexityTier];
-                const discount = volumeDiscount(i);
-                const discountedFee = mod.baseFee * (1 - discount);
-                return (
-                  <div key={mod.id} className="bg-white border border-neutral-200 rounded-xl overflow-hidden">
-                    {/* Header — always visible, clickable to expand/collapse */}
-                    <button type="button" onClick={() => toggleModExpanded(i)} className="w-full px-4 sm:px-6 py-4 flex items-center gap-3 text-left">
-                      <span className="flex items-center justify-center w-2 h-2 rounded-full bg-[#be123c] shrink-0 mt-1.5" />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-semibold text-neutral-900">{mod.category.name}: {INTAKE_TYPES.find(t => t.id === mod.intakeType)?.label || "Custom"}</p>
-                        <p className="text-[14px] text-neutral-500 mt-0.5 truncate">{mod.summary}</p>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <span className={`inline-block px-3 py-1 text-[13px] font-semibold rounded-full ${tier.bg} ${tier.text}`}>{COMPLEXITY_PRICING[mod.complexityTier].label}</span>
-                        <span className="text-sm font-semibold text-neutral-900">${discountedFee.toFixed(0)}</span>
-                        <svg className={`w-4 h-4 text-neutral-400 transition-transform ${mod.expanded ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                      </div>
-                    </button>
-
-                    {/* Expanded details */}
-                    {mod.expanded && (
-                      <div className="px-4 sm:px-6 pb-4 border-t border-neutral-100 pt-4 space-y-3">
-                        {/* Structure & Scope (per spec §7.1) */}
-                        <div className="text-[14px]">
-                          <span className="text-neutral-500 font-medium">Structure & scope:</span>
-                          <span className="text-neutral-700 ml-1">{mod.structureScope}</span>
-                        </div>
-
-                        {/* Before/After for modify (per spec §7.1) */}
-                        {mod.intakeType === "modify" && mod.intakeData.currentValue && (
-                          <div className="flex gap-4 text-[14px]">
-                            <div><span className="text-neutral-400">Before:</span> <span className="text-neutral-600">{mod.intakeData.currentValue}</span></div>
-                            <div><span className="text-neutral-400">After:</span> <span className="text-neutral-700 font-medium">{mod.intakeData.desiredValue}</span></div>
-                          </div>
-                        )}
-
-                        {/* Pricing line */}
-                        <div className="flex items-center gap-3 text-[14px] text-neutral-500 pt-2 border-t border-neutral-100">
-                          <span>Base: ${mod.baseFee}</span>
-                          {discount > 0 && <span className="text-emerald-600 font-medium">Volume: -{Math.round(discount * 100)}%</span>}
-                          {mod.autoResolved && <span className="text-blue-600 font-medium">Auto-resolved</span>}
-                        </div>
-
-                        {/* Risk flags (spec §7.1) */}
-                        {mod.riskFlags.length > 0 && (
-                          <div className="rounded-lg border border-amber-100 bg-amber-50/50 p-3 space-y-1">
-                            {mod.riskFlags.map((flag, fi) => (
-                              <p key={fi} className="text-[13px] text-amber-700 flex items-start gap-1.5">
-                                <svg className="w-3.5 h-3.5 shrink-0 mt-0.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
-                                {flag}
-                              </p>
-                            ))}
-                          </div>
-                        )}
-
-                        {/* Mandatory lawyer review flag (per spec §12.6) */}
-                        {mod.requiresLawyerReview && (
-                          <div className="rounded-lg border border-rose-200 bg-rose-50 p-3">
-                            <p className="text-[13px] text-rose-700 font-medium">This modification requires lawyer review due to regulatory requirements. Engine-only delivery is not available for this change.</p>
-                          </div>
-                        )}
-
-                        {/* Edit / Remove actions (per spec §7.5) */}
-                        <div className="flex gap-3 pt-1">
-                          <button onClick={() => handleEditMod(i)} className="text-[14px] text-neutral-500 hover:text-[#be123c] font-medium transition-colors">Edit</button>
-                          <button onClick={() => handleRemoveMod(i)} className="text-[14px] text-neutral-500 hover:text-red-600 font-medium transition-colors">Remove</button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Add another (per spec §4.3 — multi-modification support) */}
-            <button onClick={handleAddAnother} className="w-full border-2 border-dashed border-neutral-200 hover:border-[#be123c] rounded-xl px-6 py-5 flex items-center justify-center gap-3 text-sm font-semibold text-neutral-500 hover:text-[#be123c] transition-all group">
-              <span className="flex items-center justify-center w-7 h-7 rounded-full border-2 border-neutral-300 group-hover:border-[#be123c] transition-colors">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-              </span>
-              Add Another Modification
-              <span className="text-xs font-normal text-neutral-400 group-hover:text-[#be123c]/60">{modifications.length >= 1 ? '20% off' : ''}{modifications.length >= 2 ? ' \u2192 40% off 3rd+' : ''}</span>
-            </button>
-
-            {/* Delivery Options (spec §7.3) */}
-            {modifications.length > 0 && (
-              <>
-                <div>
-                  <p className="text-[15px] font-semibold text-neutral-700 mb-3">Choose delivery option</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* AI-Only (per spec §7.3 Option A) */}
-                    <button
-                      type="button"
-                      onClick={() => !anyRequiresLawyer && setDeliveryTier("ai-only")}
-                      className={`text-left border rounded-xl p-4 sm:p-6 transition-all ${anyRequiresLawyer ? "opacity-50 cursor-not-allowed border-neutral-200 bg-neutral-50" : deliveryTier === "ai-only" ? "border-[#be123c] border-2 bg-[rgba(190,18,60,0.02)]" : "border-neutral-200 hover:border-neutral-300"}`}
-                    >
-                      <p className="text-sm font-semibold text-neutral-900 mb-1">Engine-Drafted Contract</p>
-                      <p className="text-[14px] text-neutral-500 leading-relaxed mb-3">Delivered immediately upon payment. Drafted by Ruby based on your instructions.</p>
-                      <p className="text-[13px] text-neutral-400">Instant delivery</p>
-                      <p className="text-[13px] text-neutral-400 mt-1">Not reviewed by a licensed lawyer</p>
-                      {/* Regulatory override warning (per spec §12.6) */}
-                      {anyRequiresLawyer && (
-                        <div className="mt-3 rounded-lg bg-rose-50 border border-rose-100 px-3 py-2">
-                          <p className="text-[13px] text-rose-700 font-medium">Engine-only delivery is unavailable. One or more modifications require lawyer review due to regulatory requirements.</p>
-                        </div>
-                      )}
-                      {/* Risk flag warning */}
-                      {!anyRequiresLawyer && modifications.some(m => m.riskFlags.length > 0) && (
-                        <div className="mt-3 rounded-lg bg-amber-50 border border-amber-100 px-3 py-2">
-                          <p className="text-[13px] text-amber-700 font-medium">Your modification(s) have risk flags. Lawyer review is recommended.</p>
-                        </div>
-                      )}
-                    </button>
-
-                    {/* AI + Lawyer Review (per spec §7.3 Option B) */}
-                    <button
-                      type="button"
-                      onClick={() => setDeliveryTier("lawyer-standard")}
-                      className={`text-left border rounded-xl p-4 sm:p-6 transition-all ${deliveryTier.startsWith("lawyer") ? "border-[#be123c] border-2 bg-[rgba(190,18,60,0.02)]" : "border-neutral-200 hover:border-neutral-300"}`}
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="text-sm font-semibold text-neutral-900">Expert Draft + Lawyer Review</p>
-                        <span className="text-[10px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">Recommended</span>
-                      </div>
-                      <p className="text-[14px] text-neutral-500 leading-relaxed mb-3">Reviewed and approved by a licensed Canadian lawyer.</p>
-                      <div className="flex flex-col gap-2">
-                        <label className="flex items-center gap-2 text-[14px] text-neutral-600 cursor-pointer">
-                          <input type="radio" name="turnaround" checked={deliveryTier === "lawyer-standard"} onChange={() => setDeliveryTier("lawyer-standard")} className="accent-[#be123c]" />
-                          Standard (3–5 days) +${LAWYER_ADDON.standard}
-                        </label>
-                        <label className="flex items-center gap-2 text-[14px] text-neutral-600 cursor-pointer">
-                          <input type="radio" name="turnaround" checked={deliveryTier === "lawyer-priority"} onChange={() => setDeliveryTier("lawyer-priority")} className="accent-[#be123c]" />
-                          Priority (24h) +${LAWYER_ADDON.priority}
-                        </label>
-                      </div>
-                      <div className="mt-3 flex items-center gap-1.5">
-                        <svg className="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        <p className="text-[13px] text-emerald-700 font-medium">Reviewed & Approved by a Licensed Lawyer</p>
-                      </div>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Order Total (spec §7.4) */}
-                <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-5">
-                  <div className="space-y-2 text-sm">
-                    {modifications.map((mod, i) => {
-                      const disc = volumeDiscount(i);
-                      const fee = mod.baseFee * (1 - disc);
-                      return (
-                        <div key={mod.id} className="flex justify-between text-neutral-500 text-[14px]">
-                          <span className="truncate mr-3">{mod.category.name} ({COMPLEXITY_PRICING[mod.complexityTier].label}){disc > 0 ? ` -${Math.round(disc * 100)}%` : ""}</span>
-                          <span className="shrink-0">${fee.toFixed(0)}</span>
-                        </div>
-                      );
-                    })}
-                    {deliveryTier !== "ai-only" && (
-                      <div className="flex justify-between text-neutral-500 text-[14px]">
-                        <span>Lawyer review ({deliveryTier === "lawyer-priority" ? "Priority 24h" : "Standard 3–5 days"}) x{modifications.length}</span>
-                        <span>${(lawyerAddon * modifications.length).toFixed(0)}</span>
-                      </div>
-                    )}
-                    <div className="flex justify-between pt-3 border-t border-neutral-200 text-neutral-900 font-semibold">
-                      <span>Total</span>
-                      <span>${total.toFixed(0)} CAD</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* CTA */}
-                <div className="flex flex-col-reverse sm:flex-row justify-between items-center gap-3 pt-2">
-                  <button onClick={() => { setModifications([]); setCurrentStep(0); }} className="text-[15px] text-neutral-500 hover:text-neutral-700 transition-colors">Discard all — keep base contract</button>
-                  <button onClick={handleCheckout} className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#be123c] text-white rounded-xl px-8 py-3.5 text-sm font-semibold hover:bg-[#9f1239] transition-colors active:scale-[0.98]">
-                    Proceed to Checkout — ${total.toFixed(0)}
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                  </button>
-                </div>
-              </>
-            )}
-
-            {modifications.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-neutral-400 text-sm">No modifications yet. Add one to get started.</p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ═══ Step 5: Order Confirmed (spec §8) ═══ */}
-        {currentStep === 5 && (
+  // ═══════════════════════════════════════════════════════════
+  // ═══ ORDER COMPLETE VIEW ═══
+  // ═══════════════════════════════════════════════════════════
+  if (orderComplete) {
+    return (
+      <div className="min-h-screen bg-white">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
           <div className="space-y-8 text-center">
             <div>
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-50 mb-6">
-                <svg className="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <svg className="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
               </div>
               <h1 className="text-2xl sm:text-3xl font-semibold text-neutral-900 mb-3">
                 {deliveryTier === "ai-only" ? "Your customized contract is ready" : "Submitted for lawyer review"}
@@ -1287,11 +1008,10 @@ export default function CustomizePage() {
               <p className="text-neutral-500 max-w-lg mx-auto text-sm leading-relaxed">
                 {deliveryTier === "ai-only"
                   ? "Your customized contract has been generated and is ready to download."
-                  : `Your contract has been submitted for lawyer review. Expected turnaround: ${deliveryTier === "lawyer-priority" ? "24 hours" : "3–5 business days"}.`}
+                  : `Your contract has been submitted for lawyer review. Expected turnaround: ${deliveryTier === "lawyer-priority" ? "24 hours" : "3-5 business days"}.`}
               </p>
             </div>
 
-            {/* Order reference */}
             <div className="inline-flex items-center gap-2 bg-neutral-100 rounded-full px-4 py-2 text-[14px] text-neutral-600">
               <span className="font-medium">Order ref:</span>
               <span className="font-mono">RBY-{Date.now().toString(36).toUpperCase()}</span>
@@ -1299,33 +1019,41 @@ export default function CustomizePage() {
 
             {/* Modifications summary */}
             <div className="max-w-md mx-auto space-y-3">
-              {modifications.map((mod, i) => (
+              {modifications.map((mod) => (
                 <div key={mod.id} className="bg-white border border-neutral-200 rounded-lg px-4 py-3 text-left flex items-center gap-3">
-                  <span className="flex items-center justify-center w-1.5 h-1.5 rounded-full bg-[#be123c] shrink-0 mt-1" />
+                  <span className="flex items-center justify-center w-1.5 h-1.5 rounded-full bg-[#be123c] shrink-0" />
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-neutral-900 truncate">{mod.category.name}</p>
+                    <p className="text-sm font-medium text-neutral-900 truncate">{mod.category}</p>
                     <p className="text-[13px] text-neutral-400 truncate">{mod.summary}</p>
                   </div>
-                  <span className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] font-semibold ${COMPLEXITY_COLORS[mod.complexityTier].bg} ${COMPLEXITY_COLORS[mod.complexityTier].text}`}>{COMPLEXITY_PRICING[mod.complexityTier].label}</span>
+                  <span className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] font-semibold ${COMPLEXITY_COLORS[mod.complexityTier].bg} ${COMPLEXITY_COLORS[mod.complexityTier].text}`}>
+                    {COMPLEXITY_PRICING[mod.complexityTier].label}
+                  </span>
                 </div>
               ))}
             </div>
 
-            {/* Status tracker (spec §8.4 — full 4-state tracker) */}
+            {/* Status tracker for lawyer review */}
             {deliveryTier !== "ai-only" && (
               <div className="max-w-sm mx-auto">
                 <p className="text-[14px] font-semibold text-neutral-500 uppercase tracking-wide mb-4">Status</p>
                 <div className="space-y-0">
                   {[
-                    { label: "Submitted", desc: "Your contract is in the review queue.", active: true, done: true },
-                    { label: "In Review", desc: "A lawyer is reviewing your customizations.", active: false, done: false },
-                    { label: "Clarification Needed", desc: "The reviewing lawyer may have a question.", active: false, done: false },
-                    { label: "Approved", desc: "Your customized contract is ready.", active: false, done: false },
+                    { label: "Submitted", desc: "Your contract is in the review queue.", done: true },
+                    { label: "In Review", desc: "A lawyer is reviewing your customizations.", done: false },
+                    { label: "Clarification Needed", desc: "The reviewing lawyer may have a question.", done: false },
+                    { label: "Approved", desc: "Your customized contract is ready.", done: false },
                   ].map((s, i) => (
                     <div key={i}>
                       <div className="flex items-start gap-3 py-2">
                         <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${s.done ? "bg-emerald-500 text-white" : "bg-neutral-100 text-neutral-400"}`}>
-                          {s.done ? <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg> : <span className="text-[10px] font-medium">{i + 1}</span>}
+                          {s.done ? (
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
+                          ) : (
+                            <span className="text-[10px] font-medium">{i + 1}</span>
+                          )}
                         </div>
                         <div className="text-left">
                           <p className={`text-sm ${s.done ? "text-neutral-900 font-medium" : "text-neutral-400"}`}>{s.label}</p>
@@ -1339,7 +1067,6 @@ export default function CustomizePage() {
               </div>
             )}
 
-            {/* AI-Only footer note (per spec §8.2) */}
             {deliveryTier === "ai-only" && (
               <p className="text-[13px] text-neutral-400 max-w-md mx-auto">This contract was drafted by Ruby and has not been reviewed by a lawyer.</p>
             )}
@@ -1347,7 +1074,9 @@ export default function CustomizePage() {
             <div className="flex flex-col sm:flex-row justify-center gap-3 pt-4">
               {deliveryTier === "ai-only" && (
                 <button className="inline-flex items-center justify-center gap-2 bg-[#be123c] text-white rounded-xl px-6 py-3.5 text-sm font-semibold hover:bg-[#9f1239] transition-colors active:scale-[0.98]">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
                   Download Customized Contract
                 </button>
               )}
@@ -1356,11 +1085,11 @@ export default function CustomizePage() {
               </Link>
             </div>
 
-            {/* Upgrade path */}
+            {/* Upgrade path for AI-only */}
             {deliveryTier === "ai-only" && (
               <div className="max-w-md mx-auto bg-neutral-50 border border-neutral-200 rounded-xl p-5">
                 <p className="text-sm font-medium text-neutral-900 mb-1">Want a lawyer to review your customizations?</p>
-                <p className="text-[14px] text-neutral-500 leading-relaxed mb-3">Upgrade to lawyer review at any time. You&apos;ll only pay the review add-on — your base modification fee was already covered.</p>
+                <p className="text-[14px] text-neutral-500 leading-relaxed mb-3">Upgrade to lawyer review at any time. You&apos;ll only pay the review add-on.</p>
                 <div className="flex flex-col sm:flex-row gap-2">
                   <button className="text-[15px] text-[#be123c] font-medium hover:underline">Standard Review (+${LAWYER_ADDON.standard})</button>
                   <span className="text-neutral-300 hidden sm:inline">|</span>
@@ -1368,29 +1097,677 @@ export default function CustomizePage() {
                 </div>
               </div>
             )}
-
-            {/* New modification path (per spec §8.6 Path 1) */}
-            <div className="max-w-md mx-auto">
-              <button onClick={() => { setModifications([]); setOrderComplete(false); setCurrentStep(1); }} className="text-[15px] text-neutral-500 hover:text-[#be123c] transition-colors font-medium">
-                Need another modification? Start a new customization
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* ─── Mobile Sticky Bottom Nav ─── */}
-      {currentStep === 3 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 px-4 py-3 z-40 md:hidden safe-area-bottom">
-          <div className="flex items-center justify-between gap-3">
-            <button onClick={() => setCurrentStep(2)} className="text-[15px] text-neutral-500 font-medium">Back</button>
-            <div className="text-[13px] text-neutral-400">{exchangeCount}/8 exchanges · {draftCount}/3 drafts</div>
-            <button onClick={handleFinishChat} className="bg-[#be123c] text-white rounded-lg px-5 py-2.5 text-sm font-semibold active:scale-[0.97]">
-              Looks Good
-            </button>
           </div>
         </div>
-      )}
+      </div>
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // ═══ MAIN 5-STEP WIZARD ═══
+  // ═══════════════════════════════════════════════════════════
+  return (
+    <div className="flex flex-col min-h-screen bg-white">
+      {/* ─── Header ─── */}
+      <header className="shrink-0 border-b border-neutral-200 bg-white z-30">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            {currentStep > 1 && (
+              <button
+                onClick={() => {
+                  if (currentStep === 5) { setCurrentStep(4); setShowOrderSummary(false); }
+                  else if (currentStep === 4) setCurrentStep(3);
+                  else if (currentStep === 3) setCurrentStep(2);
+                  else if (currentStep === 2) setCurrentStep(1);
+                }}
+                className="flex items-center justify-center w-8 h-8 rounded-lg border border-neutral-200 text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700 transition-colors shrink-0"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+            )}
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#be123c] shrink-0">
+              <span className="text-white text-sm font-bold">R</span>
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-[15px] font-semibold text-neutral-900 truncate font-serif">
+                Ruby &mdash; Customization Wizard
+              </h1>
+              <p className="text-[12px] text-neutral-400 truncate">
+                {session.contractTitle} &middot; {session.governingLaw} law &middot; Step {currentStep} of 5
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Legal advice disclaimer */}
+        <div className="bg-neutral-50 border-t border-neutral-100 px-4 sm:px-6 py-2">
+          <div className="max-w-4xl mx-auto flex items-center gap-2 text-[12px] text-neutral-400">
+            <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Ruby helps you customize your agreement but does not provide legal advice.</span>
+          </div>
+        </div>
+      </header>
+
+      {/* ─── Progress Bar ─── */}
+      <ProgressBar />
+
+      {/* ─── Step Content ─── */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+
+          {/* ═══ STEP 1: Your Contract ═══ */}
+          {currentStep === 1 && (
+            <div className="space-y-6">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl sm:text-3xl font-semibold text-neutral-900 font-serif">Your Contract</h2>
+                <p className="text-neutral-500 mt-2 text-sm">Your base draft has been generated and is ready for customization.</p>
+              </div>
+
+              {/* Contract Summary Card */}
+              <div className="max-w-lg mx-auto bg-white border border-neutral-200 rounded-xl p-6 sm:p-8 space-y-5">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-rose-50">
+                    <svg className="w-6 h-6 text-[#be123c]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-neutral-900 font-serif">{session.contractTitle}</h3>
+                    <p className="text-sm text-neutral-400">Base draft generated</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wide">Type</p>
+                    <p className="text-sm text-neutral-700 mt-0.5 capitalize">{session.contractType || "Employment"}</p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wide">Province</p>
+                    <p className="text-sm text-neutral-700 mt-0.5">{session.governingLaw}</p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wide">Tier</p>
+                    <p className="text-sm text-neutral-700 mt-0.5">{tierLabel}</p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wide">Status</p>
+                    <p className="text-sm text-emerald-600 mt-0.5 font-medium">Ready</p>
+                  </div>
+                </div>
+
+                <div className="border-t border-neutral-100 pt-4 space-y-3">
+                  <button
+                    onClick={() => setCurrentStep(2)}
+                    className="w-full inline-flex items-center justify-center gap-2 bg-[#be123c] text-white rounded-xl px-6 py-3.5 text-sm font-semibold hover:bg-[#9f1239] transition-colors active:scale-[0.98]"
+                  >
+                    Customize This Contract
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                  <div className="flex gap-3">
+                    <button className="flex-1 inline-flex items-center justify-center gap-2 border border-neutral-200 rounded-xl px-4 py-3 text-sm font-medium text-neutral-600 hover:bg-neutral-50 transition-colors">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      Download Base Draft
+                    </button>
+                    <Link
+                      href="/documents"
+                      className="flex-1 inline-flex items-center justify-center gap-2 border border-neutral-200 rounded-xl px-4 py-3 text-sm font-medium text-neutral-600 hover:bg-neutral-50 transition-colors"
+                    >
+                      Skip Customization
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ═══ STEP 2: Select Category ═══ */}
+          {currentStep === 2 && (
+            <div className="space-y-6">
+              <div className="text-center mb-6">
+                <h2 className="text-xl sm:text-2xl font-semibold text-neutral-900 font-serif">What do you want to modify?</h2>
+                <p className="text-neutral-500 mt-2 text-sm">Select a category to get started.</p>
+              </div>
+
+              <PendingChangesSidebar />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {categories.map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => {
+                      setSelectedCategory(cat);
+                      setChangeDescription("");
+                      setCurrentStep(3);
+                    }}
+                    className="text-left border border-neutral-200 rounded-xl p-4 sm:p-5 hover:border-[#be123c] hover:bg-[rgba(190,18,60,0.01)] transition-all group active:scale-[0.99]"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-neutral-100 text-neutral-500 font-mono text-[13px] font-bold shrink-0 group-hover:bg-rose-50 group-hover:text-[#be123c] transition-colors">
+                        {cat.icon}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold text-neutral-900 group-hover:text-[#be123c] transition-colors">{cat.name}</p>
+                        <p className="text-[13px] text-neutral-500 mt-0.5 leading-relaxed">{cat.description}</p>
+                        <p className="text-[12px] text-neutral-400 mt-1.5 italic">e.g. {cat.example}</p>
+                      </div>
+                      <svg className="w-4 h-4 text-neutral-300 group-hover:text-[#be123c] shrink-0 mt-0.5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ═══ STEP 3: Describe Your Change ═══ */}
+          {currentStep === 3 && selectedCategory && (
+            <div className="space-y-6">
+              <div className="text-center mb-6">
+                <h2 className="text-xl sm:text-2xl font-semibold text-neutral-900 font-serif">Describe Your Change</h2>
+                <p className="text-neutral-500 mt-2 text-sm">Tell us what you would like to change.</p>
+              </div>
+
+              <PendingChangesSidebar />
+
+              {/* Selected category badge */}
+              <div className="inline-flex items-center gap-2 bg-rose-50 border border-rose-100 rounded-lg px-3 py-2">
+                <div className="flex items-center justify-center w-7 h-7 rounded bg-white text-[#be123c] font-mono text-[11px] font-bold border border-rose-100">
+                  {selectedCategory.icon}
+                </div>
+                <div>
+                  <p className="text-[13px] font-semibold text-[#9f1239]">{selectedCategory.name}</p>
+                  <p className="text-[11px] text-rose-400">{selectedCategory.description}</p>
+                </div>
+                <button onClick={() => setCurrentStep(2)} className="ml-2 text-rose-300 hover:text-rose-500 transition-colors">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Suggestion chips */}
+              {(SUGGESTION_CHIPS[selectedCategory.id] || SUGGESTION_CHIPS["default"]).length > 0 && (
+                <div>
+                  <p className="text-[12px] font-semibold text-neutral-400 uppercase tracking-wide mb-2">Common requests</p>
+                  <div className="flex flex-wrap gap-2">
+                    {(SUGGESTION_CHIPS[selectedCategory.id] || SUGGESTION_CHIPS["default"]).map((chip) => (
+                      <button
+                        key={chip}
+                        onClick={() => handleStep3ChipClick(chip)}
+                        className={`text-[12px] sm:text-[13px] px-3.5 py-2 rounded-lg border transition-all whitespace-nowrap active:scale-[0.97] ${
+                          changeDescription === chip
+                            ? "border-[#be123c] text-[#be123c] bg-rose-50"
+                            : "border-neutral-200 text-neutral-600 bg-white hover:border-[#be123c] hover:text-[#be123c] hover:bg-[rgba(190,18,60,0.02)]"
+                        }`}
+                      >
+                        {chip}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Text input area */}
+              <div>
+                <label className="text-[12px] font-semibold text-neutral-500 uppercase tracking-wide mb-2 block">Describe what you&apos;d like to change</label>
+                <textarea
+                  ref={descInputRef}
+                  value={changeDescription}
+                  onChange={(e) => setChangeDescription(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey && changeDescription.trim()) {
+                      e.preventDefault();
+                      handleAddChange();
+                    }
+                  }}
+                  placeholder={`e.g. "${selectedCategory.example}"`}
+                  rows={3}
+                  className="w-full border border-neutral-200 rounded-xl px-4 py-3 text-[14px] sm:text-[15px] text-neutral-900 placeholder:text-neutral-400 focus:ring-2 focus:ring-[rgba(190,18,60,0.15)] focus:border-[#be123c] outline-none resize-none transition-all"
+                />
+              </div>
+
+              {/* Inline risk flags */}
+              {changeDescription.trim() && detectRisks(changeDescription, selectedCategory).length > 0 && (
+                <div className="space-y-2">
+                  {detectRisks(changeDescription, selectedCategory).map((risk, i) => (
+                    <div key={i} className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-2.5 flex items-start gap-2">
+                      <svg className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                      </svg>
+                      <p className="text-[13px] text-amber-800 leading-relaxed">{risk}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Province tip */}
+              {changeDescription.trim() && getProvinceTip(changeDescription, session.governingLaw) && (
+                <div className="rounded-xl bg-blue-50 border border-blue-200 px-4 py-2.5 flex items-start gap-2">
+                  <svg className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div>
+                    <p className="text-[12px] font-semibold text-blue-700 uppercase tracking-wide mb-0.5">{session.governingLaw} Consideration</p>
+                    <p className="text-[13px] text-blue-800 leading-relaxed">{getProvinceTip(changeDescription, session.governingLaw)}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Continue button */}
+              <div className="flex items-center justify-between pt-2">
+                <button
+                  onClick={() => setCurrentStep(2)}
+                  className="text-sm text-neutral-500 hover:text-neutral-700 transition-colors"
+                >
+                  Back to categories
+                </button>
+                <button
+                  onClick={handleAddChange}
+                  disabled={!changeDescription.trim()}
+                  className="inline-flex items-center gap-2 bg-[#be123c] text-white rounded-xl px-6 py-3 text-sm font-semibold hover:bg-[#9f1239] transition-colors disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]"
+                >
+                  Continue
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ═══ STEP 4: Review with Ruby ═══ */}
+          {currentStep === 4 && (
+            <div className="flex flex-col" style={{ minHeight: "calc(100vh - 280px)" }}>
+              <PendingChangesSidebar />
+
+              {/* Chat Messages */}
+              <div ref={chatContainerRef} className="flex-1 space-y-5 pb-4">
+                {messages.map((msg) => (
+                  <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                    {msg.role === "ruby" && (
+                      <div className="flex items-start gap-3 max-w-[85%] sm:max-w-[75%]">
+                        <div className="flex items-center justify-center w-7 h-7 rounded-full bg-[#be123c] shrink-0 mt-0.5">
+                          <span className="text-white text-[11px] font-bold">R</span>
+                        </div>
+                        <div className="space-y-3">
+                          <div className="bg-white border border-neutral-200 rounded-2xl rounded-tl-sm px-4 py-3">
+                            <p className="text-[14px] sm:text-[15px] leading-relaxed text-neutral-900 whitespace-pre-wrap">{renderContent(msg.content)}</p>
+                          </div>
+
+                          {msg.riskFlag && (
+                            <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-2.5 flex items-start gap-2">
+                              <svg className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                              </svg>
+                              <p className="text-[13px] text-amber-800 leading-relaxed">{msg.riskFlag}</p>
+                            </div>
+                          )}
+
+                          {msg.provinceTip && (
+                            <div className="rounded-xl bg-blue-50 border border-blue-200 px-4 py-2.5 flex items-start gap-2">
+                              <svg className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              <div>
+                                <p className="text-[12px] font-semibold text-blue-700 uppercase tracking-wide mb-0.5">{session.governingLaw} Consideration</p>
+                                <p className="text-[13px] text-blue-800 leading-relaxed">{msg.provinceTip}</p>
+                              </div>
+                            </div>
+                          )}
+
+                          {msg.clausePreview && (
+                            <div className="rounded-xl border border-neutral-200 overflow-hidden">
+                              <div className="bg-neutral-50 px-4 py-2 border-b border-neutral-200">
+                                <p className="text-[13px] font-semibold text-neutral-700">{msg.clausePreview.title}</p>
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-neutral-200">
+                                <div className="px-4 py-3">
+                                  <p className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wide mb-1.5">Current</p>
+                                  <p className="text-[13px] text-neutral-600 leading-relaxed">{msg.clausePreview.current}</p>
+                                </div>
+                                <div className="px-4 py-3 bg-emerald-50/30">
+                                  <p className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wide mb-1.5">Proposed</p>
+                                  <p className="text-[13px] text-neutral-700 leading-relaxed">{msg.clausePreview.proposed}</p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {msg.quickActions && msg.quickActions.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {msg.quickActions.map((action) => (
+                                <button
+                                  key={action.label}
+                                  onClick={() => handleSend(action.value)}
+                                  disabled={isTyping}
+                                  className="text-[13px] px-3.5 py-2 rounded-lg border border-neutral-200 text-neutral-700 bg-white hover:border-[#be123c] hover:text-[#be123c] hover:bg-[rgba(190,18,60,0.02)] transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.97]"
+                                >
+                                  {action.label}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {msg.role === "user" && (
+                      <div className="max-w-[85%] sm:max-w-[75%]">
+                        <div className="bg-[#be123c] text-white rounded-2xl rounded-tr-sm px-4 py-3">
+                          <p className="text-[14px] sm:text-[15px] leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {msg.role === "system" && (
+                      <div className="w-full">
+                        <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 flex items-start gap-2">
+                          <svg className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                          </svg>
+                          <p className="text-[14px] text-amber-800 leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                {/* Typing indicator */}
+                {isTyping && (
+                  <div className="flex justify-start">
+                    <div className="flex items-start gap-3">
+                      <div className="flex items-center justify-center w-7 h-7 rounded-full bg-[#be123c] shrink-0 mt-0.5">
+                        <span className="text-white text-[11px] font-bold">R</span>
+                      </div>
+                      <div className="bg-white border border-neutral-200 rounded-2xl rounded-tl-sm px-4 py-3">
+                        <div className="flex gap-1.5">
+                          <div className="w-2 h-2 bg-neutral-300 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                          <div className="w-2 h-2 bg-neutral-300 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                          <div className="w-2 h-2 bg-neutral-300 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div ref={chatEndRef} />
+              </div>
+
+              {/* Input Area for Step 4 */}
+              <div className="border-t border-neutral-200 bg-white pt-3 mt-auto">
+                {/* Chat input */}
+                <div className="flex items-end gap-3 mb-3">
+                  <div className="flex-1 min-w-0">
+                    <textarea
+                      ref={inputRef}
+                      value={chatInput}
+                      onChange={handleInputChange}
+                      onKeyDown={handleKeyDown}
+                      placeholder="Ask Ruby a question or refine your request..."
+                      rows={1}
+                      disabled={isTyping}
+                      className="w-full border border-neutral-200 rounded-xl px-4 py-3 pr-12 text-[14px] sm:text-[15px] text-neutral-900 placeholder:text-neutral-400 focus:ring-2 focus:ring-[rgba(190,18,60,0.15)] focus:border-[#be123c] outline-none resize-none transition-all disabled:opacity-60"
+                      style={{ maxHeight: "120px" }}
+                    />
+                  </div>
+                  <button
+                    onClick={() => handleSend()}
+                    disabled={!chatInput.trim() || isTyping}
+                    className="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#be123c] text-white hover:bg-[#9f1239] disabled:opacity-40 disabled:cursor-not-allowed transition-colors shrink-0 active:scale-[0.95] mb-[1px]"
+                    aria-label="Send message"
+                  >
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19V5m0 0l-7 7m7-7l7 7" />
+                    </svg>
+                  </button>
+                </div>
+                <p className="text-[11px] text-neutral-300 text-center mb-3">Press Enter to send, Shift+Enter for new line</p>
+
+                {/* Action buttons */}
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-neutral-100 pt-3">
+                  <button
+                    onClick={() => {
+                      setSelectedCategory(null);
+                      setChangeDescription("");
+                      setCurrentStep(2);
+                    }}
+                    className="inline-flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-700 transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Add Another Modification
+                  </button>
+                  <button
+                    onClick={() => {
+                      // Convert pending changes to modification records if not already done
+                      for (const pc of pendingChanges) {
+                        if (!pc.confirmed) {
+                          const complexity = determineComplexity(messages.length, pc.category, pc.riskFlags);
+                          const mod: ModificationRecord = {
+                            id: nextModId(),
+                            category: pc.category.name,
+                            summary: pc.description.length > 80 ? pc.description.slice(0, 77) + "..." : pc.description,
+                            complexityTier: complexity,
+                            baseFee: COMPLEXITY_PRICING[complexity].base,
+                            riskFlags: pc.riskFlags,
+                            requiresLawyerReview: requiresMandatoryLawyerReview(pc.description, pc.category),
+                            messages: [...messages],
+                          };
+                          setModifications((prev) => [...prev, mod]);
+                          setPendingChanges((prev) => prev.map((p) => p.id === pc.id ? { ...p, confirmed: true } : p));
+                        }
+                      }
+                      setShowOrderSummary(true);
+                      setCurrentStep(5);
+                    }}
+                    disabled={pendingChanges.length === 0}
+                    className="inline-flex items-center gap-2 bg-[#be123c] text-white rounded-xl px-6 py-3 text-sm font-semibold hover:bg-[#9f1239] transition-colors disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]"
+                  >
+                    Finalize Changes
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ═══ STEP 5: Order Summary & Pay ═══ */}
+          {currentStep === 5 && (
+            <div className="space-y-6">
+              {/* Header */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-semibold text-neutral-900 font-serif">Order Summary &amp; Pay</h2>
+                  <p className="text-sm text-neutral-500 mt-1">Review your customizations and choose a delivery option.</p>
+                </div>
+                <button
+                  onClick={() => { setShowOrderSummary(false); setCurrentStep(4); }}
+                  className="inline-flex items-center gap-2 text-sm font-medium text-neutral-500 hover:text-neutral-700 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  Back to review
+                </button>
+              </div>
+
+              {/* Modification cards */}
+              <div className="space-y-3">
+                {modifications.map((mod, i) => {
+                  const tier = COMPLEXITY_COLORS[mod.complexityTier];
+                  const discount = volumeDiscount(i);
+                  const discountedFee = mod.baseFee * (1 - discount);
+                  return (
+                    <div key={mod.id} className="bg-white border border-neutral-200 rounded-xl p-4 sm:p-5">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-semibold text-neutral-900">{mod.category}</p>
+                          <p className="text-[14px] text-neutral-500 mt-0.5">{mod.summary}</p>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className={`inline-block px-3 py-1 text-[13px] font-semibold rounded-full ${tier.bg} ${tier.text}`}>
+                            {COMPLEXITY_PRICING[mod.complexityTier].label}
+                          </span>
+                          <span className="text-sm font-semibold text-neutral-900">${discountedFee.toFixed(0)}</span>
+                        </div>
+                      </div>
+                      {discount > 0 && (
+                        <p className="text-[13px] text-emerald-600 font-medium mt-2">Volume discount: -{Math.round(discount * 100)}%</p>
+                      )}
+                      {mod.riskFlags.length > 0 && (
+                        <div className="mt-3 rounded-lg border border-amber-100 bg-amber-50/50 p-3 space-y-1">
+                          {mod.riskFlags.map((flag, fi) => (
+                            <p key={fi} className="text-[13px] text-amber-700 flex items-start gap-1.5">
+                              <svg className="w-3.5 h-3.5 shrink-0 mt-0.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                              </svg>
+                              {flag}
+                            </p>
+                          ))}
+                        </div>
+                      )}
+                      {mod.requiresLawyerReview && (
+                        <div className="mt-3 rounded-lg border border-rose-200 bg-rose-50 p-3">
+                          <p className="text-[13px] text-rose-700 font-medium">This modification requires lawyer review due to regulatory requirements.</p>
+                        </div>
+                      )}
+                      <button
+                        onClick={() => {
+                          setModifications((prev) => prev.filter((_, idx) => idx !== i));
+                        }}
+                        className="text-[13px] text-neutral-400 hover:text-red-600 font-medium transition-colors mt-3"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {modifications.length === 0 && (
+                <div className="text-center py-12 bg-neutral-50 border border-neutral-200 rounded-xl">
+                  <p className="text-neutral-400 text-sm">No modifications captured yet. Go back to review changes with Ruby.</p>
+                  <button onClick={() => { setShowOrderSummary(false); setCurrentStep(4); }} className="mt-3 text-sm text-[#be123c] font-medium hover:underline">
+                    Back to review
+                  </button>
+                </div>
+              )}
+
+              {modifications.length > 0 && (
+                <>
+                  {/* Delivery Options */}
+                  <div>
+                    <p className="text-[15px] font-semibold text-neutral-700 mb-3">Choose delivery option</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* AI-Only */}
+                      <button
+                        type="button"
+                        onClick={() => !anyRequiresLawyer && setDeliveryTier("ai-only")}
+                        className={`text-left border rounded-xl p-4 sm:p-6 transition-all ${anyRequiresLawyer ? "opacity-50 cursor-not-allowed border-neutral-200 bg-neutral-50" : deliveryTier === "ai-only" ? "border-[#be123c] border-2 bg-[rgba(190,18,60,0.02)]" : "border-neutral-200 hover:border-neutral-300"}`}
+                      >
+                        <p className="text-sm font-semibold text-neutral-900 mb-1">Engine-Drafted Contract</p>
+                        <p className="text-[14px] text-neutral-500 leading-relaxed mb-3">Delivered immediately upon payment. Drafted by Ruby based on your instructions.</p>
+                        <p className="text-[13px] text-neutral-400">Instant delivery</p>
+                        <p className="text-[13px] text-neutral-400 mt-1">Not reviewed by a licensed lawyer</p>
+                        {anyRequiresLawyer && (
+                          <div className="mt-3 rounded-lg bg-rose-50 border border-rose-100 px-3 py-2">
+                            <p className="text-[13px] text-rose-700 font-medium">Engine-only delivery is unavailable. One or more modifications require lawyer review.</p>
+                          </div>
+                        )}
+                      </button>
+
+                      {/* Lawyer Review */}
+                      <button
+                        type="button"
+                        onClick={() => setDeliveryTier("lawyer-standard")}
+                        className={`text-left border rounded-xl p-4 sm:p-6 transition-all ${deliveryTier.startsWith("lawyer") ? "border-[#be123c] border-2 bg-[rgba(190,18,60,0.02)]" : "border-neutral-200 hover:border-neutral-300"}`}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="text-sm font-semibold text-neutral-900">Base Draft + Lawyer Review</p>
+                          <span className="text-[10px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">Recommended</span>
+                        </div>
+                        <p className="text-[14px] text-neutral-500 leading-relaxed mb-3">Reviewed and approved by a licensed Canadian lawyer.</p>
+                        <div className="flex flex-col gap-2">
+                          <label className="flex items-center gap-2 text-[14px] text-neutral-600 cursor-pointer">
+                            <input type="radio" name="turnaround" checked={deliveryTier === "lawyer-standard"} onChange={() => setDeliveryTier("lawyer-standard")} className="accent-[#be123c]" />
+                            Standard (3-5 days) +${LAWYER_ADDON.standard}
+                          </label>
+                          <label className="flex items-center gap-2 text-[14px] text-neutral-600 cursor-pointer">
+                            <input type="radio" name="turnaround" checked={deliveryTier === "lawyer-priority"} onChange={() => setDeliveryTier("lawyer-priority")} className="accent-[#be123c]" />
+                            Priority (24h) +${LAWYER_ADDON.priority}
+                          </label>
+                        </div>
+                        <div className="mt-3 flex items-center gap-1.5">
+                          <svg className="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <p className="text-[13px] text-emerald-700 font-medium">Reviewed &amp; Approved by a Licensed Lawyer</p>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Order Total */}
+                  <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-5">
+                    <div className="space-y-2 text-sm">
+                      {modifications.map((mod, i) => {
+                        const disc = volumeDiscount(i);
+                        const fee = mod.baseFee * (1 - disc);
+                        return (
+                          <div key={mod.id} className="flex justify-between text-neutral-500 text-[14px]">
+                            <span className="truncate mr-3">
+                              {mod.category} ({COMPLEXITY_PRICING[mod.complexityTier].label})
+                              {disc > 0 ? ` -${Math.round(disc * 100)}%` : ""}
+                            </span>
+                            <span className="shrink-0">${fee.toFixed(0)}</span>
+                          </div>
+                        );
+                      })}
+                      {deliveryTier !== "ai-only" && (
+                        <div className="flex justify-between text-neutral-500 text-[14px]">
+                          <span>Lawyer review ({deliveryTier === "lawyer-priority" ? "Priority 24h" : "Standard 3-5 days"}) x{modifications.length}</span>
+                          <span>${(lawyerAddon * modifications.length).toFixed(0)}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between pt-3 border-t border-neutral-200 text-neutral-900 font-semibold">
+                        <span>Total</span>
+                        <span>${total.toFixed(0)} CAD</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* CTA */}
+                  <div className="flex flex-col-reverse sm:flex-row justify-between items-center gap-3 pt-2">
+                    <button onClick={() => { setShowOrderSummary(false); setCurrentStep(4); }} className="text-[15px] text-neutral-500 hover:text-neutral-700 transition-colors">
+                      Back to review
+                    </button>
+                    <button onClick={handleCheckout} className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#be123c] text-white rounded-xl px-8 py-3.5 text-sm font-semibold hover:bg-[#9f1239] transition-colors active:scale-[0.98]">
+                      Proceed to Checkout - ${total.toFixed(0)}
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+        </div>
+      </div>
     </div>
   );
 }

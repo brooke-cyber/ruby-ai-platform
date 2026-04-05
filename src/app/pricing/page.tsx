@@ -58,7 +58,7 @@ export default function PricingPage() {
 
   const faqItems = [
     {
-      question: 'What is included in Expert Draft?',
+      question: 'What is included in Base Draft?',
       answer: 'A production-ready agreement built from our proprietary clause library and Canadian compliance database. Every clause is jurisdiction-specific and enforceable. You receive a downloadable document ready to execute.',
     },
     {
@@ -75,7 +75,7 @@ export default function PricingPage() {
     },
     {
       question: 'How long does delivery take?',
-      answer: 'Expert Draft documents are generated in minutes. Lawyer Review is delivered within 3-5 business days, or 24 hours with Priority Review.',
+      answer: 'Base Draft documents are generated in minutes. Lawyer Review is delivered within 3-5 business days, or 24 hours with Priority Review.',
     },
   ];
 
@@ -111,7 +111,7 @@ export default function PricingPage() {
               {
                 step: '1',
                 title: 'Choose Your Agreement',
-                desc: 'Pick from 27 agreement types. Answer the wizard questions to configure your deal.',
+                desc: 'Pick from 40+ agreement types. Answer the wizard questions to configure your deal.',
                 highlight: 'From $99',
               },
               {
@@ -153,13 +153,13 @@ export default function PricingPage() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="font-serif text-3xl md:text-4xl font-bold text-gray-900 mb-3">Two tiers. You choose.</h2>
-            <p className="text-gray-500 max-w-lg mx-auto text-sm sm:text-base">Every agreement is available as Expert Draft or with Lawyer Review.</p>
+            <p className="text-gray-500 max-w-lg mx-auto text-sm sm:text-base">Every agreement is available as Base Draft or with Lawyer Review.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Expert Draft */}
+            {/* Base Draft */}
             <div className="rounded-xl border border-gray-200 bg-white p-6 sm:p-8 transition-all duration-300 hover:shadow-lg hover:border-gray-300">
-              <h3 className="text-lg font-bold text-gray-900 mb-1">Expert Draft</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-1">Base Draft</h3>
               <p className="text-sm text-gray-500 mb-6">Production-ready. Instant delivery.</p>
               <div className="space-y-3 mb-8">
                 {[
@@ -181,18 +181,18 @@ export default function PricingPage() {
               </div>
             </div>
 
-            {/* Expert Draft + Lawyer Review */}
+            {/* Base Draft + Lawyer Review */}
             <div className="rounded-xl border-2 border-[#be123c]/20 bg-white p-6 sm:p-8 relative transition-all duration-300 hover:shadow-lg hover:border-[#be123c]/40">
               <div className="absolute -top-3 left-6">
                 <span className="inline-block bg-[#be123c] text-white text-[11px] sm:text-[13px] font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
                   Recommended
                 </span>
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-1 mt-1">Expert Draft + Lawyer Review</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-1 mt-1">Base Draft + Lawyer Review</h3>
               <p className="text-sm text-gray-500 mb-6">Everything above, plus licensed counsel.</p>
               <div className="space-y-3 mb-8">
                 {[
-                  'Everything in Expert Draft',
+                  'Everything in Base Draft',
                   'Licensed Canadian lawyer review',
                   'Redline markup & annotations',
                   'Plain-language legal memo',
@@ -255,7 +255,7 @@ export default function PricingPage() {
                     <thead>
                       <tr className="bg-[#faf9f7] border-b border-gray-200">
                         <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Agreement</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Expert Draft</th>
+                        <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Base Draft</th>
                         <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">+ Lawyer Review</th>
                       </tr>
                     </thead>
@@ -286,7 +286,7 @@ export default function PricingPage() {
                       <p className="text-sm font-semibold text-gray-900 mb-3">{agreement.title}</p>
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-[11px] uppercase tracking-wider text-gray-400 mb-0.5">Expert Draft</p>
+                          <p className="text-[11px] uppercase tracking-wider text-gray-400 mb-0.5">Base Draft</p>
                           <p className="text-sm font-bold text-gray-900">${agreement.price}</p>
                         </div>
                         <div className="text-right">

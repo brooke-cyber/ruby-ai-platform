@@ -1,18 +1,28 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AGREEMENTS, calculatePricing } from "@/data/agreements";
 
-export default function TiersPage() {
+function TiersContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [selected, setSelected] = useState<string[]>([]);
 
   useEffect(() => {
+    // Read from URL param first (single agreement from library card click)
+    const urlAgreement = searchParams.get("agreement");
+    if (urlAgreement) {
+      const ids = [urlAgreement];
+      setSelected(ids);
+      sessionStorage.setItem("ruby-selected", JSON.stringify(ids));
+      return;
+    }
+    // Fallback to sessionStorage (multi-select or returning)
     const stored = sessionStorage.getItem("ruby-selected");
     if (stored) setSelected(JSON.parse(stored));
-  }, []);
+  }, [searchParams]);
 
   const selfServe = calculatePricing(selected, "self-serve");
   const counsel = calculatePricing(selected, "counsel");
@@ -34,8 +44,8 @@ export default function TiersPage() {
             Return to the agreement library to make your selection.
           </p>
           <button
-            onClick={() => router.push("/documents")}
-            className="mt-10 px-10 py-3.5 bg-neutral-900 text-white text-sm font-medium tracking-wide hover:bg-neutral-800 transition-colors"
+            onClick={() => router.push("/agreements")}
+            className="mt-10 px-10 py-3.5 bg-neutral-900 text-white text-sm font-medium tracking-wide rounded-lg hover:bg-neutral-800 transition-colors"
           >
             Browse Agreements
           </button>
@@ -53,7 +63,7 @@ export default function TiersPage() {
   ];
 
   const counselFeatures = [
-    "Everything in Expert Draft",
+    "Everything in Base Draft",
     "Licensed Canadian lawyer in your province reviews your agreement",
     "Plain-language memo: what's in it and what it means for you",
     "Redline markup flagging anything that needs attention",
@@ -85,10 +95,10 @@ export default function TiersPage() {
 
         {/* Tier Cards */}
         <div className="grid md:grid-cols-2 gap-8">
-          {/* Expert Draft */}
+          {/* Base Draft */}
           <div className="border border-neutral-200 p-10 md:p-12">
             <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-400">
-              Expert Draft
+              Base Draft
             </p>
 
             <div className="mt-8 pb-8 border-b border-neutral-100">
@@ -124,13 +134,13 @@ export default function TiersPage() {
             </button>
           </div>
 
-          {/* Expert Draft + Lawyer Review */}
+          {/* Base Draft + Lawyer Review */}
           <div className="border border-[#be123c] p-10 md:p-12 relative">
             <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-[#be123c] mb-1">
               Recommended
             </p>
             <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-400">
-              Expert Draft + Lawyer Review
+              Base Draft + Lawyer Review
             </p>
 
             <div className="mt-8 pb-8 border-b border-neutral-100">
@@ -185,5 +195,13 @@ export default function TiersPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function TiersPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+      <TiersContent />
+    </Suspense>
   );
 }

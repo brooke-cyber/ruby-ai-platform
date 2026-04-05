@@ -67,7 +67,7 @@ export default function AboutPage() {
                 The problem isn&apos;t bad lawyers. It&apos;s a broken model. Billable hours punish efficiency. Flat fees still mean slow turnaround. And DIY templates leave you exposed.
               </p>
               <p>
-                <span className="text-neutral-900 font-medium">So we started from scratch.</span> We built a law firm where the technology and the legal practice are one thing -- not a law firm that bolted AI onto a legacy process.
+                <span className="text-neutral-900 font-medium">So we started from scratch.</span> We built a law firm where the technology and the legal practice are one thing — not a law firm that bolted AI onto a legacy process.
               </p>
             </div>
           </div>
@@ -93,7 +93,7 @@ export default function AboutPage() {
               {
                 title: 'Lawyer-certified at the architecture level',
                 description:
-                  'Every unique permutation of every agreement is pre-certified by a licensed lawyer. Your contract is production-ready the moment it generates -- not after a review cycle.',
+                  'Every unique permutation of every agreement is pre-certified by a licensed lawyer. Your contract is production-ready the moment it generates — not after a review cycle.',
                 icon: (
                   <svg className="h-6 w-6 text-[#be123c]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
@@ -165,7 +165,7 @@ export default function AboutPage() {
                 Deterministic Contract Wizard
               </h3>
               <p className="text-[15px] sm:text-base text-neutral-400 leading-relaxed mb-6">
-                Built on deep Canadian legal workflows -- not generic templates. Every unique permutation of every agreement is <span className="text-white font-medium">pre-certified by a lawyer at the architecture level</span>.
+                Built on deep Canadian legal workflows — not generic templates. Every unique permutation of every agreement is <span className="text-white font-medium">pre-certified by a lawyer at the architecture level</span>.
               </p>
               <ul className="space-y-3">
                 {[
@@ -195,7 +195,7 @@ export default function AboutPage() {
                 AI Customization Wizard
               </h3>
               <p className="text-[15px] sm:text-base text-neutral-400 leading-relaxed mb-6">
-                For modifications beyond standard options, Ruby drafts custom provisions through a <span className="text-white font-medium">conversational interface</span> -- with optional lawyer review for added confidence.
+                For modifications beyond standard options, Ruby drafts custom provisions through a <span className="text-white font-medium">conversational interface</span> — with optional lawyer review for added confidence.
               </p>
               <ul className="space-y-3">
                 {[
@@ -242,7 +242,7 @@ export default function AboutPage() {
               {
                 title: 'Creators & Agencies',
                 description:
-                  'Brand deals, content licensing, platform terms -- the legal side of your business shouldn\u2019t cost more than the deal itself.',
+                  'Brand deals, content licensing, platform terms — the legal side of your business shouldn\u2019t cost more than the deal itself.',
                 tags: ['Service Contracts', 'Privacy Policies', 'SaaS Agreements', 'Licensing'],
               },
               {
@@ -297,7 +297,7 @@ export default function AboutPage() {
                 Ruby Law was founded by <span className="text-neutral-900 font-medium">Brooke Shang</span>, a corporate and securities lawyer who spent years at leading Canadian firms advising on M&amp;A, private placements, and corporate governance.
               </p>
               <p>
-                After watching the same inefficiency play out hundreds of times -- founders waiting weeks and paying thousands for agreements drafted from the same precedent -- she decided to build the firm she wished existed.
+                After watching the same inefficiency play out hundreds of times — founders waiting weeks and paying thousands for agreements drafted from the same precedent — she decided to build the firm she wished existed.
               </p>
             </div>
             <div className="space-y-6 text-neutral-500 leading-relaxed text-[15px] sm:text-base md:text-lg">
@@ -305,7 +305,7 @@ export default function AboutPage() {
                 Ruby Law is not a legal tech startup that hired a lawyer as an afterthought. It&apos;s a <span className="text-neutral-900 font-medium">licensed Canadian law firm</span> that was engineered from day one to deliver legal work faster, better, and at a fraction of the cost.
               </p>
               <p>
-                Every agreement on our platform reflects real legal expertise -- structured into deterministic workflows, tested against Canadian statute, and backed by lawyers who stand behind the work.
+                Every agreement on our platform reflects real legal expertise — structured into deterministic workflows, tested against Canadian statute, and backed by lawyers who stand behind the work.
               </p>
             </div>
           </div>
@@ -334,7 +334,7 @@ export default function AboutPage() {
               },
               {
                 title: 'Lawyer-Solicitor Privilege',
-                description: 'Your communications with Ruby Law are protected by solicitor-client privilege. We are your lawyers -- not a software vendor.',
+                description: 'Your communications with Ruby Law are protected by solicitor-client privilege. We are your lawyers — not a software vendor.',
               },
               {
                 title: 'Pre-Certified Agreements',

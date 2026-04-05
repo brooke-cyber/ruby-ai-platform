@@ -90,7 +90,7 @@ function AgreementCard({ doc, isSelected, onToggle }: { doc: Agreement; isSelect
         </p>
         <div className="flex items-center gap-3 sm:gap-4 py-3 border-t border-neutral-100 mt-auto">
           <div className="min-w-0">
-            <div className="text-[10px] text-neutral-400 uppercase tracking-wider mb-0.5">Expert Draft</div>
+            <div className="text-[10px] text-neutral-400 uppercase tracking-wider mb-0.5">Base Draft</div>
             <div className="text-[15px] sm:text-base font-bold text-neutral-900">
               ${doc.price} <span className="text-[11px] font-normal text-neutral-400">CAD</span>
             </div>
@@ -443,7 +443,7 @@ export default function DocumentsPage() {
                       : 'text-neutral-500 hover:text-neutral-700'
                   }`}
                 >
-                  Expert Draft
+                  Base Draft
                 </button>
                 <button
                   type="button"
@@ -454,7 +454,7 @@ export default function DocumentsPage() {
                       : 'text-neutral-500 hover:text-neutral-700'
                   }`}
                 >
-                  Expert Draft + Lawyer Review
+                  Base Draft + Lawyer Review
                 </button>
               </div>
 

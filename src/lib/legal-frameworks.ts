@@ -29,8 +29,10 @@ Most heavily litigated provisions in Canadian employment law.
 REGULATORY COMPLIANCE:
 - Waksdale v. Swegon Group AB, 2020 ONCA 391: ANY single ESA violation in the termination clause voids the ENTIRE termination/severance section, exposing employer to full common law reasonable notice (potentially 24+ months)
 - ESA 2000 minimum notice: 1 week per year of service up to 8 weeks; severance pay threshold: 5+ years service AND employer payroll $2.5M+
-- Howard v. Benson Group Ltd., 2012 ONCA 231: Fixed-term contracts — early termination clause MUST explicitly allow early termination without cause; absence = pay for remainder of term
+- Howard v. Benson Group Inc., 2016 ONCA 256: Fixed-term contracts — early termination clause MUST explicitly allow early termination without cause; absence = pay for remainder of term
 - Termination for cause must meet the high threshold set by McKinley v. BC Tel, 2001 SCC 38 (proportionality analysis)
+- Matthews v. Ocean Nutrition Canada Ltd., 2020 SCC 26: Employee entitled to bonus/incentive compensation during the reasonable notice period UNLESS the plan contains clear, unambiguous language to the contrary. Bonus forfeiture clauses are construed narrowly.
+- Monterosso v. Metro Freightliner Hamilton Inc., 2023 ONCA 413: Fixed-term independent contractor case — Court of Appeal confirmed that independent contractors (unlike employees) have a duty to mitigate damages on early termination of a fixed-term contract. Note: For the Waksdale reinforcement principle (for-cause and without-cause provisions read together), see also Rahman v. Cannon Design Architecture Inc., 2022 ONCA 451 and subsequent ONCA jurisprudence confirming that an ESA-non-compliant for-cause provision voids the entire termination section
 
 THREE POSITIONS FOR WITHOUT-CAUSE TERMINATION:
 EMPLOYER-FRIENDLY: ESA minimums only (1 week/year up to 8 weeks notice + severance if applicable). Clear language limiting to statutory minimums. Include benefits continuation during statutory notice period only.
@@ -269,7 +271,7 @@ MINORITY-PROTECTIVE: Mandatory annual distribution of 50%+ of available net inco
 SECTION 7: RESTRICTIVE COVENANTS
 ═══════════════════════════════════════════
 - Non-Competition: 1-3 year term, Competing Business scope, geographic limitations
-- Ontario s.67.2: Non-compete VOID for employee-shareholders (use enhanced non-solicitation)
+- Ontario s.67.2: Non-compete VOID for employee-shareholders in their capacity as employees (use enhanced non-solicitation). NOTE: A non-compete binding a shareholder purely in their shareholder capacity (e.g., on sale of shares) is NOT caught by s.67.2, but dual-capacity individuals require careful drafting to delineate the source of the obligation.
 - Non-Solicitation: customers (1-2 years), employees (1-2 years)
 - Confidentiality: indefinite for trade secrets, 2-5 years for other information
 - Enforceability: Shafron test applies
@@ -286,7 +288,7 @@ For ROFR, tag-along, drag-along, shotgun, and forced buyout:
 ═══════════════════════════════════════════
 JURISDICTION-SPECIFIC COMPLIANCE
 ═══════════════════════════════════════════
-CBCA (Federal): s.146 USA auto-binding on transferees unless rescind within 30 days. s.194 dissent rights cannot be eliminated. s.241 oppression remedy cannot be contracted out.
+CBCA (Federal): s.146 USA auto-binding on transferees unless rescind within 30 days. s.190 dissent rights cannot be eliminated (note: s.190, not s.194 which relates to court applications). s.241 oppression remedy cannot be contracted out — BCE Inc. v. 1976 Debentureholders, 2008 SCC 69: oppression remedy assessed against "reasonable expectations" of stakeholders; shareholder agreements inform but do not conclusively determine those expectations.
 OBCA (Ontario): Similar to CBCA. s.67.2 non-compete prohibition for employees.
 QBCA (Quebec): s.213-230 USA provisions. s.216 mandatory registrar disclosure. s.219 USA terminates if corporation becomes reporting issuer. Civil Code art. 2089 stricter non-compete.
 BCBCA (British Columbia): Most flexible approach. Significant PE activity precedent.
@@ -502,7 +504,8 @@ REGULATORY COMPLIANCE:
 - 10 Fair Information Principles (Schedule 1 to PIPEDA): Accountability, Identifying Purposes, Consent, Limiting Collection, Limiting Use/Disclosure/Retention, Accuracy, Safeguards, Openness, Individual Access, Challenging Compliance
 - Breach notification: 72-hour notification to OPC and affected individuals for breaches creating "real risk of significant harm" (RROSH)
 - CASL (Canada's Anti-Spam Legislation, S.C. 2010, c. 23): Express consent required for commercial electronic messages
-- Provincial privacy laws: PIPA (Alberta), PIPA (BC), Quebec Law 25 (An Act respecting the protection of personal information in the private sector)
+- Provincial privacy laws: PIPA (Alberta), PIPA (BC), Quebec Law 25 (An Act respecting the protection of personal information in the private sector — fully in force as of September 2024, including automated decision-making transparency obligations under s.12.1, data portability rights, and mandatory privacy impact assessments for high-risk processing)
+- AI and Automated Decision-Making: OPC has signaled increased enforcement focus on algorithmic transparency and automated profiling. Quebec Law 25 s.12.1 requires organizations to inform individuals when personal information is used to render decisions based exclusively on automated processing. Draft data processing provisions to address AI/ML use cases.
 
 DATA RESIDENCY:
 VENDOR-PREFERRED: Data may be processed in any jurisdiction. Adequate protection via contractual safeguards.
@@ -672,7 +675,7 @@ REGULATORY MODULES:
 - M-TC-005: Ontario Consumer Protection Act (unfair practices, internet agreements, cooling-off periods)
 - M-TC-006: BC Consumer Protection (BPCPA specific requirements)
 - M-TC-007: Copyright Act (notice-and-notice, fair dealing, moral rights)
-- M-TC-008: Competition Act (deceptive marketing, drip pricing, performance claims)
+- M-TC-008: Competition Act (deceptive marketing, drip pricing under s.74.01(1.1), performance claims, greenwashing under s.74.01(1)(b.1); 2024 amendments via Bill C-56/C-59 expanded private right of action under s.103.1)
 - M-TC-009: Accessibility (AODA/WCAG 2.1 AA for Ontario)
 - M-TC-010: E-Commerce (UECA, electronic signatures, electronic documents)
 - M-TC-011: Industry-Specific (financial services, health, education triggers)
@@ -719,6 +722,10 @@ STRUCTURE:
 - Individual SOWs (Statements of Work) define specific engagements
 - SOW template with: scope, deliverables, timeline, fees, acceptance criteria
 
+REGULATORY COMPLIANCE:
+- Bhasin v. Hrynew, 2014 SCC 71: Recognized a general organizing principle of good faith in contractual performance. Parties owe a duty of honest performance — must not lie to or knowingly mislead the other party about matters directly linked to performance. Draft termination-for-convenience, renewal, and discretionary clauses to account for this duty.
+- Callow v. Zollinger, 2020 SCC 45: Extended Bhasin — active deception during performance (including silence that misleads) breaches the duty of honest performance. Relevant to renewal/non-renewal decisions and exercise of discretionary rights under MSAs.
+
 KEY PROVISIONS:
 1. Services Description & SOW Framework
 2. Fees & Payment Terms (net-30, net-60, milestone-based)
@@ -746,14 +753,14 @@ INFLUENCER AGREEMENT DRAFTING FRAMEWORK
 Based on Ruby Law proprietary Clause Library, Drafting Workflow, and Regulatory Module Reference
 
 APPLICABLE LEGAL FRAMEWORK:
-- Competition Act R.S.C. 1985, c. C-34 (s.52 criminal, s.74.01 civil; June 2024 amendments — strict liability, penalties up to CAD 15M corporations, CAD 1M individuals)
+- Competition Act R.S.C. 1985, c. C-34 (s.52 criminal, s.74.01 civil; June 2024 amendments via Bill C-56 and Bill C-59 — strict liability for deceptive marketing, AMPs up to CAD 10M first occurrence / CAD 15M subsequent for corporations, CAD 750K first / CAD 1M subsequent for individuals, new private right of action under s.103.1, expanded drip pricing provisions under s.74.01(1.1), enhanced greenwashing provisions requiring "adequate and proper testing" for environmental claims under s.74.01(1)(b.1))
 - Competition Bureau Influencer Marketing Guidelines (2022): Clear/conspicuous disclosure of material connection
 - Ad Standards Canada (ASC) Code & Interpretation Guideline #5: #ad/#sponsored in first 50 characters on Instagram; stand-alone hashtags
 - Copyright Act R.S.C. 1985, c. C-42 (ss.3, 5, 13, 14.1, 29): Author retains copyright unless explicitly assigned; moral rights waiver must be explicit per Acoose v. Glenbow Museum 2014 FC 1064
 - Trademarks Act R.S.C. 1985, c. T-13 (s.19): Authorized use of brand trademarks
 - PIPEDA S.C. 2000, c. 5: Privacy compliance for audience data collection
-- CASL S.C. 2010, c. 23: Opt-in consent for commercial electronic messages (penalties up to CAD 6M corporations)
-- Quebec Law 25 (Bill 64): Stricter privacy requirements for Quebec-based influencers/companies (penalties up to CAD 250K organizations)
+- CASL S.C. 2010, c. 23: Opt-in consent for commercial electronic messages (penalties up to CAD 10M per violation for corporations)
+- Quebec Law 25 (Bill 64): Stricter privacy requirements for Quebec-based influencers/companies (administrative monetary penalties up to CAD 25M or 4% of worldwide turnover)
 - FTC Endorsement Guides 16 CFR Part 255: Applies if US audience; material connection must be "clear and conspicuous"
 - AGCO iGaming Standards (Ontario) s.2.03: Prohibits influencers likely to appeal to minors in iGaming
 - CCCS GenAI/LLM Warning: Synthetic content disclosure requirements

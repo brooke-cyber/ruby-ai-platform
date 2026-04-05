@@ -150,7 +150,7 @@ function ProductDemo() {
   const phaseLabels = ['Intake', 'Drafting', 'Complete'];
 
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white shadow-[0_20px_70px_rgba(0,0,0,0.07)] overflow-hidden">
+    <div className="rounded-2xl border border-neutral-200/80 bg-white shadow-[0_20px_70px_rgba(0,0,0,0.08),0_0_0_1px_rgba(0,0,0,0.02)] overflow-hidden ring-1 ring-neutral-900/[0.04] hover:shadow-[0_25px_80px_rgba(0,0,0,0.1)] transition-shadow duration-500">
       {/* Top bar */}
       <div className="px-4 sm:px-5 py-3 border-b border-neutral-100 bg-neutral-50/60">
         <div className="flex items-center justify-between gap-3">
@@ -283,7 +283,7 @@ function ProductDemo() {
 
           {checks >= 5 && (
             <div className="mt-4 flex justify-center">
-              <div className="inline-flex items-center gap-2 bg-[#be123c] text-white text-[13px] font-medium px-4 py-1.5 rounded-lg animate-[fadeSlideIn_0.4s_ease-out]">
+              <div className="inline-flex items-center gap-2 bg-[#be123c] text-white text-[13px] font-medium px-5 py-2 rounded-lg shadow-[0_4px_16px_rgba(190,18,60,0.2)] animate-[fadeSlideIn_0.4s_ease-out] hover:bg-[#9f1239] transition-colors duration-200 cursor-pointer">
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
                 Download Agreement
               </div>
@@ -359,11 +359,11 @@ export default function Home() {
               </p>
 
               <div className="flex flex-wrap gap-4 mt-10">
-                <Link href="/documents" className="inline-flex items-center gap-2.5 bg-[#be123c] hover:bg-[#9f1239] text-white text-[14px] sm:text-[15px] font-medium tracking-wide px-6 sm:px-8 py-3.5 rounded-md transition-all duration-200 hover:shadow-[0_4px_16px_rgba(190,18,60,0.2)] hover:-translate-y-px active:translate-y-0">
+                <Link href="/documents" className="group inline-flex items-center gap-2.5 bg-[#be123c] hover:bg-[#9f1239] text-white text-[14px] sm:text-[15px] font-medium tracking-wide px-6 sm:px-8 py-3.5 rounded-lg transition-all duration-300 hover:shadow-[0_8px_30px_rgba(190,18,60,0.25)] hover:-translate-y-0.5 active:translate-y-0">
                   Draft Your Agreement
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                  <svg className="group-hover:translate-x-0.5 transition-transform duration-300" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </Link>
-                <Link href="/pricing" className="inline-flex items-center gap-2 border border-neutral-200 hover:border-neutral-400 text-neutral-600 text-[14px] sm:text-[15px] font-medium tracking-wide px-6 sm:px-8 py-3.5 rounded-md transition-all duration-200">
+                <Link href="/pricing" className="inline-flex items-center gap-2 border border-neutral-200 hover:border-neutral-300 text-neutral-600 hover:text-neutral-900 text-[14px] sm:text-[15px] font-medium tracking-wide px-6 sm:px-8 py-3.5 rounded-lg transition-all duration-300 hover:shadow-sm">
                   See Pricing
                 </Link>
               </div>
@@ -375,7 +375,7 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-2 text-[12px] sm:text-[13px] text-neutral-500">
                   <svg className="h-3.5 w-3.5 text-[#be123c]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                  27 agreement types
+                  40+ agreement types
                 </div>
                 <div className="flex items-center gap-2 text-[12px] sm:text-[13px] text-neutral-500">
                   <svg className="h-3.5 w-3.5 text-[#be123c]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -386,7 +386,10 @@ export default function Home() {
 
             {/* Right — Product Demo */}
             <div className="relative lg:pl-4">
-              <ProductDemo />
+              <div className="absolute -inset-4 bg-gradient-to-br from-[#be123c]/[0.04] via-transparent to-[#be123c]/[0.02] rounded-3xl blur-2xl pointer-events-none" />
+              <div className="relative">
+                <ProductDemo />
+              </div>
             </div>
           </div>
         </div>
@@ -410,8 +413,8 @@ export default function Home() {
                 { value: '8–15 hrs', sub: 'Typical drafting time', sub2: 'for a single agreement' },
                 { value: 'Minutes', sub: 'Not weeks', sub2: 'same compliance standard', accent: true },
               ].map((s) => (
-                <div key={s.value} className="text-center">
-                  <div className={`font-serif text-2xl sm:text-3xl md:text-4xl mb-2 ${s.accent ? 'text-[#be123c]' : 'text-neutral-900'}`}>{s.value}</div>
+                <div key={s.value} className={`text-center p-4 sm:p-6 rounded-xl transition-all duration-300 ${s.accent ? 'bg-[#be123c]/[0.04] border border-[#be123c]/10 shadow-sm' : 'bg-neutral-50/80 border border-neutral-100'}`}>
+                  <div className={`font-serif text-2xl sm:text-3xl md:text-[2.75rem] mb-2 tracking-tight ${s.accent ? 'text-[#be123c]' : 'text-neutral-900'}`}>{s.value}</div>
                   <p className="text-[12px] sm:text-[14px] text-neutral-400 leading-relaxed">{s.sub}<br className="hidden sm:block" /><span className="hidden sm:inline"> </span>{s.sub2}</p>
                 </div>
               ))}
@@ -438,7 +441,7 @@ export default function Home() {
               {
                 num: '01',
                 title: 'Choose your agreement',
-                desc: 'Select from 27 agreement types across 6 practice areas — employment, equity, capital raising, software, platform, and creator agreements.',
+                desc: 'Select from 40+ agreement types across 6 practice areas — employment, equity, capital raising, software, platform, and creator agreements.',
               },
               {
                 num: '02',
@@ -457,9 +460,13 @@ export default function Home() {
               },
             ].map((step) => (
               <FadeIn key={step.num}>
-                <span className="text-[13px] font-medium tracking-[0.2em] text-[#be123c]">{step.num}</span>
-                <h3 className="font-serif text-xl text-neutral-900 mt-3 mb-4">{step.title}</h3>
-                <p className="text-[14px] text-neutral-500 leading-[1.75]">{step.desc}</p>
+                <div className="group">
+                  <div className="inline-flex items-center justify-center h-10 w-10 rounded-xl bg-[#be123c]/[0.06] border border-[#be123c]/10 mb-4 group-hover:bg-[#be123c]/[0.1] transition-colors duration-300">
+                    <span className="text-[13px] font-semibold tracking-[0.1em] text-[#be123c]">{step.num}</span>
+                  </div>
+                  <h3 className="font-serif text-xl text-neutral-900 mb-4">{step.title}</h3>
+                  <p className="text-[14px] text-neutral-500 leading-[1.75]">{step.desc}</p>
+                </div>
               </FadeIn>
             ))}
           </div>
@@ -481,10 +488,11 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FadeIn>
-              <div className="bg-white border border-neutral-200 rounded-xl p-6 sm:p-10 h-full hover:border-[#be123c]/40 hover:shadow-md transition-all duration-300">
-                <span className="text-[13px] font-medium tracking-[0.2em] text-[#be123c] uppercase">Layer 1</span>
-                <h3 className="font-serif text-xl sm:text-2xl text-neutral-900 mt-3 mb-4">Bulletproof Base Contracts</h3>
-                <ul className="space-y-3">
+              <div className="bg-white border border-neutral-200/80 rounded-2xl p-6 sm:p-10 h-full hover:border-[#be123c]/30 hover:shadow-[0_8px_40px_rgba(190,18,60,0.06)] transition-all duration-500 group relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#be123c]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold tracking-[0.2em] text-[#be123c] uppercase bg-[#be123c]/[0.05] px-3 py-1 rounded-full">Layer 1</span>
+                <h3 className="font-serif text-xl sm:text-2xl text-neutral-900 mt-4 mb-5">Bulletproof Base Contracts</h3>
+                <ul className="space-y-3.5">
                   {[
                     'Lawyer-engineered from a proprietary clause library',
                     'Every permutation pre-certified by a licensed Canadian lawyer',
@@ -492,7 +500,9 @@ export default function Home() {
                     'Instant delivery in minutes — not weeks, not months',
                   ].map((item) => (
                     <li key={item} className="text-[14px] text-neutral-500 leading-[1.75] flex items-start gap-3">
-                      <svg className="h-4 w-4 text-[#be123c] shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                      <div className="h-5 w-5 rounded-full bg-[#be123c]/[0.07] flex items-center justify-center shrink-0 mt-0.5">
+                        <svg className="h-3 w-3 text-[#be123c]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                      </div>
                       {item}
                     </li>
                   ))}
@@ -500,10 +510,11 @@ export default function Home() {
               </div>
             </FadeIn>
             <FadeIn>
-              <div className="bg-white border border-neutral-200 rounded-xl p-6 sm:p-10 h-full hover:border-[#be123c]/40 hover:shadow-md transition-all duration-300">
-                <span className="text-[13px] font-medium tracking-[0.2em] text-[#be123c] uppercase">Layer 2</span>
-                <h3 className="font-serif text-xl sm:text-2xl text-neutral-900 mt-3 mb-4">AI-Powered Customization</h3>
-                <ul className="space-y-3">
+              <div className="bg-white border border-neutral-200/80 rounded-2xl p-6 sm:p-10 h-full hover:border-[#be123c]/30 hover:shadow-[0_8px_40px_rgba(190,18,60,0.06)] transition-all duration-500 group relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#be123c]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold tracking-[0.2em] text-[#be123c] uppercase bg-[#be123c]/[0.05] px-3 py-1 rounded-full">Layer 2</span>
+                <h3 className="font-serif text-xl sm:text-2xl text-neutral-900 mt-4 mb-5">AI-Powered Customization</h3>
+                <ul className="space-y-3.5">
                   {[
                     'For modifications beyond the standard options',
                     'Ruby drafts custom clauses through a guided conversation',
@@ -511,7 +522,9 @@ export default function Home() {
                     'From $49 per modification',
                   ].map((item) => (
                     <li key={item} className="text-[14px] text-neutral-500 leading-[1.75] flex items-start gap-3">
-                      <svg className="h-4 w-4 text-[#be123c] shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                      <div className="h-5 w-5 rounded-full bg-[#be123c]/[0.07] flex items-center justify-center shrink-0 mt-0.5">
+                        <svg className="h-3 w-3 text-[#be123c]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                      </div>
                       {item}
                     </li>
                   ))}
@@ -537,15 +550,15 @@ export default function Home() {
             </FadeIn>
 
             <FadeIn>
-              <div className="space-y-8">
+              <div className="space-y-6">
                 {[
                   { title: 'Built for your deal, not from a template', desc: 'Every clause is tailored to your specific parties, terms, and jurisdiction. You choose from three negotiating positions — client-favorable, balanced, or counter-party — based on your deal dynamics.' },
                   { title: 'Every clause tested for enforceability', desc: 'Ruby applies the same enforceability standards that top Canadian courts require. Restrictive covenants, termination clauses, transfer restrictions — all validated before you see them.' },
                   { title: 'Canadian compliance, handled automatically', desc: 'Securities exemptions, employment standards, corporate governance, privacy law — our system detects which rules apply to your deal and builds them in. You don\u2019t have to ask.' },
                 ].map((item) => (
-                  <div key={item.title} className="border-l-2 border-neutral-100 pl-6 hover:border-[#be123c]/40 transition-colors duration-300">
-                    <h3 className="text-[14px] font-semibold text-neutral-900 mb-1.5">{item.title}</h3>
-                    <p className="text-[15px] text-neutral-500 leading-[1.75]">{item.desc}</p>
+                  <div key={item.title} className="group border-l-2 border-neutral-200 pl-6 hover:border-[#be123c] transition-all duration-300 py-1">
+                    <h3 className="text-[15px] font-semibold text-neutral-900 mb-2 group-hover:text-[#be123c] transition-colors duration-300">{item.title}</h3>
+                    <p className="text-[14px] text-neutral-500 leading-[1.75]">{item.desc}</p>
                   </div>
                 ))}
               </div>
@@ -555,10 +568,11 @@ export default function Home() {
       </section>
 
       {/* ═══ TRUST / RISK REVERSAL ═══ */}
-      <section className="px-6 py-20 border-y border-neutral-100">
+      <section className="px-6 py-20 sm:py-24 border-y border-neutral-100 bg-gradient-to-b from-white to-neutral-50/50">
         <FadeIn>
           <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-16">
+            <p className="text-[13px] font-medium uppercase tracking-[0.25em] text-[#be123c] mb-12 text-center">Trusted by Founders Across Canada</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
               {[
                 {
                   icon: <svg className="h-6 w-6 text-[#be123c]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z" /></svg>,
@@ -576,12 +590,12 @@ export default function Home() {
                   desc: 'All data hosted in Canadian data centers. Encrypted in transit and at rest. We never move your information outside the country.',
                 },
               ].map((item) => (
-                <div key={item.title} className="text-center">
-                  <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-neutral-50 mb-4">
+                <div key={item.title} className="text-center group">
+                  <div className="inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-[#be123c]/[0.05] border border-[#be123c]/10 mb-5 group-hover:bg-[#be123c]/[0.08] group-hover:scale-105 transition-all duration-300">
                     {item.icon}
                   </div>
-                  <h3 className="text-[14px] font-semibold text-neutral-900 mb-2">{item.title}</h3>
-                  <p className="text-[15px] text-neutral-500 leading-[1.7]">{item.desc}</p>
+                  <h3 className="text-[15px] font-semibold text-neutral-900 mb-2">{item.title}</h3>
+                  <p className="text-[14px] text-neutral-500 leading-[1.7]">{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -601,15 +615,15 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
-              { category: 'Hiring & Team', href: '/documents', items: ['Employment Agreements (Standard & Executive)', 'Fixed-Term & Project-Based Contracts', 'Independent Contractor Agreements', 'Non-Compete & Non-Solicitation', 'Confidentiality & IP Protection', 'Offer Letters'], from: 'From $99', tag: '7 agreement types' },
-              { category: 'Equity & Governance', href: '/documents', items: ['Co-Founder & Shareholder Agreements', 'Incorporation & Corporate Formation', 'Joint Venture & Investor Agreements', '50/50 Partnership & Deadlock Resolution', 'Partnership Agreements'], from: 'From $149', tag: '9 agreement types' },
-              { category: 'Raising Capital', href: '/documents', items: ['SAFE Agreements (Canadian)', 'Convertible Note Agreements', 'Bilateral Loan Agreements', 'Demand Promissory Notes', 'Revolving Credit Facilities'], from: 'From $199', tag: '5 agreement types' },
-              { category: 'Software & Services', href: '/documents', items: ['Service Level Agreements (SaaS)', 'Managed Services Agreements', 'Enterprise Licensing Agreements', 'Terms & Conditions', 'Privacy Policies', 'Master Services Agreements'], from: 'From $199', tag: '6 agreement types' },
-              { category: 'Platform & Business', href: '/documents', items: ['Website Terms & Conditions', 'Privacy Policies', 'Partnership Agreements', 'Master Services Agreements'], from: 'From $199', tag: '4 agreement types' },
-              { category: 'Creator & Influencer', href: '/documents', items: ['Influencer & Brand Partnership Agreements', 'Privacy Policies for Campaigns', 'Confidentiality & IP Protection', 'Contractor Agreements for Creators', 'Exclusivity & Non-Compete'], from: 'From $149', tag: '5 agreement types' },
+              { category: 'Hiring & Team', href: '/documents', items: ['Employment Agreements (Standard & Executive)', 'Fixed-Term & Project-Based Contracts', 'Independent Contractor Agreements', 'Non-Compete & Non-Solicitation', 'Confidentiality & IP Protection', 'Offer Letters', 'Consulting Agreements'], from: 'From $99', tag: '7+ agreement types' },
+              { category: 'Equity & Governance', href: '/documents', items: ['Co-Founder & Shareholder Agreements', 'Incorporation & Corporate Formation', 'Joint Venture & Investor Agreements', '50/50 Partnership & Deadlock Resolution', 'Voting Agreements', 'ROFR & Co-Sale Agreements', 'Amended & Restated Articles', 'Founders Lock-Up Agreements'], from: 'From $149', tag: '12+ agreement types' },
+              { category: 'Raising Capital', href: '/documents', items: ['Term Sheets (CVCA Model)', 'SAFE Agreements (Canadian)', 'Convertible Note Agreements', 'Subscription Agreements (NI 45-106)', 'Investors Rights Agreements', 'Series B & C Financing', 'Bilateral Loan & Credit Facilities'], from: 'From $199', tag: '13+ agreement types' },
+              { category: 'Software & Services', href: '/documents', items: ['Service Level Agreements (SaaS)', 'Managed Services Agreements', 'Enterprise Licensing Agreements', 'Software Licensing Agreements', 'Vendor & Procurement Agreements', 'Consulting Agreements', 'Subscription Agreements'], from: 'From $199', tag: '10+ agreement types' },
+              { category: 'Platform & Business', href: '/documents', items: ['Website Terms & Conditions', 'Privacy Policies', 'Partnership Agreements', 'Master Services Agreements', 'Statements of Work'], from: 'From $199', tag: '5+ agreement types' },
+              { category: 'Creator & Influencer', href: '/documents', items: ['Influencer & Brand Partnership Agreements', 'Privacy Policies for Campaigns', 'Confidentiality & IP Protection', 'Contractor Agreements for Creators', 'Exclusivity & Non-Compete'], from: 'From $149', tag: '5+ agreement types' },
             ].map((group) => (
               <FadeIn key={group.category}>
-                <Link href={group.href} className="block bg-white border border-neutral-200 rounded-xl p-6 sm:p-8 h-full hover:border-[#be123c]/40 hover:shadow-md transition-all duration-300 group">
+                <Link href={group.href} className="block bg-white border border-neutral-200/80 rounded-2xl p-6 sm:p-8 h-full hover:border-[#be123c]/30 hover:shadow-[0_8px_40px_rgba(190,18,60,0.06)] transition-all duration-500 group relative overflow-hidden">
                   <div className="flex items-start justify-between mb-6">
                     <h3 className="font-serif text-lg text-neutral-900 group-hover:text-[#be123c] transition-colors">{group.category}</h3>
                     <span className="text-[15px] font-medium text-[#be123c]">{group.from}</span>
@@ -634,19 +648,19 @@ export default function Home() {
       </section>
 
       {/* ═══ STATS ═══ */}
-      <section className="px-6 py-20">
+      <section className="px-6 py-20 sm:py-24">
         <FadeIn>
-          <div className="max-w-3xl mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10">
+          <div className="max-w-4xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
               {[
                 { stat: 'Minutes', label: 'Not weeks', href: '/documents' },
-                { stat: '27', label: 'Agreement types', href: '/documents' },
+                { stat: '40+', label: 'Agreement types', href: '/documents' },
                 { stat: '100%', label: 'Canadian compliant', href: '/about' },
                 { stat: 'From $49', label: 'Per customization', href: '/pricing' },
               ].map((item, i) => (
-                <Link key={i} href={item.href} className="text-center group">
-                  <div className="font-serif text-2xl sm:text-3xl text-neutral-900 mb-1 group-hover:text-[#be123c] transition-colors">{item.stat}</div>
-                  <p className="text-[13px] text-neutral-400 tracking-wide uppercase">{item.label}</p>
+                <Link key={i} href={item.href} className="text-center group p-5 sm:p-6 rounded-2xl border border-neutral-100 bg-white hover:border-[#be123c]/20 hover:shadow-[0_4px_24px_rgba(190,18,60,0.05)] transition-all duration-400">
+                  <div className="font-serif text-2xl sm:text-3xl md:text-[2.25rem] text-neutral-900 mb-2 group-hover:text-[#be123c] transition-colors duration-300 tracking-tight">{item.stat}</div>
+                  <p className="text-[12px] sm:text-[13px] text-neutral-400 tracking-[0.15em] uppercase font-medium">{item.label}</p>
                 </Link>
               ))}
             </div>
@@ -655,20 +669,28 @@ export default function Home() {
       </section>
 
       {/* ═══ FINAL CTA ═══ */}
-      <section className="px-6 py-20 sm:py-28 md:py-36 border-t border-neutral-100">
+      <section className="px-6 py-20 sm:py-28 md:py-36 border-t border-neutral-100 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-white via-[#be123c]/[0.015] to-white pointer-events-none" />
         <FadeIn>
-          <div className="max-w-xl mx-auto text-center">
+          <div className="relative max-w-xl mx-auto text-center">
             <h2 className="font-serif text-3xl md:text-[2.75rem] text-neutral-900 tracking-tight leading-[1.1] mb-6">
               Stop waiting weeks.<br />Start drafting now.
             </h2>
             <p className="text-[15px] sm:text-[16px] text-neutral-500 mb-10 leading-[1.7]">
-              27 agreement types. Six practice areas. Instant delivery.<br className="hidden md:block" /> Add a licensed Canadian lawyer review for any agreement.
+              40+ agreement types. Six practice areas. Instant delivery.<br className="hidden md:block" /> Add a licensed Canadian lawyer review for any agreement.
             </p>
-            <Link href="/documents" className="inline-flex items-center gap-2.5 bg-[#be123c] hover:bg-[#9f1239] text-white text-[14px] sm:text-[15px] font-medium tracking-wide px-8 sm:px-10 py-4 rounded-md transition-all duration-200 hover:shadow-[0_4px_16px_rgba(190,18,60,0.2)] hover:-translate-y-px active:translate-y-0">
+            <Link href="/documents" className="group inline-flex items-center gap-2.5 bg-[#be123c] hover:bg-[#9f1239] text-white text-[14px] sm:text-[15px] font-medium tracking-wide px-8 sm:px-10 py-4 rounded-lg transition-all duration-300 hover:shadow-[0_8px_30px_rgba(190,18,60,0.25)] hover:-translate-y-0.5 active:translate-y-0">
               Draft Your First Agreement
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              <svg className="group-hover:translate-x-0.5 transition-transform duration-300" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </Link>
-            <p className="text-[13px] text-neutral-400 mt-6 tracking-wide uppercase">Canada&rsquo;s first AI-native law firm · Licensed &amp; regulated · No retainer required</p>
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-8">
+              {['Canada\u2019s first AI-native law firm', 'Licensed & regulated', 'No retainer required'].map((text) => (
+                <div key={text} className="flex items-center gap-2 text-[12px] sm:text-[13px] text-neutral-400">
+                  <svg className="h-3.5 w-3.5 text-[#be123c]/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  {text}
+                </div>
+              ))}
+            </div>
           </div>
         </FadeIn>
       </section>

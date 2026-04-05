@@ -14,17 +14,21 @@ interface RateLimitEntry {
 
 const rateLimitMap = new Map<string, RateLimitEntry>();
 
-// Periodically prune stale entries so the map doesn't grow unbounded
-setInterval(() => {
+// Prune stale entries lazily during rate limit checks
+let lastPrune = Date.now();
+function pruneIfNeeded() {
   const now = Date.now();
+  if (now - lastPrune < RATE_LIMIT_WINDOW_MS) return;
+  lastPrune = now;
   for (const [key, entry] of rateLimitMap) {
     if (now >= entry.resetAt) {
       rateLimitMap.delete(key);
     }
   }
-}, RATE_LIMIT_WINDOW_MS);
+}
 
 function isRateLimited(ip: string): { limited: boolean; retryAfterSec: number } {
+  pruneIfNeeded();
   const now = Date.now();
   const entry = rateLimitMap.get(ip);
 

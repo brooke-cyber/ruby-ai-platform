@@ -19,6 +19,23 @@ interface LendingData { loanAmount: string; interestRateType: string; interestRa
 interface RiskProfile { tolerance: string; priorities: string[]; context: string; experience: string; }
 interface InfluencerData { platforms: string[]; contentTypes: string[]; campaignDuration: string; postFrequency: string; hasUsAudience: boolean; usAudiencePercent: string; isRegulatedIndustry: boolean; regulatedCategory: string; collectsPersonalData: boolean; usesAiContent: boolean; hasQuebecAudience: boolean; compensationModel: string; compensationAmount: string; paymentSchedule: string; performanceMetrics: boolean; metricType: string; metricTarget: string; contentApproval: string; approvalDays: string; revisionRounds: string; ipOwnership: string; usageRightsScope: string; usageRightsDuration: string; exclusivity: boolean; exclusivityScope: string; exclusivityDuration: string; moralsClauseScope: string; terminationNotice: string; terminationForCause: string[]; whitelisting: boolean; whitelistingScope: string; boostingRights: boolean; }
 
+// Province-specific employment legislation names for contextual display
+const PROVINCE_EMPLOYMENT_LAW: Record<string, { act: string; shortName: string; minVacation: string; minNotice: string }> = {
+  "ontario": { act: "Employment Standards Act, 2000 (ESA)", shortName: "ESA", minVacation: "2 weeks (3 weeks after 5 years)", minNotice: "1–8 weeks based on tenure" },
+  "british-columbia": { act: "Employment Standards Act (RSBC 1996)", shortName: "BC ESA", minVacation: "2 weeks (3 weeks after 5 years)", minNotice: "1–8 weeks based on tenure" },
+  "alberta": { act: "Employment Standards Code (RSA 2000)", shortName: "AB ESC", minVacation: "2 weeks (3 weeks after 5 years)", minNotice: "1–8 weeks based on tenure" },
+  "quebec": { act: "Act Respecting Labour Standards (CQLR c N-1.1)", shortName: "LSA / Normes du travail", minVacation: "2 weeks (3 weeks after 3 years)", minNotice: "1–8 weeks based on tenure" },
+  "manitoba": { act: "Employment Standards Code (CCSM c E110)", shortName: "MB ESC", minVacation: "2 weeks (3 weeks after 5 years)", minNotice: "1–8 pay periods" },
+  "saskatchewan": { act: "Saskatchewan Employment Act (SS 2013)", shortName: "SK EA", minVacation: "3 weeks (4 weeks after 10 years)", minNotice: "1–8 weeks based on tenure" },
+  "nova-scotia": { act: "Labour Standards Code (RSNS 1989)", shortName: "NS LSC", minVacation: "2 weeks", minNotice: "1–8 weeks based on tenure" },
+  "new-brunswick": { act: "Employment Standards Act (SNB 1982)", shortName: "NB ESA", minVacation: "2 weeks", minNotice: "2 weeks (after 6 months)" },
+  "pei": { act: "Employment Standards Act (RSPEI 1988)", shortName: "PEI ESA", minVacation: "2 weeks (3 weeks after 8 years)", minNotice: "2 weeks" },
+  "newfoundland": { act: "Labour Standards Act (RSNL 1990)", shortName: "NL LSA", minVacation: "2 weeks", minNotice: "1–2 weeks based on tenure" },
+  "northwest-territories": { act: "Employment Standards Act (SNWT 2007)", shortName: "NWT ESA", minVacation: "2 weeks (3 weeks after 10 years)", minNotice: "2 weeks" },
+  "yukon": { act: "Employment Standards Act (RSY 2002)", shortName: "YK ESA", minVacation: "2 weeks", minNotice: "1–4 weeks based on tenure" },
+  "nunavut": { act: "Labour Standards Act (RSNWT 1988)", shortName: "NU LSA", minVacation: "2 weeks (3 weeks after 6 years)", minNotice: "2 weeks" },
+};
+
 const RESERVED_MATTERS_OPTIONS = [
   "Dividend policy", "Debt issuance above threshold", "Related-party transactions",
   "Share issuance or dilution", "Material contracts", "Winding up or dissolution",
@@ -215,11 +232,8 @@ function GenerationProgress({ isActive }: { isActive: boolean }) {
 function StepHeader({ title, subtitle }: { title: string; subtitle: string }) {
   return (
     <div className="mb-8">
-      <div className="flex items-center gap-3 mb-1">
-        <h2 className="text-2xl font-bold font-serif text-neutral-900 leading-tight">{title}</h2>
-        <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-neutral-400 border border-neutral-200 rounded-full px-2.5 py-0.5">Layer 1</span>
-      </div>
-      <p className="text-[14px] text-neutral-500 mt-2">{subtitle}</p>
+      <h2 className="text-2xl font-bold font-serif text-neutral-900 leading-tight">{title}</h2>
+      <p className="text-[14px] text-neutral-500 mt-2 leading-relaxed">{subtitle}</p>
     </div>
   );
 }
@@ -243,6 +257,11 @@ export default function WizardPage() {
   const [platform, setPlatform] = useState<PlatformData>({ businessType: "saas", platformUrl: "", hasUserAccounts: true, collectsPersonalInfo: true, hasEcommerce: false, hasUGC: false, operatesInQuebec: false, hasInternationalUsers: false, acceptanceMechanism: "clickwrap", disputeResolution: "arbitration", dataStorage: "canada", partnershipType: "general", profitSplit: "equal", managementStructure: "all-partners", msaPaymentTerms: "net-30", msaIpOwnership: "client-owns", ageRestriction: false, cookieConsent: "banner", contentModeration: "post-moderation", apiAccess: false, rateLimiting: true, accountSuspensionRights: true, classActionWaiver: false, dataCategories: ["names-contact"], dataRetentionPeriod: "2-years", thirdPartyProcessors: false, crossBorderTransfers: false, crossBorderCountries: "", breachNotificationHours: "72", cookieCategories: ["necessary"], privacyOfficerDesignated: false, dataSubjectRights: ["access", "rectification", "deletion"], automatedDecisionMaking: false, childrenDataCollection: false, biometricData: false, consentMechanism: "opt-in", dataMinimization: true, pipedaCompliant: true, quebecLaw25Compliant: false, userRegistrationRequired: true, paymentProcessing: "stripe", refundPolicy: "pro-rata", autoRenewalDisclosure: false, autoRenewalPeriod: "monthly", governingLaw: "ontario", liabilityCapType: "fees-based", liabilityCapAmount: "", indemnificationScope: "mutual", dmcaTakedown: false, accessibilityCompliance: false, sowTemplate: true, changeOrderProcess: "formal-written", acceptanceCriteria: "written-signoff", warrantyPeriod: "90-days", insuranceRequirements: [], backgroundChecks: false, subcontractingAllowed: false, exitTransitionPeriod: "30-days", dataReturnOnTermination: true, performanceMetrics: false, escalationProcess: "internal-executive-mediation-arbitration" });
   const [lending, setLending] = useState<LendingData>({ loanAmount: "", interestRateType: "fixed", interestRate: "", loanTerm: "", repaymentSchedule: "monthly", secured: false, collateralDescription: "", prepaymentPenalty: false, financialCovenants: [], reportingRequirements: "quarterly", eventsOfDefault: ["payment-default"], curePeriod: "30", defaultInterestPremium: "" });
   const [riskProfile, setRiskProfile] = useState<RiskProfile>({ tolerance: "balanced", priorities: [], context: "", experience: "first-time" });
+  const [showAccountGate, setShowAccountGate] = useState(false);
+  const [accountEmail, setAccountEmail] = useState("");
+  const [accountName, setAccountName] = useState("");
+  const [accountPassword, setAccountPassword] = useState("");
+  const [accountCreating, setAccountCreating] = useState(false);
   const [influencer, setInfluencer] = useState<InfluencerData>({ platforms: ["instagram"], contentTypes: ["photo"], campaignDuration: "3-months", postFrequency: "weekly", hasUsAudience: false, usAudiencePercent: "0", isRegulatedIndustry: false, regulatedCategory: "", collectsPersonalData: false, usesAiContent: false, hasQuebecAudience: false, compensationModel: "flat-fee", compensationAmount: "", paymentSchedule: "on-delivery", performanceMetrics: false, metricType: "", metricTarget: "", contentApproval: "brand-pre-approval", approvalDays: "3", revisionRounds: "2", ipOwnership: "brand-owns-license", usageRightsScope: "all-channels", usageRightsDuration: "campaign-plus-12", exclusivity: false, exclusivityScope: "", exclusivityDuration: "campaign-only", moralsClauseScope: "mutual", terminationNotice: "30", terminationForCause: [], whitelisting: false, whitelistingScope: "", boostingRights: false });
 
   useEffect(() => {
@@ -261,6 +280,13 @@ export default function WizardPage() {
   const hasPlatform = categories.includes("platform");
   const hasCreator = categories.includes("creator");
 
+  // Auto-sync platform governing law with selected jurisdiction
+  useEffect(() => {
+    if (hasPlatform && party.jurisdiction) {
+      setPlatform((prev) => ({ ...prev, governingLaw: party.jurisdiction }));
+    }
+  }, [party.jurisdiction, hasPlatform]);
+
   // Agreement-specific configurations
   const selectedIds = items.map((a) => a.id);
   const hasInfluencer = selectedIds.includes("influencer-agreement");
@@ -268,57 +294,60 @@ export default function WizardPage() {
   const agreementClausePositions = useMemo(() => getClausePositions(selectedIds), [selectedIds]);
   const [clauseSelections, setClauseSelections] = useState<Record<string, string>>({});
 
-  const questions = useMemo(() => getQuestionsForCategories(categories), [categories]);
+  const questions = useMemo(() => getQuestionsForCategories(categories, selectedIds), [categories, selectedIds]);
   const { activeModules, warnings } = useMemo(
     () => evaluateCompliance(categories, party.jurisdiction, triggerAnswers),
     [categories, party.jurisdiction, triggerAnswers]
   );
 
   const steps = useMemo(() => {
+    // Psychological flow: who → what → details → strategy → compliance → review
     const s: { id: string; label: string }[] = [
-      { id: "party", label: "Party Information" },
-      { id: "risk-profile", label: "Your Risk Profile" },
-      { id: "compliance", label: "Compliance Check" },
+      { id: "party", label: "Who's Involved" },
     ];
 
-    // Use agreement-specific wizard steps instead of generic category-based ones
+    // Use agreement-specific wizard steps — the core "what" of the deal
     const neededSteps = getWizardSteps(selectedIds);
     const STEP_LABELS: Record<string, string> = {
       "emp-comp": "Compensation & Benefits",
-      "emp-clause": "Clause Positions",
+      "emp-clause": "Employment Terms",
       "emp-covenant": "Restrictive Covenants",
-      "emp-ip": "IP Assignment",
-      "corp-shareholders": "Shareholder Structure",
-      "corp-governance": "Governance Provisions",
+      "emp-ip": "IP Ownership",
+      "corp-shareholders": "Ownership Structure",
+      "corp-governance": "Governance & Voting",
       "corp-transfer": "Transfer Restrictions",
       "corp-deadlock": "Deadlock & Exit",
-      "inv-terms": "Investment Terms",
+      "inv-terms": "Deal Terms",
       "inv-conversion": "Conversion Mechanics",
       "inv-info": "Information Rights",
       "inv-lending": "Loan Terms",
       "inv-covenants": "Covenants & Default",
-      "com-service": "Service Definition",
+      "com-service": "Service Scope",
       "com-sla": "Service Levels",
       "com-data": "Data & Privacy",
-      "com-liability": "Liability",
-      "plat-business": "Business & Platform",
-      "plat-privacy": "Privacy & Data Protection",
-      "plat-terms": "Terms & Privacy",
-      "plat-structure": "Partnership / MSA",
-      "inf-campaign": "Campaign & Platforms",
+      "com-liability": "Liability & Risk",
+      "plat-business": "Platform Details",
+      "plat-privacy": "Privacy & Data",
+      "plat-terms": "Terms & Policies",
+      "plat-structure": "Structure & Roles",
+      "inf-campaign": "Campaign Details",
       "inf-deliverables": "Content & Approval",
-      "inf-rights": "IP, Exclusivity & Rights",
-      "inf-terms": "Compensation & Termination",
-      "inf-compliance": "Disclosure & Compliance",
+      "inf-rights": "Rights & Exclusivity",
+      "inf-terms": "Payment & Terms",
+      "inf-compliance": "Disclosure Rules",
     };
     for (const stepId of neededSteps) {
       s.push({ id: stepId, label: STEP_LABELS[stepId] || stepId });
     }
 
-    // Add agreement-specific clause positions step if there are any
+    // Agreement strategy (clause positions) — after they understand the deal
     if (agreementClausePositions.length > 0) {
-      s.push({ id: "agreement-clauses", label: "Agreement Strategy" });
+      s.push({ id: "agreement-clauses", label: "Your Strategy" });
     }
+
+    // Risk profile and compliance — after all details, before final review
+    s.push({ id: "risk-profile", label: "Risk Preferences" });
+    s.push({ id: "compliance", label: "Compliance Scan" });
 
     s.push({ id: "review", label: "Review & Generate" });
     return s;
@@ -396,7 +425,7 @@ export default function WizardPage() {
       sessionStorage.setItem("ruby-draft", draft);
       sessionStorage.setItem("ruby-contract-type", categories.join(","));
       sessionStorage.setItem("ruby-contract-title", items.map((i) => i.title).join(", "));
-      router.push("/preview");
+      setShowAccountGate(true);
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") {
         setError("Generation timed out. Please try again.");
@@ -413,7 +442,7 @@ export default function WizardPage() {
     switch (currentStepId) {
       case "party": return (
         <div className="space-y-6">
-          <StepHeader title="Party Information" subtitle="Identify the parties and governing jurisdiction for your agreement." />
+          <StepHeader title="Who's involved?" subtitle="Tell us the parties and where this agreement will be governed. Everything else flows from here." />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
             <label className="block"><span className={labelClass}>{partyLabels.partyALabel}</span><input type="text" value={party.partyA} onChange={(e) => setParty({ ...party, partyA: e.target.value })} placeholder={partyLabels.partyAPlaceholder} className={inputClass} /></label>
             <label className="block"><span className={labelClass}>{partyLabels.partyBLabel}</span><input type="text" value={party.partyB} onChange={(e) => setParty({ ...party, partyB: e.target.value })} placeholder={partyLabels.partyBPlaceholder} className={inputClass} /></label>
@@ -428,7 +457,7 @@ export default function WizardPage() {
 
       case "compliance": return (
         <div className="space-y-6">
-          <StepHeader title="Compliance Check" subtitle="Answer these questions so we can automatically include the right legal protections. If you're unsure, it's safer to say yes — we'll handle the rest." />
+          <StepHeader title="Compliance scan" subtitle="Quick yes/no questions so Ruby can automatically include the right legal protections. If you're unsure, say yes — we'll cover you." />
           <div className="space-y-3">
             {questions.map((q) => (
               <div key={q.id} className="flex items-center justify-between rounded-xl border border-neutral-200 p-5 transition-colors hover:bg-neutral-50">
@@ -456,9 +485,20 @@ export default function WizardPage() {
         </div>
       );
 
-      case "emp-comp": return (
+      case "emp-comp": {
+        const provLaw = PROVINCE_EMPLOYMENT_LAW[party.jurisdiction];
+        return (
         <div className="space-y-6">
           <StepHeader title="Compensation & Benefits" subtitle="Core employment terms, compensation structure, bonuses, and allowances." />
+          {provLaw && (
+            <div className="rounded-xl border border-blue-100 bg-blue-50/40 p-4 flex items-start gap-3">
+              <svg className="w-5 h-5 text-blue-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <div>
+                <p className="text-sm font-medium text-blue-900">Governed by {provLaw.act}</p>
+                <p className="text-[13px] text-blue-700 mt-0.5">Minimum vacation: {provLaw.minVacation} · Minimum notice: {provLaw.minNotice}. Ruby will ensure your agreement meets or exceeds these statutory minimums.</p>
+              </div>
+            </div>
+          )}
           <p className="text-[13px] font-medium uppercase tracking-[0.12em] text-neutral-500">Position Details</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
             <label className="block"><span className={labelClass}>Position Title</span><input type="text" value={employment.positionTitle} onChange={(e) => setEmployment({ ...employment, positionTitle: e.target.value })} placeholder="Senior Software Engineer" className={inputClass} /></label>
@@ -580,11 +620,14 @@ export default function WizardPage() {
           </div>
         </div>
       );
+      }
 
-      case "emp-clause": return (
+      case "emp-clause": {
+        const provLaw = PROVINCE_EMPLOYMENT_LAW[party.jurisdiction];
+        return (
         <div className="space-y-6">
           <StepHeader title="Clause Positions" subtitle="Choose how strongly each clause protects you vs. the other party. Left favours your company, middle is fair to both sides, right favours the employee." />
-          {[{ id: "terminationPosition" as const, label: "Termination Without Cause", help: "If you fire someone without a specific reason, how much severance do they get? 'ESA minimum' is the legal minimum. 'Enhanced formula' adds extra based on years worked. 'Full continuation' pays their full salary for a set period.", ef: "ESA minimum only", bal: "ESA-Plus enhanced formula", ep: "Full compensation continuation" }, { id: "probationPosition" as const, label: "Probation Period", help: "A trial period at the start of employment. During probation, you can let someone go more easily. Longer probation favours the employer, shorter or none favours the employee.", ef: "Maximum probation (6 months)", bal: "Standard probation (3 months)", ep: "No probation period" }].map((clause) => (
+          {[{ id: "terminationPosition" as const, label: "Termination Without Cause", help: `If you fire someone without a specific reason, how much severance do they get? '${provLaw?.shortName || "ESA"} minimum' is the legal minimum. 'Enhanced formula' adds extra based on years worked. 'Full continuation' pays their full salary for a set period.`, ef: `${provLaw?.shortName || "ESA"} minimum only`, bal: `${provLaw?.shortName || "ESA"}-Plus enhanced formula`, ep: "Full compensation continuation" }, { id: "probationPosition" as const, label: "Probation Period", help: "A trial period at the start of employment. During probation, you can let someone go more easily. Longer probation favours the employer, shorter or none favours the employee.", ef: "Maximum probation (6 months)", bal: "Standard probation (3 months)", ep: "No probation period" }].map((clause) => (
             <div key={clause.id} className="rounded-xl border border-neutral-200 p-5">
               <p className="text-sm font-semibold text-neutral-900 mb-4">{clause.label} {clause.help && <HelpTip text={clause.help} />}</p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -609,13 +652,16 @@ export default function WizardPage() {
               </select>
             </label>
           </div>
-          <label className="block"><span className={labelClass}>Probation Period (months) <HelpTip text="The initial trial period during which termination obligations are reduced. During probation, the employer can end the relationship with minimal notice. Standard is 3 months; maximum is typically 6 months under ESA." /></span><input type="number" value={employment.probationMonths} onChange={(e) => setEmployment({ ...employment, probationMonths: e.target.value })} placeholder="3" className={inputClass} /></label>
+          <label className="block"><span className={labelClass}>Probation Period (months) <HelpTip text={`The initial trial period during which termination obligations are reduced. During probation, the employer can end the relationship with minimal notice. Standard is 3 months; maximum is typically 6 months under ${provLaw?.shortName || "ESA"}.`} /></span><input type="number" value={employment.probationMonths} onChange={(e) => setEmployment({ ...employment, probationMonths: e.target.value })} placeholder="3" className={inputClass} /></label>
         </div>
       );
+      }
 
-      case "emp-covenant": return (
+      case "emp-covenant": {
+        const provName = JURISDICTIONS.find((j) => j.id === party.jurisdiction)?.name || party.jurisdiction;
+        return (
         <div className="space-y-5">
-          <StepHeader title="Restrictive Covenants" subtitle="These clauses protect your business after someone leaves. Toggle on the protections you want — we'll draft them to be enforceable in your province." />
+          <StepHeader title="Restrictive Covenants" subtitle={`These clauses protect your business after someone leaves. Toggle on the protections you want — Ruby will draft them to be enforceable in ${provName}.`} />
           <div className="rounded-xl border border-neutral-200 p-5">
             <div className="flex items-center justify-between">
               <div><p className="text-sm font-medium text-neutral-900">Confidentiality Clause <HelpTip text="A confidentiality clause legally prevents the employee from sharing your company's trade secrets, client lists, pricing, and other sensitive information — both during and after employment. This is the most enforceable type of restrictive covenant." /></p><p className="text-[14px] text-neutral-400 mt-0.5">Prevents them from sharing your company's private information, client lists, or trade secrets</p></div>
@@ -672,6 +718,7 @@ export default function WizardPage() {
           </div>
         </div>
       );
+      }
 
       case "emp-ip": return (
         <div className="space-y-6">
@@ -882,9 +929,18 @@ export default function WizardPage() {
         </div>
       );
 
-      case "inv-terms": return (
+      case "inv-terms": {
+        const provName = JURISDICTIONS.find((j) => j.id === party.jurisdiction)?.name || party.jurisdiction;
+        return (
         <div className="space-y-6">
           <StepHeader title="Investment Terms" subtitle="Set the key numbers for your investment round. These determine how much the investor pays, and how their investment converts into shares later." />
+          <div className="rounded-xl border border-amber-100 bg-amber-50/40 p-4 flex items-start gap-3">
+            <svg className="w-5 h-5 text-amber-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
+            <div>
+              <p className="text-sm font-medium text-amber-900">Securities filings required in {provName}</p>
+              <p className="text-[13px] text-amber-700 mt-0.5">Private placements in {provName} require Form 45-106F1 filing with the provincial securities commission within 10 days of closing. Ruby will include the appropriate exemption language and disclosure requirements.</p>
+            </div>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
             <label className="block"><span className={labelClass}>Investment Amount (CAD)</span><input type="text" value={investment.investmentAmount} onChange={(e) => setInvestment({ ...investment, investmentAmount: e.target.value })} placeholder="$250,000" className={inputClass} /></label>
             <label className="block"><span className={labelClass}>Valuation Cap (CAD) <HelpTip text="The maximum company value used when calculating how many shares the investor gets. A lower cap is better for the investor." /></span><input type="text" value={investment.valuationCap} onChange={(e) => setInvestment({ ...investment, valuationCap: e.target.value })} placeholder="$5,000,000" className={inputClass} /></label>
@@ -947,6 +1003,7 @@ export default function WizardPage() {
           </div>
         </div>
       );
+      }
 
       case "inv-conversion": return (
         <div className="space-y-6">
@@ -1082,7 +1139,7 @@ export default function WizardPage() {
             </label>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-            <label className="block"><span className={labelClass}>Support Hours <HelpTip text="When your support team is available to respond to tickets and inquiries. Distinct from service availability -- this is human response availability." /></span>
+            <label className="block"><span className={labelClass}>Support Hours <HelpTip text="When your support team is available to respond to tickets and inquiries. Distinct from service availability — this is human response availability." /></span>
               <select value={commercial.supportHours} onChange={(e) => setCommercial({ ...commercial, supportHours: e.target.value })} className={inputClass}>
                 <option value="24-7">24/7 Support</option><option value="business-hours">Business Hours (Mon-Fri 9am-5pm)</option><option value="extended">Extended Hours (7am-11pm)</option>
               </select>
@@ -1146,12 +1203,12 @@ export default function WizardPage() {
             </select>
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-            <label className="block"><span className={labelClass}>Disaster Recovery RPO <HelpTip text="Recovery Point Objective -- the maximum acceptable amount of data loss measured in time. A 1-hour RPO means backups occur at least every hour, so at most 1 hour of data could be lost." /></span>
+            <label className="block"><span className={labelClass}>Disaster Recovery RPO <HelpTip text="Recovery Point Objective — the maximum acceptable amount of data loss measured in time. A 1-hour RPO means backups occur at least every hour, so at most 1 hour of data could be lost." /></span>
               <select value={commercial.disasterRecoveryRpo} onChange={(e) => setCommercial({ ...commercial, disasterRecoveryRpo: e.target.value })} className={inputClass}>
                 <option value="0h">0 hours (zero data loss)</option><option value="1h">1 hour</option><option value="4h">4 hours</option><option value="12h">12 hours</option><option value="24h">24 hours</option>
               </select>
             </label>
-            <label className="block"><span className={labelClass}>Disaster Recovery RTO <HelpTip text="Recovery Time Objective -- the maximum acceptable downtime after a disaster before service must be restored. Shorter RTOs require more redundancy and cost more." /></span>
+            <label className="block"><span className={labelClass}>Disaster Recovery RTO <HelpTip text="Recovery Time Objective — the maximum acceptable downtime after a disaster before service must be restored. Shorter RTOs require more redundancy and cost more." /></span>
               <select value={commercial.disasterRecoveryRto} onChange={(e) => setCommercial({ ...commercial, disasterRecoveryRto: e.target.value })} className={inputClass}>
                 <option value="1h">1 hour</option><option value="4h">4 hours</option><option value="8h">8 hours</option><option value="24h">24 hours</option><option value="72h">72 hours</option>
               </select>
@@ -1176,7 +1233,7 @@ export default function WizardPage() {
           <StepHeader title="Data & Privacy" subtitle="Privacy compliance, data classification, security certifications, breach response, and data lifecycle management." />
           <label className="block"><span className={labelClass}>Data Classification Level <HelpTip text="The sensitivity level of data being processed under this agreement. Higher classifications trigger stricter security controls, access restrictions, and handling requirements." /></span>
             <select value={commercial.dataClassification} onChange={(e) => setCommercial({ ...commercial, dataClassification: e.target.value })} className={inputClass}>
-              <option value="public">Public -- no restrictions on disclosure</option><option value="internal">Internal -- limited to authorized personnel</option><option value="confidential">Confidential -- business-sensitive, NDA-protected</option><option value="restricted">Restricted -- highest sensitivity (PII, financial, health)</option>
+              <option value="public">Public — no restrictions on disclosure</option><option value="internal">Internal — limited to authorized personnel</option><option value="confidential">Confidential — business-sensitive, NDA-protected</option><option value="restricted">Restricted — highest sensitivity (PII, financial, health)</option>
             </select>
           </label>
           {[{ key: "pipeda" as const, label: "PIPEDA Compliance", desc: "Federal privacy legislation for commercial activities" }, { key: "casl" as const, label: "CASL Compliance", desc: "Canada Anti-Spam Legislation for electronic messaging" }].map((item) => (
@@ -1219,7 +1276,7 @@ export default function WizardPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
-              { key: "crossBorderRestrictions" as const, label: "Cross-Border Data Transfer Restrictions", desc: "Limit data transfers outside Canada unless specific safeguards are in place -- critical for PIPEDA compliance and provincial privacy laws" },
+              { key: "crossBorderRestrictions" as const, label: "Cross-Border Data Transfer Restrictions", desc: "Limit data transfers outside Canada unless specific safeguards are in place — critical for PIPEDA compliance and provincial privacy laws" },
               { key: "subProcessorNotification" as const, label: "Sub-Processor Notification", desc: "Notify the customer before sharing their data with any new third-party service provider" },
               { key: "dataPortability" as const, label: "Data Portability on Termination", desc: "Customer can export all their data in a standard format when the agreement ends" },
               { key: "penetrationTesting" as const, label: "Regular Penetration Testing", desc: "Require the provider to conduct regular third-party penetration testing and share summary results" },
@@ -1615,7 +1672,7 @@ export default function WizardPage() {
 
       case "risk-profile": return (
         <div className="space-y-6">
-          <StepHeader title="Your Risk Profile" subtitle="Help us understand your priorities so every clause is drafted to match how you think about risk — not a generic template." />
+          <StepHeader title="How aggressive should we be?" subtitle="This shapes every clause — from termination rights to liability caps. There's no wrong answer, just your preference." />
           <div className="rounded-xl border border-neutral-200 p-6 space-y-2">
             <p className="text-sm font-semibold text-neutral-900">How much risk are you comfortable taking?</p>
             <p className="text-[14px] text-neutral-400 mb-4">This shapes every clause in your agreement — from termination rights to liability caps.</p>
@@ -1978,7 +2035,7 @@ export default function WizardPage() {
 
       case "review": return (
         <div className="space-y-6">
-          <StepHeader title="Review & Generate" subtitle="Review your selections and generate the draft." />
+          <StepHeader title="Almost done" subtitle="Review your details below, then hit generate. Ruby will draft your agreement in under 60 seconds." />
           <div className="rounded-xl bg-white border border-neutral-200 p-6 space-y-4">
             {[
               ["Parties", `${party.partyA || "—"} / ${party.partyB || "—"}`],
@@ -2153,6 +2210,54 @@ export default function WizardPage() {
           )}
         </div>
       </div>
+
+      {/* ── Account Creation Gate (after generation) ── */}
+      {showAccountGate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 animate-fade-slide-in">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-emerald-50 mb-4">
+                <svg className="h-7 w-7 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h2 className="font-serif text-2xl font-bold text-neutral-900">Your agreement is ready!</h2>
+              <p className="text-neutral-500 mt-2 text-[15px] leading-relaxed">Create a free Ruby account to access your draft, track revisions, and communicate with your lawyer.</p>
+            </div>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              setAccountCreating(true);
+              setTimeout(() => {
+                setAccountCreating(false);
+                setShowAccountGate(false);
+                router.push("/preview");
+              }, 1000);
+            }} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1.5">Full Name</label>
+                <input type="text" value={accountName} onChange={(e) => setAccountName(e.target.value)} placeholder="Jane Smith" required className="w-full rounded-lg border border-neutral-200 px-4 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#be123c]/20 focus:border-[#be123c] transition-all" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1.5">Email</label>
+                <input type="email" value={accountEmail} onChange={(e) => setAccountEmail(e.target.value)} placeholder="you@company.com" required className="w-full rounded-lg border border-neutral-200 px-4 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#be123c]/20 focus:border-[#be123c] transition-all" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1.5">Password</label>
+                <input type="password" value={accountPassword} onChange={(e) => setAccountPassword(e.target.value)} placeholder="Create a password (min. 8 characters)" required minLength={8} className="w-full rounded-lg border border-neutral-200 px-4 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#be123c]/20 focus:border-[#be123c] transition-all" />
+              </div>
+              <button type="submit" disabled={accountCreating} className="w-full bg-[#be123c] text-white rounded-lg py-3 text-sm font-semibold hover:bg-[#9f1239] disabled:opacity-60 disabled:cursor-not-allowed transition-all">
+                {accountCreating ? (
+                  <span className="inline-flex items-center gap-2">
+                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                    Creating account...
+                  </span>
+                ) : 'Create Account & View Draft'}
+              </button>
+              <p className="text-[12px] text-neutral-400 text-center mt-2">By creating an account you agree to Ruby Law&apos;s Terms of Service</p>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
